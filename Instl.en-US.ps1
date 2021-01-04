@@ -3,8 +3,8 @@
 #
 #    Author: Yi ( https://fengyi.tel )
 #
-#    From: Yi Solution Suite For MSWin Bundled Kit
-#    buildstring: 2.0.0.2.bk_release.201025-1208
+#    From: Yi Solution Suite
+#    buildstring: 5.0.1.0.bk_release.210120-1208
 #
 #
 #    Description:
@@ -20,7 +20,11 @@
 #    Prerequisites
 #      - PowerShell 5.1 or PowerShellCore 7.03 higher
 #
+#    Learn or download:
+#    https://github.com/ilikeyi/powershell.install.software
+#
 
+# Get the script parameters if there are any
 [CmdletBinding()]
 param(
     [parameter(Mandatory = $false, HelpMessage = "Forced operation.")]
@@ -34,17 +38,17 @@ $app = @(
      [PP]::Wait,
      [FileType]::zip,
      "AIO Repack for Microsoft Visual C++ Redistributable Runtimes",
-     "$env:SystemDrive\Bundled Kit\00\AIO",
+     "$env:SystemDrive\Yi\00\AIO",
      "VisualCppRedist_AIO_x86_x64",
-     "VisualCppRedist_AIO_x86_x64_38",
-     "https://github.com/abbodi1406/vcredist/releases/download/v0.38.0/",
-     "/aiA /gm2"),
+     "VisualCppRedist_AIO_x86_x64_40",
+     "https://github.com/abbodi1406/vcredist/releases/download/v0.40.0/",
+     "/y"),
     ([Status]::Disable,
      [Action]::Install,
      [PP]::Wait,
      [FileType]::exe,
      "Gpg4win",
-     "$env:SystemDrive\Bundled Kit\00\AIO",
+     "$env:SystemDrive\Yi\00\AIO",
      "gpg4win-3.1.13",
      "gpg4win-3.1.13",
      "https://files.gpg4win.org/",
@@ -54,7 +58,7 @@ $app = @(
      [PP]::Wait,
      [FileType]::exe,
      "Python",
-     "$env:SystemDrive\Bundled Kit\00\AIO",
+     "$env:SystemDrive\Yi\00\AIO",
      "python-3.8.5",
      "python-3.8.5",
      "https://www.python.org/ftp/python/3.8.5/",
@@ -64,7 +68,7 @@ $app = @(
      [PP]::Wait,
      [FileType]::exe,
       "Nvidia",
-      "$env:SystemDrive\Bundled Kit\00\Drive",
+      "$env:SystemDrive\Yi\00\Drive",
       "451.67-desktop-win10-64bit-international-dch-whql",
       "451.67-desktop-win10-64bit-international-dch-whql",
       "https://cn.download.nvidia.com/Windows/451.67/",
@@ -74,7 +78,7 @@ $app = @(
      [PP]::Wait,
      [FileType]::exe,
      "kugou music",
-     "$env:SystemDrive\Bundled Kit\00\Music video",
+     "$env:SystemDrive\Yi\00\V",
      "kugou9144",
      "kugou9144",
      "http://downmini.kugou.com/web/",
@@ -84,7 +88,7 @@ $app = @(
      [PP]::Wait,
      [FileType]::exe,
      "NetEase Cloud Music",
-     "$env:SystemDrive\Bundled Kit\00\Music video",
+     "$env:SystemDrive\Yi\00\V",
      "cloudmusicsetup2.7.3.198319",
      "cloudmusicsetup2.7.3.198319",
      "https://d1.music.126.net/dmusic/",
@@ -94,7 +98,7 @@ $app = @(
      [PP]::Fast,
      [FileType]::exe,
      "QQ Music",
-     "$env:SystemDrive\Bundled Kit\00\Music video",
+     "$env:SystemDrive\Yi\00\V",
      "QQMusicSetup",
      "QQMusicSetup",
      "https://dldir1.qq.com/music/clntupate/",
@@ -104,7 +108,7 @@ $app = @(
      [PP]::Wait,
      [FileType]::exe,
      "Tencent QQ 2020",
-     "$env:SystemDrive\Bundled Kit\00\Chat Tools",
+     "$env:SystemDrive\Yi\00\C",
      "PCQQ2020",
      "PCQQ2020",
      "https://down.qq.com/qqweb/PCQQ/PCQQ_EXE/",
@@ -114,7 +118,7 @@ $app = @(
      [PP]::Wait,
      [FileType]::exe,
      "WeChat",
-     "$env:SystemDrive\Bundled Kit\00\Chat Tools",
+     "$env:SystemDrive\Yi\00\C",
      "WeChatSetup",
      "WeChatSetup",
      "https://dldir1.qq.com/weixin/Windows/",
@@ -149,7 +153,18 @@ Enum FileType
 }
 
 function Get-Version {
-    param($status,$act,$pp,$types,$appname,$folder,$filename,$packer,$url,$param)
+    param(
+        $status,
+        $act,
+        $pp,
+        $types,
+        $appname,
+        $folder,
+        $filename,
+        $packer,
+        $url,
+        $param
+    )
     $url = $url + $packer + "." + $types
     $output = $folder + "\" + $filename+"." + $types
     $outputfoldoer = $folder + "\"
@@ -208,7 +223,7 @@ function Get-Version {
                     {
                         Unzip {
                             if ((Test-Path $output -PathType Leaf)) {
-                                Write-Host "   Unzip only...."
+                                Write-Host "    - Unzip only...."
                                 Expand-Archive -LiteralPath $output -DestinationPath $outputfoldoer -force
 
                                 # Delete the ZIP file after decompression
@@ -218,7 +233,7 @@ function Get-Version {
                         }
                         Install {
                             if ((Test-Path $output -PathType Leaf)) {
-                                Write-Host "   Run after decompression..."
+                                Write-Host "    - Run after decompression..."
                                 Expand-Archive -LiteralPath $output -DestinationPath $outputfoldoer -force
 
                                 # Delete the ZIP file after decompression
@@ -233,14 +248,14 @@ function Get-Version {
                 }
                 else
                 {
-                    Write-Host "   Locally exist: $tmpnewpathzip"
+                    Write-Host "    - Locally exist: $tmpnewpathzip"
                     Switch ($act)
                     {
                         Unzip {
                             if ((Test-Path $output -PathType Leaf)) {
-                                Write-Host "   Unzip Only"
+                                Write-Host "    - Unzip Only"
                                 Expand-Archive -LiteralPath $output -DestinationPath $outputfoldoer -force
-                                
+
                                 # Delete the ZIP file after decompression
                                 if ((Test-Path $output)) { remove-item -path $output -force }
                                 return
@@ -248,7 +263,7 @@ function Get-Version {
                         }
                         Install {
                             if ((Test-Path $output -PathType Leaf)) {
-                                echo "   Unzip after install."
+                                Write-Host "   Unzip after install."
                                 Expand-Archive -LiteralPath $output -DestinationPath $outputfoldoer -force
     
                                 # Delete the ZIP file after decompression
@@ -301,14 +316,19 @@ function Get-Version {
 }
 
 function Get-RunApp {
-    param($filename,$param,$pp,$sel)
+    param(
+        $filename,
+        $param,
+        $pp,
+        $sel
+    )
 
     if ((Test-Path $filename -PathType Leaf))
     {
         Switch ($pp)
         {
             Fast {
-                Write-Host "   Quickly execute commands: $filename $param`n"
+                Write-Host "    - Quickly execute commands: $filename $param"
                 if ($param -eq ""){
                     switch ($sel)
                     {
@@ -328,7 +348,7 @@ function Get-RunApp {
                 }
             }
             Wait {
-                Write-Host "   Execute the command (waiting to end): $filename $param`n"
+                Write-Host "    - Execute the command (waiting to end): $filename $param"
                 if ($param -eq ""){
                     switch ($sel)
                     {
@@ -351,12 +371,14 @@ function Get-RunApp {
     }
     else
     {
-        Write-Host "   No installation files were found, please check the integrity: $filename ."
+        Write-Host "   No installation files were found, please check the integrity: $filename"
     }
 }
 
-Write-Host "`n   FYSuite Advanced panel v2.0
-   Author: Yi ( http://fengyi.tel )
+Write-Host "`n   Author: Yi ( http://fengyi.tel )
+
+   From: Yi Solution Suite
+   buildstring: 5.0.1.0.bk_release.210120-1208
 
    Install software ( List )
    ------------------------------------"
@@ -371,32 +393,66 @@ for ($i=0; $i -lt $app.Count; $i++) {
         }
     }
 }
-Write-Host "   ------------------------------------`n"
+Write-Host "   ------------------------------------"
+
+function Wait-Exit {
+    param(
+        [int]$wait
+    )
+    Write-Host "`n   Tip: The installation script will automatically exit after $wait seconds..." -ForegroundColor Red
+    Start-Sleep -s $wait
+    exit
+}
+
+function Install-start {
+    Write-Host "`n   Installing software..."
+    Write-Host "   ------------------------------------"
+    for ($i=0; $i -lt $app.Count; $i++) {
+        Get-Version -status $app[$i][0] -act $app[$i][1] -pp $app[$i][2] -types $app[$i][3] -appname $app[$i][4] -folder $app[$i][5] -filename $app[$i][6] -packer $app[$i][7] -url $app[$i][8] -param $app[$i][9]
+    }
+}
+
+function Process-other {
+    Write-Host "`n    Processing other:" -ForegroundColor Green
+
+    Write-Host "    - Delete redundant shortcuts"
+    Set-Location "$env:userprofile\Desktop\"
+    Remove-Item -Force -ErrorAction SilentlyContinue ".\Kleopatra.lnk" | Out-Null
+
+    Write-Host "    - Delete startup items"
+    Remove-ItemProperty -ErrorAction SilentlyContinue -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" -Name "Wechat" | Out-Null
+
+    Write-Host "    - Delete scheduled task"
+    Disable-ScheduledTask -TaskName GoogleUpdateTaskMachineCore -ErrorAction SilentlyContinue | Out-Null
+    Disable-ScheduledTask -TaskName GoogleUpdateTaskMachineUA -ErrorAction SilentlyContinue | Out-Null
+
+    Write-Host "    - Rename"
+    Set-Location "$env:public\Desktop\"
+    #Rename-Item -Path ".\Google Chrome.lnk" -NewName "New Browser.lnk" -ErrorAction SilentlyContinue | Out-Null
+}
 
 If ($Force) {
+    Install-start
+    Process-other
 } else {
-	Write-Host "   Press any key to start installation ...`n"
-	$x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+    Write-Host "   Do you want to install the above software?" -ForegroundColor Green
+
+    $caption="Please confirm before installing the software."
+    $message="Confirm the installation (Y), `ncancel the installation (N)."
+    $choices = @("&Yes","&No")        
+    $choicedesc = New-Object System.Collections.ObjectModel.Collection[System.Management.Automation.Host.ChoiceDescription] 
+    $choices | foreach  { $choicedesc.Add((New-Object "System.Management.Automation.Host.ChoiceDescription" -ArgumentList $_))} 
+    $prompt = $Host.ui.PromptForChoice($caption, $message, $choicedesc, 1)
+    Switch ($prompt)
+    {
+        0 {
+            Install-start
+            Process-other
+            Wait-Exit -wait 6
+        }
+        1 {
+            Write-Host "`n   Cancel the installation."
+            Wait-Exit -wait 2
+        }
+    }
 }
-
-Write-Host "   Installing software...
-   ------------------------------------"
-for ($i=0; $i -lt $app.Count; $i++) {
-    Get-Version -status $app[$i][0] -act $app[$i][1] -pp $app[$i][2] -types $app[$i][3] -appname $app[$i][4] -folder $app[$i][5] -filename $app[$i][6] -packer $app[$i][7] -url $app[$i][8] -param $app[$i][9]
-}
-Write-Host "   ------------------------------------`n"
-
-Write-Host "   Delete redundant shortcuts"
-Set-Location "$env:userprofile\Desktop\"
-Remove-Item -Force -ErrorAction SilentlyContinue ".\Kleopatra.lnk" | Out-Null
-
-Write-Host "   Delete startup items"
-Remove-ItemProperty -ErrorAction SilentlyContinue -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" -Name "Wechat" | Out-Null
-
-Write-Host "   Delete scheduled task"
-Disable-ScheduledTask -TaskName GoogleUpdateTaskMachineCore -ErrorAction SilentlyContinue | Out-Null
-Disable-ScheduledTask -TaskName GoogleUpdateTaskMachineUA -ErrorAction SilentlyContinue | Out-Null
-
-Write-Host "   Rename"
-Set-Location "$env:public\Desktop\"
-#Rename-Item -Path ".\Google Chrome.lnk" -NewName "New Browser.lnk" -ErrorAction SilentlyContinue | Out-Null
