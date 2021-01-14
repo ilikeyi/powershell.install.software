@@ -24,7 +24,8 @@
 # 如何创建
 # How to create
 
-([Status]::Disable,
+```
+$ ([Status]::Disable,
  [Action]::Install,
  [PP]::Wait,
  [FileType]::exe,
@@ -35,6 +36,7 @@
  "461.09-desktop-win10-64bit-international-dch-whql",
  "https://us.download.nvidia.com/Windows/461.09/",
  "-s -clean -noreboot -noeula"),
+```
 
 # How to create help:
 1. Target structure: "Yi\00\Drive"
