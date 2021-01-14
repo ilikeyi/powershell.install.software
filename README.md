@@ -39,17 +39,17 @@ $ ([Status]::Disable,
 ```
 
 # How to create help:
-1. Target structure: "Yi\00\Drive"
-2. Drive letter: After setting "auto", search from A to Z (full disk search, according to structure),
-Combine: [a-z]:\Yi\00\Drive
+* 1. Target structure: "Yi\00\Drive"
+* 2. Drive letter: After setting "auto", search from A to Z (full disk search, according to structure)
+* Combine: [a-z]:\Yi\00\Drive
 
-3. Drive letter: modify "auto" to "D",
-Specify absolute path D:\Yi\00\Drive
+* 3. Drive letter: modify "auto" to "D",
+* Specify absolute path D:\Yi\00\Drive
 
 # 帮助：
-1、目标结构："Yi\00\Drive"
-2、盘符：设置 "auto" 后，从 A 到 Z 盘搜索（全盘搜索，按结构），
-合并：[a-z]:\Yi\00\Drive
+* 1、目标结构："Yi\00\Drive"
+* 2、盘符：设置 "auto" 后，从 A 到 Z 盘搜索（全盘搜索，按结构），
+* 合并：[a-z]:\Yi\00\Drive
 
-3、盘符：修改 "auto" 为 "D"，
-指定绝对路径 D:\Yi\00\Drive
+* 3、盘符：修改 "auto" 为 "D"，
+* 指定绝对路径 D:\Yi\00\Drive
