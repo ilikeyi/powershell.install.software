@@ -1,10 +1,10 @@
-﻿#
+#
 #    警告：为防止更新后覆盖，请另存为后再修改。
 #
 #    Author: Yi ( https://fengyi.tel )
 #
-#    From: Yi Solution Suite
-#    buildstring: 5.1.0.0.bk_release.210120-1208
+#    From: Yi's Solution
+#    buildstring: 5.1.0.1.bk_release.210120-1208
 #
 #
 #    描述:
@@ -410,8 +410,8 @@ function Get-RunApp {
 cls
 Write-Host "`n   Author: Yi ( http://fengyi.tel )
 
-   From: Yi Solution Suite
-   buildstring: 5.1.0.0.bk_release.210120-1208
+   From: Yi's Solution
+   buildstring: 5.1.0.1.bk_release.210120-1208
 
    安装软件列表 ( 共 $($app.Count) 款 )
    ---------------------------------------------------"
