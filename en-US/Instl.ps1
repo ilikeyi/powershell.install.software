@@ -1,12 +1,6 @@
 #
 #    Warning: In order to prevent overwriting after updating, please save as and then modify.
 #
-#    Author: Yi ( https://fengyi.tel )
-#
-#    From: Yi Solution Suite
-#    buildstring: 5.1.0.0.bk_release.210120-1208
-#
-#
 #    Description:
 #
 #    You are welcome to use multifunctional installation scripts to install common software locally,
@@ -410,8 +404,8 @@ function Get-RunApp {
 cls
 Write-Host "`n   Author: Yi ( http://fengyi.tel )
 
-   From: Yi Solution Suite
-   buildstring: 5.1.0.0.bk_release.210120-1208
+   From: Yi's Solution
+   buildstring: 5.1.0.1.bk_release.210120-1208
 
    Installed software list ( total $($app.Count) items )
    ---------------------------------------------------"
