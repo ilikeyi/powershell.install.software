@@ -21,23 +21,7 @@
     先决条件：
       - PowerShell 5.1 或 PowerShellCore 7.03 更高
 
-# 如何使用
 # How to using
-
-```
-("Nvidia GEFORCE GAME READY DRIVER",                  # 软件包名称
- [Status]::Disable,                                   # 状态：Enable = 启用，Disable = 禁用
- [Action]::Install,                                   # 动作：Install = 安装，NoInst = 下载后不安装，Unzip = 下载后仅解压，To = 安装到目录
- [PP]::Wait,                                          # 运行方式：Wait = 等待运行结束，Fast = 直接运行
- [FileType]::exe,                                     # 文件类型：exe, zip，或自定义文件类型
- "auto",                                              # 盘符：Auto = 全盘搜索，A-Z = 指定盘符或自定义路径
- "安装包\驱动",                                        # 目录结构，例如：AUTO 改成 C，合并结果：C:\Yi\Apps\Drive
- "*-desktop-win10-*-international-dch-whql",          # 匹配文件名，支持模糊功能（*）
- "460.89-desktop-win10-64bit-international-dch-whql", # 网站下载绝对文件名，请勿填后缀
- "https://us.download.nvidia.cn/Windows/460.89/",     # 网站路径前缀，/ 号结尾
- "-s -clean -noreboot -noeula")
-```
-
 ```
 ("Nvidia GEFORCE GAME READY DRIVER",                  # Package name
  [Status]::Disable,                                   # Status: Enable = enabled, Disable = disabled
@@ -52,3 +36,17 @@
  "-s -clean -noreboot -noeula"),                      # Parameters
 ```
 
+# 如何使用
+```
+("Nvidia GEFORCE GAME READY DRIVER",                  # 软件包名称
+ [Status]::Disable,                                   # 状态：Enable = 启用，Disable = 禁用
+ [Action]::Install,                                   # 动作：Install = 安装，NoInst = 下载后不安装，Unzip = 下载后仅解压，To = 安装到目录
+ [PP]::Wait,                                          # 运行方式：Wait = 等待运行结束，Fast = 直接运行
+ [FileType]::exe,                                     # 文件类型：exe, zip，或自定义文件类型
+ "auto",                                              # 盘符：Auto = 全盘搜索，A-Z = 指定盘符或自定义路径
+ "安装包\驱动",                                        # 目录结构，例如：AUTO 改成 C，合并结果：C:\Yi\Apps\Drive
+ "*-desktop-win10-*-international-dch-whql",          # 匹配文件名，支持模糊功能（*）
+ "460.89-desktop-win10-64bit-international-dch-whql", # 网站下载绝对文件名，请勿填后缀
+ "https://us.download.nvidia.cn/Windows/460.89/",     # 网站路径前缀，/ 号结尾
+ "-s -clean -noreboot -noeula")
+```
