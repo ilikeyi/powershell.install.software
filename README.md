@@ -1,55 +1,54 @@
-#    You are welcome to use multifunctional installation scripts to install common software locally,  If there is no Installation package, activate the online download function
-#    欢迎您使用多功能安装脚本，本地安装常用软件，不存在安装包，则激活在线下载功能
+#    You are welcome to install the software using PowerShell
+#    欢迎您使用 PowerShell 安装软件
 
     The main function:
-      1. Local Installation package, support parameters and activate silent installation;
-      2. Automatically judge whether the file exists or not, then download it online;
-      3. The installation disk can be specified with a drive letter. If it is not specified,
-         it will be searched in the order of [a-z]. If it is not found, the system drive will be defaulted;
-      4. Support decompression package processing, multiple modules.
+      1. The installation package does not exist locally, activate the download;
+      2. You can specify the drive letter of the Apps, if not specified, search in the order of [d-z],
+         Only the available disks are searched, and the default current system disk is not searched;
+      3. Search file name supports fuzzy search, wildcard *;
+      4. Support decompression package processing, etc.
 
     Prerequisites
-      - PowerShell 5.1 or PowerShellCore 7.03 higher
+      - PowerShell 1.0 or higher
 
     主要功能：
-      1. 本地安装包，支持参数并激活静默安装；
-      2. 自动判断文件是否存在，未存在，则在线下载；
-      3. 安装盘可指定盘符，未指定则按 [a-z] 顺序搜索，
-         未搜索到则默认系统盘；
-      4. 支持解压包处理，多模块。
+      1. 本地不存在安装包，激活下载；
+      2. 可指定软件包盘符，未指定则按 [d-z] 顺序搜索，
+         仅搜索可用盘，未搜索到默认当前系统盘；
+      3. 搜索文件名支持模糊查找，通配符 *；
+      4. 支持解压包处理等。
 
     先决条件：
       - PowerShell 5.1 或 PowerShellCore 7.03 更高
 
-# 如何创建
-# How to create
+# 如何使用
+# How to using
 
 ```
-$ ([Status]::Disable,
- [Action]::Install,
- [PP]::Wait,
- [FileType]::exe,
- "Nvidia GEFORCE GAME READY DRIVER",
- "auto",
- "Yi\00\Drive",
- "461.09-desktop-win10-64bit-international-dch-whql",
- "461.09-desktop-win10-64bit-international-dch-whql",
- "https://us.download.nvidia.com/Windows/461.09/",
- "-s -clean -noreboot -noeula"),
+("Nvidia GEFORCE GAME READY DRIVER",                  # 软件包名称
+ [Status]::Disable,                                   # 状态：Enable = 启用，Disable = 禁用
+ [Action]::Install,                                   # 动作：Install = 安装，NoInst = 下载后不安装，Unzip = 下载后仅解压，To = 安装到目录
+ [PP]::Wait,                                          # 运行方式：Wait = 等待运行结束，Fast = 直接运行
+ [FileType]::exe,                                     # 文件类型：exe, zip，或自定义文件类型
+ "auto",                                              # 盘符：Auto = 全盘搜索，A-Z = 指定盘符或自定义路径
+ "安装包\驱动",                                        # 目录结构，例如：AUTO 改成 C，合并结果：C:\Yi\Apps\Drive
+ "*-desktop-win10-*-international-dch-whql",          # 匹配文件名，支持模糊功能（*）
+ "460.89-desktop-win10-64bit-international-dch-whql", # 网站下载绝对文件名，请勿填后缀
+ "https://us.download.nvidia.cn/Windows/460.89/",     # 网站路径前缀，/ 号结尾
+ "-s -clean -noreboot -noeula")
 ```
 
-# How to create help:
-* 1. Target structure: "Yi\00\Drive"
-* 2. Drive letter: After setting "auto", search from A to Z (full disk search, according to structure)
-* Combine: [a-z]:\Yi\00\Drive
+```
+("Nvidia GEFORCE GAME READY DRIVER",                  # Package name
+ [Status]::Disable,                                   # Status: Enable = enabled, Disable = disabled
+ [Action]::Install,                                   # Action: Install = install, NoInst = do not install after download, Unzip = only extract after download, To = install to directory
+ [PP]::Wait,                                          # Operating mode: Wait = wait for the end of the run, Fast = run directly
+ [FileType]::exe,                                     # File type: exe, zip, or custom file type
+ "auto",                                              # Drive letter: Auto = full disk search, A-Z = designated drive letter or custom path
+ "Installation package\Drive",                        # Directory structure, for example: change AUTO to C, merge result: C:\Yi\Apps\Drive
+ "*-desktop-win10-*-international-dch-whql",          # Match file name, support fuzzy function (*)
+ "460.89-desktop-win10-64bit-international-dch-whql", # The absolute file name of the website download, please do not fill in the suffix
+ "https://us.download.nvidia.cn/Windows/460.89/",     # Site path prefix, ending with /
+ "-s -clean -noreboot -noeula"),                      # Parameters
+```
 
-* 3. Drive letter: modify "auto" to "D",
-* Specify absolute path D:\Yi\00\Drive
-
-# 帮助：
-* 1、目标结构："Yi\00\Drive"
-* 2、盘符：设置 "auto" 后，从 A 到 Z 盘搜索（全盘搜索，按结构），
-* 合并：[a-z]:\Yi\00\Drive
-
-* 3、盘符：修改 "auto" 为 "D"，
-* 指定绝对路径 D:\Yi\00\Drive
