@@ -46,7 +46,7 @@
  [Mode]::Wait,                                        # 运行方式：Wait = 等待完成，Fast = 直接运行
  "exe",                                               # 文件类型：exe, zip 或自定义文件类型
  "auto",                                              # 盘符：Auto = 全盘搜索，A-Z = 指定盘符或自定义路径
- "安装包\驱动程序\显卡",                              # 目录结构，例如：AUTO 改成 C，合并结果：C:\安装包\驱动程序\显卡
+ "安装包\驱动程序\显卡",                               # 目录结构，例如：AUTO 改成 C，合并结果：C:\安装包\驱动程序\显卡
  "*-desktop-win10-*-international-dch-whql",          # 匹配文件名，支持模糊功能（*）
  "460.89-desktop-win10-64bit-international-dch-whql", # 网站下载绝对文件名，请勿填后缀
  "https://us.download.nvidia.cn/Windows/460.89/",     # 网站路径前缀，/ 号结尾
