@@ -14,8 +14,8 @@
 #Requires -version 1.0
 #
 #  源代码：
-#  https://github.com/ilikeyi/powershell.install.software
-#  https://gitee.com/ilikeyi/powershell.install.software
+#  - https://github.com/ilikeyi/powershell.install.software
+#  - https://gitee.com/ilikeyi/powershell.install.software
 #
 
 # 获取脚本参数（如果有）
@@ -44,17 +44,6 @@ $param      "/S"),                       运行参数
 
 # 所有软件配置
 $app = @(
-	("Nvidia GEFORCE GAME READY DRIVER",
-	 "Disable",
-	 "Install",
-	 "wait",
-	 "auto",
-	 "安装包\驱动程序\显卡",
-	 "https://us.download.nvidia.cn/Windows/460.89",
-	 "460.89-desktop-win10-64bit-international-dch-whql",
-	 "exe",
-	 "*-desktop-win10-*-international-dch-whql",
-	 "-s -clean -noreboot -noeula"),
 	("Yi's 个性主题包",
 	 "Disable",
 	 "Install",
@@ -66,6 +55,17 @@ $app = @(
 	 "deskthemepack",
 	 "Yi*",
 	 ""),
+	("Nvidia GEFORCE GAME READY DRIVER",
+	 "Disable",
+	 "Install",
+	 "wait",
+	 "auto",
+	 "安装包\驱动程序\显卡",
+	 "https://us.download.nvidia.cn/Windows/460.89",
+	 "460.89-desktop-win10-64bit-international-dch-whql",
+	 "exe",
+	 "*-desktop-win10-*-international-dch-whql",
+	 "-s -clean -noreboot -noeula"),
 	("Sysinternals Suite",
 	 "Disable",
 	 "To",
@@ -291,7 +291,7 @@ function Start-Install-Software {
 						break
 					}
 					if (Test-Path -Path $OutArchive) {
-						Write-Host "    - 已有安装包`n"
+						Write-Host "    - 已有安装包"
 					} else {
 						Write-Host "    * 开始下载`n      > 连接到：$url"
 						try {
@@ -305,7 +305,7 @@ function Start-Install-Software {
 					}
 					Write-Host "    - 解压中"
 					Archive-Unzip -filename $OutArchive -to $OutTo
-					Write-Host "    - 解压完成`n"
+					Write-Host "    - 解压完成"
 					if ((Test-Path $OutArchive)) { remove-item -path $OutArchive -force }
 					Get-ChildItem $OutTo -Recurse -Include "*$($filename)*.exe" -ErrorAction SilentlyContinue | Foreach-Object {
 						Write-Host "    - 本地存在：$($_.fullname)"
@@ -490,7 +490,7 @@ function Get-Mainpage {
 	Write-Host "`n   Author: Yi ( http://fengyi.tel )
 
    From: Yi's Solution
-   buildstring: 5.1.2.8.bk_release.210120-1208
+   buildstring: 5.2.0.0.bs_release.210120-1208
 
    安装软件列表 ( 共 $($app.Count) 款 )
    ---------------------------------------------------"
@@ -508,12 +508,16 @@ function Get-Mainpage {
 	Write-Host "   ---------------------------------------------------"
 }
 
-Get-Mainpage
+function initialization {
+}
 
 If ($Force) {
+	Get-Mainpage
+	Initialization
 	Obtain-And-Install
 	Process-other
 } else {
+	Get-Mainpage
 	Write-Host "   是否安装以上软件？" -ForegroundColor Green
 	$caption="安装软件前请确认。"
 	$message="继续安装（Y）`n取消安装（N）"
@@ -524,6 +528,7 @@ If ($Force) {
 	Switch ($prompt)
 	{
 		0 {
+			Initialization
 			Obtain-And-Install
 			Process-other
 			Wait-Exit -wait 6

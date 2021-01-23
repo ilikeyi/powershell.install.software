@@ -11,8 +11,8 @@ You are welcome to install the software using PowerShell
       4. Support decompression package processing, etc.
 
     Prerequisites
-      - Instl.old.ps1 - ( PowerShell 1.0 或更高 )
-      - Instl.ps1     - ( PowerShell 3.0 或更高 )
+      - Instl.old.ps1 - ( PowerShell 2.0 或更高 )
+      - Instl.ps1     - ( PowerShell 5.0 或更高 )
 
     主要功能：
       1. 本地不存在安装包，激活下载；
@@ -22,8 +22,8 @@ You are welcome to install the software using PowerShell
       4. 支持解压包处理等。
 
     先决条件：
-      - Instl.old.ps1 - ( PowerShell 1.0 或更高 )
-      - Instl.ps1     - ( PowerShell 3.0 或更高 )
+      - Instl.old.ps1 - ( PowerShell 2.0 或更高 )
+      - Instl.ps1     - ( PowerShell 5.0 或更高 )
 
 # Package configuration tutorial
 ```
