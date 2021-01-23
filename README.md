@@ -25,32 +25,34 @@ You are welcome to install the software using PowerShell
       - Instl.old.ps1 - ( PowerShell 1.0 或更高 )
       - Instl.ps1     - ( PowerShell 3.0 或更高 )
 
-# How to using
+# Package configuration tutorial
 ```
-("Nvidia GEFORCE GAME READY DRIVER",                  # Package name
- [Status]::Disable,                                   # Status: Enable = enabled, Disable = disabled
- [Action]::Install,                                   # Action: Install = install, NoInst = do not install after download, Unzip = only extract after download, To = install to directory
- [Mode]::Wait,                                        # Operating mode: Wait = wait for the end of the run, Fast = run directly
- "exe",                                               # File type: exe, archive or custom file type
- "auto",                                              # Drive letter: Auto = full disk search, A-Z = designated drive letter or custom path
- "Installation package\Driver\Graphics card",         # Directory structure, for example: change AUTO to C, merge result: C:\Installation package\Driver\Graphics card
- "*-desktop-win10-*-international-dch-whql",          # Match file name, support fuzzy function (*)
- "460.89-desktop-win10-64bit-international-dch-whql", # The absolute file name of the website download, please do not fill in the suffix
- "https://us.download.nvidia.cn/Windows/460.89/",     # Site path prefix, ending with /
- "-s -clean -noreboot -noeula"),                      # Parameters
+Variable    Package Configuration        Description
+$appname   ("Gpg4win",                   Package name
+$status     [Status]::Disable,           Status: Enable - enabled; Disable - disabled
+$act        [Action]::Install,           Action: Install - install; NoInst - does not install after download; Unzip - only extract after download; To - install to directory
+$mode       [Mode]::Wait,                Operation mode: Wait - wait for completion; Fast - run directly
+$todisk     "auto",                      Set Auto to search automatically from the A-Z disk; specify the drive letter [A:]-[Z:]; specify the path: \\192.168.1.1
+$structure  "Installation package\AIO",  Directory Structure
+$url        "https://files.gpg4win.org", Website address
+$packer     "gpg4win-3.1.15",            File name downloaded from website
+$types      "exe",                       File type downloaded from the website: exe, zip or custom file type; result: https://files.gpg4win.org/gpg4win-3.1.15.exe
+$filename   "gpg4win*",                  File name fuzzy search (*)
+$param      "/S"),                       Operating parameters
 ```
 
-# 如何使用
+# 软件包配置教程
 ```
-("Nvidia GEFORCE GAME READY DRIVER",                  # 软件包名称
- [Status]::Disable,                                   # 状态：Enable = 启用，Disable = 禁用
- [Action]::Install,                                   # 动作：Install = 安装，NoInst = 下载后不安装，Unzip = 下载后仅解压，To = 安装到目录
- [Mode]::Wait,                                        # 运行方式：Wait = 等待完成，Fast = 直接运行
- "exe",                                               # 文件类型：exe, zip 或自定义文件类型
- "auto",                                              # 盘符：Auto = 全盘搜索，A-Z = 指定盘符或自定义路径
- "安装包\驱动程序\显卡",                               # 目录结构，例如：AUTO 改成 C，合并结果：C:\安装包\驱动程序\显卡
- "*-desktop-win10-*-international-dch-whql",          # 匹配文件名，支持模糊功能（*）
- "460.89-desktop-win10-64bit-international-dch-whql", # 网站下载绝对文件名，请勿填后缀
- "https://us.download.nvidia.cn/Windows/460.89/",     # 网站路径前缀，/ 号结尾
- "-s -clean -noreboot -noeula"),                      # 参数
+变量名       软件包配置                  描述
+$appname   ("Gpg4win",                   软件包名称
+$status     [Status]::Disable,           状态：Enable - 启用；Disable - 禁用
+$act        [Action]::Install,           动作：Install - 安装；NoInst 下载后不安装；Unzip - 下载后仅解压；To - 安装到目录
+$mode       [Mode]::Wait,                运行方式：Wait - 等待完成；Fast - 直接运行
+$todisk     "auto",                      设置 Auto 自动从 A-Z 盘开始搜索；指定盘符 [A:]-[Z:]；指定路径：\\192.168.1.1
+$structure  "安装包\AIO",                目录结构
+$url        "https://files.gpg4win.org", 网站地址
+$packer     "gpg4win-3.1.15",            从网站下载的文件名
+$types      "exe",                       从网站下载的文件类型：exe, zip 或自定义文件类型；结果：https://files.gpg4win.org/gpg4win-3.1.15.exe
+$filename   "gpg4win*",                  文件名模糊查找（*）
+$param      "/S"),                       运行参数
 ```

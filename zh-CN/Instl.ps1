@@ -25,130 +25,148 @@ param(
 	[Switch]$Force
 )
 
+<# 软件包配置教程
+
+变量名       软件包配置                  描述
+$appname   ("Gpg4win",                   软件包名称
+$status     [Status]::Disable,           状态：Enable - 启用；Disable - 禁用
+$act        [Action]::Install,           动作：Install - 安装；NoInst 下载后不安装；Unzip - 下载后仅解压；To - 安装到目录
+$mode       [Mode]::Wait,                运行方式：Wait - 等待完成；Fast - 直接运行
+$todisk     "auto",                      设置 Auto 自动从 A-Z 盘开始搜索；指定盘符 [A:]-[Z:]；指定路径：\\192.168.1.1
+$structure  "安装包\AIO",                目录结构
+$url        "https://files.gpg4win.org", 网站地址
+$packer     "gpg4win-3.1.15",            从网站下载的文件名
+$types      "exe",                       从网站下载的文件类型：exe, zip 或自定义文件类型；结果：https://files.gpg4win.org/gpg4win-3.1.15.exe
+$filename   "gpg4win*",                  文件名模糊查找（*）
+$param      "/S"),                       运行参数
+
+#>
+
 # 所有软件配置
 $app = @(
-	("Nvidia GEFORCE GAME READY DRIVER",                  # 软件包名称
-	 [Status]::Disable,                                   # 状态：Enable = 启用，Disable = 禁用
-	 [Action]::Install,                                   # 动作：Install = 安装，NoInst = 下载后不安装，Unzip = 下载后仅解压，To = 安装到目录
-	 [Mode]::Wait,                                        # 运行方式：Wait = 等待完成，Fast = 直接运行
-	 "exe",                                               # 文件类型：exe, zip 或自定义文件类型
-	 "auto",                                              # 盘符：Auto = 全盘搜索，A-Z = 指定盘符或自定义路径
-	 "安装包\驱动程序\显卡",                              # 目录结构，例如：AUTO 改成 C，合并结果：C:\安装包\驱动程序\显卡
-	 "*-desktop-win10-*-international-dch-whql",          # 匹配文件名，支持模糊功能（*）
-	 "460.89-desktop-win10-64bit-international-dch-whql", # 网站下载绝对文件名，请勿填后缀
-	 "https://us.download.nvidia.cn/Windows/460.89/",     # 网站路径前缀，/ 号结尾
-	 "-s -clean -noreboot -noeula"),                      # 参数
+	("Nvidia GEFORCE GAME READY DRIVER",
+	 [Status]::Disable,
+	 [Action]::Install,
+	 [Mode]::Wait,
+	 "auto",
+	 "安装包\驱动程序\显卡",
+	 "https://us.download.nvidia.cn/Windows/460.89",
+	 "460.89-desktop-win10-64bit-international-dch-whql",
+	 "exe",
+	 "*-desktop-win10-*-international-dch-whql",
+	 "-s -clean -noreboot -noeula"),
 	("Yi's 个性主题包",
 	 [Status]::Disable,
 	 [Action]::Install,
 	 [Mode]::Fast,
-	 "deskthemepack",
 	 "auto",
 	 "安装包\主题包",
-	 "Yi*",
+	 "https://fengyi.tel",
 	 "Yi",
-	 "https://fengyi.tel/",
+	 "deskthemepack",
+	 "Yi*",
 	 ""),
 	("Sysinternals Suite",
 	 [Status]::Disable,
 	 [Action]::To,
 	 [Mode]::Wait,
-	 "zip",
 	 $env:SystemDrive,
 	 "",
+	 "https://download.sysinternals.com/files",
 	 "SysinternalsSuite",
+	 "zip",
 	 "SysinternalsSuite",
-	 "https://download.sysinternals.com/files/",
 	 ""),
 	("VisualCppRedist AIO",
 	 [Status]::Disable,
 	 [Action]::Install,
 	 [Mode]::Wait,
-	 "zip",
 	 "auto",
 	 "安装包\AIO",
-	 "VisualCppRedist*",
+	 "https://github.com/abbodi1406/vcredist/releases/download/v0.43.0",
 	 "VisualCppRedist_AIO_x86_x64_43",
-	 "https://github.com/abbodi1406/vcredist/releases/download/v0.43.0/",
+	 "zip",
+	 "VisualCppRedist*",
 	 "/y"),
 	("Gpg4win",
 	 [Status]::Disable,
 	 [Action]::Install,
 	 [Mode]::Wait,
-	 "exe",
 	 "auto",
 	 "安装包\AIO",
-	 "gpg4win*",
+	 "https://files.gpg4win.org",
 	 "gpg4win-3.1.15",
-	 "https://files.gpg4win.org/",
+	 "exe",
+	 "gpg4win*",
 	 "/S"),
 	("Python",
 	 [Status]::Disable,
 	 [Action]::Install,
 	 [Mode]::Wait,
-	 "exe",
 	 "auto",
 	 "安装包\开发软件",
-	 "python-*",
+	 "https://www.python.org/ftp/python/3.9.1",
 	 "python-3.9.1-amd64",
-	 "https://www.python.org/ftp/python/3.9.1/",
+	 "exe",
+	 "python-*",
 	 "/quiet InstallAllUsers=1 PrependPath=1 Include_test=0"),
 	("酷狗音乐",
 	 [Status]::Disable,
 	 [Action]::Install,
 	 [Mode]::Wait,
-	 "exe",
 	 "auto",
 	 "安装包\音乐软件",
-	 "kugou*",
+	 "https://downmini.yun.kugou.com/web",
 	 "kugou9175",
-	 "https://downmini.yun.kugou.com/web/",
+	 "exe",
+	 "kugou*",
 	 "/S"),
 	("网易云音乐",
 	 [Status]::Disable,
 	 [Action]::Install,
 	 [Mode]::Wait,
-	 "exe",
 	 "auto",
 	 "安装包\音乐软件",
-	 "cloudmusicsetup*",
+	 "https://d1.music.126.net/dmusic",
 	 "cloudmusicsetup2.7.5.198554",
-	 "https://d1.music.126.net/dmusic/",
+	 "exe",
+	 "cloudmusicsetup*",
 	 "/S"),
 	("QQ 音乐",
 	 [Status]::Disable,
 	 [Action]::Install,
 	 [Mode]::Fast,
-	 "exe",
 	 "auto",
 	 "安装包\音乐软件",
+	 "https://dldir1.qq.com/music/clntupate",
 	 "QQMusicSetup",
+	 "exe",
 	 "QQMusicSetup",
-	 "https://dldir1.qq.com/music/clntupate/",
 	 "/S"),
 	("腾讯 QQ 2020",
 	 [Status]::Enable,
 	 [Action]::Install,
 	 [Mode]::Wait,
-	 "exe",
 	 "auto",
 	 "安装包\社交软件",
+	 "https://down.qq.com/qqweb/PCQQ/PCQQ_EXE",
 	 "PCQQ2020",
+	 "exe",
 	 "PCQQ2020",
-	 "https://down.qq.com/qqweb/PCQQ/PCQQ_EXE/",
 	 "/S"),
 	("微信",
 	 [Status]::Enable,
 	 [Action]::Install,
 	 [Mode]::Wait,
-	 "exe",
 	 "auto",
 	 "安装包\社交软件",
+	 "https://dldir1.qq.com/weixin/Windows",
 	 "WeChatSetup",
+	 "exe",
 	 "WeChatSetup",
-	 "https://dldir1.qq.com/weixin/Windows/",
 	 "/S")
 )
+# 最后 ) 结尾请勿带 , 号，否则你懂的。
 
 Enum Status
 {
@@ -247,18 +265,35 @@ function Test-Catalog {
 	}
 }
 
+function Join-Url {
+	param (
+		[parameter(Mandatory=$True, HelpMessage="Base Path")]
+		[ValidateNotNullOrEmpty()]
+		[string] $Path,
+		[parameter(Mandatory=$True, HelpMessage="Child Path or Item Name")]
+		[ValidateNotNullOrEmpty()]
+		[string] $ChildPath
+	)
+	if ($Path.EndsWith('/')) {
+		return "$Path"+"$ChildPath"
+	}
+	else {
+		return "$Path/$ChildPath"
+	}
+}
+
 function Start-Install-Software {
 	param(
 		$appname,
 		$status,
 		$act,
-		$pp,
-		$types,
+		$mode,
 		$todisk,
 		$structure,
-		$filename,
-		$packer,
 		$url,
+		$packer,
+		$types,
+		$filename,
 		$param
 	)
 
@@ -268,11 +303,12 @@ function Start-Install-Software {
 			Write-Host "   正在安装 - $($appname)" -ForegroundColor Green
 		}
 		Disable {
+			Write-Host "   跳过安装 - $($appname)" -ForegroundColor Red
 			return
 		}
 	}
 
-	$url = $url + $packer + "." + $types
+	$url = Join-Url -Path "$($url)" -ChildPath "$($packer).$($types)"
 
 	Switch ($todisk)
 	{
@@ -314,7 +350,7 @@ function Start-Install-Software {
 				Install {
 					Get-ChildItem $OutTo -Recurse -Include "*$($filename)*.exe" -ErrorAction SilentlyContinue | Foreach-Object {
 						Write-Host "    - 本地存在：$($_.fullname)"
-						Open-App -filename $($_.fullname) -param $param -pp $pp
+						Open-App -filename $($_.fullname) -param $param -mode $mode
 						break
 					}
 					if (Test-Path -Path $OutArchive) {
@@ -330,7 +366,7 @@ function Start-Install-Software {
 					if ((Test-Path $OutArchive)) { remove-item -path $OutArchive -force }
 					Get-ChildItem $OutTo -Recurse -Include "*$($filename)*.exe" -ErrorAction SilentlyContinue | Foreach-Object {
 						Write-Host "    - 本地存在：$($_.fullname)"
-						Open-App -filename $($_.fullname) -param $param -pp $pp
+						Open-App -filename $($_.fullname) -param $param -mode $mode
 					}
 				}
 				NoInst {
@@ -373,14 +409,14 @@ function Start-Install-Software {
 		}
 		default {
 			if ((Test-Path $OutAny -PathType Leaf)) {
-				Open-App -filename $OutAny -param $param -pp $pp
+				Open-App -filename $OutAny -param $param -mode $mode
 			} else {
 				Write-Host "    * 开始下载`n      > 连接到：$url"
 				if (test-uri $url) {
 					Write-Host "      + 保存到：$OutAny"
 					Test-Catalog -chkpath $OutTo
 					Invoke-WebRequest -Uri $url -OutFile $OutAny -ErrorAction SilentlyContinue | Out-Null
-					Open-App -filename $OutAny -param $param -pp $pp
+					Open-App -filename $OutAny -param $param -mode $mode
 				} else {
 					Write-Host "      - 状态：不可用`n" -ForegroundColor Red
 				}
@@ -427,11 +463,11 @@ function Open-App {
 	param(
 		$filename,
 		$param,
-		$pp
+		$mode
 	)
 
 	if ((Test-Path $filename -PathType Leaf)) {
-		Switch ($pp)
+		Switch ($mode)
 		{
 			Fast {
 				Write-Host "    - 快速运行：$filename`n    - 参数：$param`n"
@@ -468,7 +504,7 @@ function Obtain-And-Install {
 	Write-Host "`n   正在安装软件中"
 	Write-Host "   ---------------------------------------------------"
 	for ($i=0; $i -lt $app.Count; $i++) {
-		Start-Install-Software -appname $app[$i][0] -status $app[$i][1] -act $app[$i][2] -pp $app[$i][3] -types $app[$i][4] -todisk $app[$i][5] -structure $app[$i][6] -filename $app[$i][7] -packer $app[$i][8] -url $app[$i][9] -param $app[$i][10]
+		Start-Install-Software -appname $app[$i][0] -status $app[$i][1] -act $app[$i][2] -mode $app[$i][3] -todisk $app[$i][4] -structure $app[$i][5] -url $app[$i][6] -packer $app[$i][7] -types $app[$i][8] -filename $app[$i][9] -param $app[$i][10]
 	}
 }
 
@@ -495,7 +531,7 @@ function Get-Mainpage {
 	Write-Host "`n   Author: Yi ( http://fengyi.tel )
 
    From: Yi's Solution
-   buildstring: 5.1.2.6.bk_release.210120-1208
+   buildstring: 5.1.2.8.bk_release.210120-1208
 
    安装软件列表 ( 共 $($app.Count) 款 )
    ---------------------------------------------------"

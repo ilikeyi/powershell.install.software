@@ -25,130 +25,148 @@ param(
 	[Switch]$Force
 )
 
+<# Package configuration tutorial
+
+Variable    Package Configuration        Description
+$appname   ("Gpg4win",                   Package name
+$status     "Disable",                   Status: Enable - enabled; Disable - disabled
+$act        "Install",                   Action: Install - install; NoInst - does not install after download; Unzip - only extract after download; To - install to directory
+$mode       "wait",                      Operation mode: Wait - wait for completion; Fast - run directly
+$todisk     "auto",                      Set Auto to search automatically from the A-Z disk; specify the drive letter [A:]-[Z:]; specify the path: \\192.168.1.1
+$structure  "Installation package\AIO",  Directory Structure
+$url        "https://files.gpg4win.org", Website address
+$packer     "gpg4win-3.1.15",            File name downloaded from website
+$types      "exe",                       File type downloaded from the website: exe, zip or custom file type; result: https://files.gpg4win.org/gpg4win-3.1.15.exe
+$filename   "gpg4win*",                  File name fuzzy search (*)
+$param      "/S"),                       Operating parameters
+
+#>
+
 # All software configurations
 $app = @(
-	("Nvidia GEFORCE GAME READY DRIVER",                  # Package name
-	 "Disable",                                           # Status: Enable = enabled, Disable = disabled
-	 "Install",                                           # Action: Install = install, NoInst = do not install after download, Unzip = only extract after download, To = install to directory
-	 "wait",                                              # Operating mode: Wait = wait for the end of the run, Fast = run directly
-	 "exe",                                               # File type: exe, archive or custom file type
-	 "auto",                                              # Drive letter: Auto = full disk search, (A:)-(Z:) = designated drive letter or custom path ( \\IP\ )
-	 "Installation package\Driver\Graphics card",         # Directory structure, for example: change AUTO to C, merge result: C:\Installation package\Driver\Graphics card
-	 "*-desktop-win10-*-international-dch-whql",          # Match file name, support fuzzy function (*)
-	 "460.89-desktop-win10-64bit-international-dch-whql", # The absolute file name of the website download, please do not fill in the suffix
-	 "https://us.download.nvidia.cn/Windows/460.89/",     # Site path prefix, ending with /
-	 "-s -clean -noreboot -noeula"),                      # Parameters
+	("Nvidia GEFORCE GAME READY DRIVER",
+	 "Disable",
+	 "Install",
+	 "wait",
+	 "auto",
+	 "Installation package\Driver\Graphics card",
+	 "https://us.download.nvidia.cn/Windows/460.89",
+	 "460.89-desktop-win10-64bit-international-dch-whql",
+	 "exe",
+	 "*-desktop-win10-*-international-dch-whql",
+	 "-s -clean -noreboot -noeula"),
 	("Yi's Personalized theme pack",
 	 "Disable",
 	 "Install",
 	 "fast",
-	 "deskthemepack",
 	 "auto",
 	 "Installation package\Theme pack",
-	 "Yi*",
+	 "https://fengyi.tel",
 	 "Yi",
-	 "https://fengyi.tel/",
+	 "deskthemepack",
+	 "Yi*",
 	 ""),
 	("Sysinternals Suite",
 	 "Disable",
 	 "To",
 	 "wait",
-	 "zip",
 	 $env:SystemDrive,
 	 "",
+	 "https://download.sysinternals.com/files",
 	 "SysinternalsSuite",
+	 "zip",
 	 "SysinternalsSuite",
-	 "https://download.sysinternals.com/files/",
 	 ""),
 	("VisualCppRedist AIO",
 	 "Disable",
 	 "Install",
 	 "wait",
-	 "zip",
 	 "auto",
 	 "Installation package\AIO",
-	 "VisualCppRedist*",
+	 "https://github.com/abbodi1406/vcredist/releases/download/v0.43.0",
 	 "VisualCppRedist_AIO_x86_x64_43",
-	 "https://github.com/abbodi1406/vcredist/releases/download/v0.43.0/",
+	 "zip",
+	 "VisualCppRedist*",
 	 "/y"),
 	("Gpg4win",
 	 "Disable",
 	 "Install",
 	 "wait",
-	 "exe",
 	 "auto",
 	 "Installation package\AIO",
-	 "gpg4win*",
+	 "https://files.gpg4win.org",
 	 "gpg4win-3.1.15",
-	 "https://files.gpg4win.org/",
+	 "exe",
+	 "gpg4win*",
 	 "/S"),
 	("Python",
 	 "Disable",
 	 "Install",
 	 "wait",
-	 "exe",
 	 "auto",
 	 "Installation package\Develop software",
-	 "python-*",
+	 "https://www.python.org/ftp/python/3.9.1",
 	 "python-3.9.1-amd64",
-	 "https://www.python.org/ftp/python/3.9.1/",
+	 "exe",
+	 "python-*",
 	 "/quiet InstallAllUsers=1 PrependPath=1 Include_test=0"),
 	("kugou music",
 	 "Disable",
 	 "Install",
 	 "wait",
-	 "exe",
 	 "auto",
 	 "Installation package\Music software",
-	 "kugou*",
+	 "https://downmini.yun.kugou.com/web",
 	 "kugou9175",
-	 "https://downmini.yun.kugou.com/web/",
+	 "exe",
+	 "kugou*",
 	 "/S"),
 	("NetEase Cloud Music",
 	 "Disable",
 	 "Install",
 	 "wait",
-	 "exe",
 	 "auto",
 	 "Installation package\Music software",
-	 "cloudmusicsetup*",
+	 "https://d1.music.126.net/dmusic",
 	 "cloudmusicsetup2.7.5.198554",
-	 "https://d1.music.126.net/dmusic/",
+	 "exe",
+	 "cloudmusicsetup*",
 	 "/S"),
 	("QQ music",
 	 "Disable",
 	 "Install",
 	 "fast",
-	 "exe",
 	 "auto",
 	 "Installation package\Music software",
+	 "https://dldir1.qq.com/music/clntupate",
 	 "QQMusicSetup",
+	 "exe",
 	 "QQMusicSetup",
-	 "https://dldir1.qq.com/music/clntupate/",
 	 "/S"),
 	("Tencent QQ 2020",
 	 "Enable",
 	 "Install",
 	 "wait",
-	 "exe",
 	 "auto",
 	 "Installation package\Social application",
+	 "https://down.qq.com/qqweb/PCQQ/PCQQ_EXE",
 	 "PCQQ2020",
+	 "exe",
 	 "PCQQ2020",
-	 "https://down.qq.com/qqweb/PCQQ/PCQQ_EXE/",
 	 "/S"),
 	("WeChat",
 	 "Enable",
 	 "Install",
 	 "wait",
-	 "exe",
 	 "auto",
 	 "Installation package\Social application",
+	 "https://dldir1.qq.com/weixin/Windows",
 	 "WeChatSetup",
+	 "exe",
 	 "WeChatSetup",
-	 "https://dldir1.qq.com/weixin/Windows/",
 	 "/S")
 )
+# Finally, please don't put , at the end, otherwise you will understand.
 
 function Test-Available-Disk {
 	param (
@@ -184,18 +202,35 @@ function Test-Catalog {
 	}
 }
 
+function Join-Url {
+	param (
+		[parameter(Mandatory=$True, HelpMessage="Base Path")]
+		[ValidateNotNullOrEmpty()]
+		[string] $Path,
+		[parameter(Mandatory=$True, HelpMessage="Child Path or Item Name")]
+		[ValidateNotNullOrEmpty()]
+		[string] $ChildPath
+	)
+	if ($Path.EndsWith('/')) {
+		return "$Path"+"$ChildPath"
+	}
+	else {
+		return "$Path/$ChildPath"
+	}
+}
+
 function Start-Install-Software {
 	param(
 		$appname,
 		$status,
 		$act,
-		$pp,
-		$types,
+		$mode,
 		$todisk,
 		$structure,
-		$filename,
-		$packer,
 		$url,
+		$packer,
+		$types,
+		$filename,
 		$param
 	)
 
@@ -205,11 +240,12 @@ function Start-Install-Software {
 			Write-Host "   Installing   - $($appname)" -ForegroundColor Green
 		}
 		Disable {
+			Write-Host "   Skip install - $($appname)" -ForegroundColor Red
 			return
 		}
 	}
 
-	$url = $url + $packer + "." + $types
+	$url = Join-Url -Path "$($url)" -ChildPath "$($packer).$($types)"
 
 	Switch ($todisk)
 	{
@@ -251,7 +287,7 @@ function Start-Install-Software {
 				Install {
 					Get-ChildItem $OutTo -Recurse -Include "*$($filename)*.exe" -ErrorAction SilentlyContinue | Foreach-Object {
 						Write-Host "    - Locally exist: $($_.fullname)"
-						Open-App -filename $($_.fullname) -param $param -pp $pp
+						Open-App -filename $($_.fullname) -param $param -mode $mode
 						break
 					}
 					if (Test-Path -Path $OutArchive) {
@@ -273,7 +309,7 @@ function Start-Install-Software {
 					if ((Test-Path $OutArchive)) { remove-item -path $OutArchive -force }
 					Get-ChildItem $OutTo -Recurse -Include "*$($filename)*.exe" -ErrorAction SilentlyContinue | Foreach-Object {
 						Write-Host "    - Locally exist: $($_.fullname)"
-						Open-App -filename $($_.fullname) -param $param -pp $pp
+						Open-App -filename $($_.fullname) -param $param -mode $mode
 					}
 				}
 				NoInst {
@@ -335,14 +371,14 @@ function Start-Install-Software {
 		}
 		default {
 			if ((Test-Path $OutAny -PathType Leaf)) {
-				Open-App -filename $OutAny -param $param -pp $pp
+				Open-App -filename $OutAny -param $param -mode $mode
 			} else {
 				Write-Host "    * Start download`n      > Connected to: $url"
 				try {
 					Write-Host "      + Save to: $OutAny"
 					Test-Catalog -chkpath $OutTo
 					(New-Object System.Net.WebClient).DownloadFile($url, $OutAny) | Out-Null
-					Open-App -filename $OutAny -param $param -pp $pp
+					Open-App -filename $OutAny -param $param -mode $mode
 				} catch {
 					Write-Host "      - Status: Not available`n" -ForegroundColor Red
 					break
@@ -359,11 +395,11 @@ function Archive-Unzip {
 	)
 
 	if (Get-Zip) {
-		Write-host "    - Use $script:Zip to unzip the software`n"
+		Write-host "    - Use $script:Zip to unzip the software"
 		$arguments = "x ""-r"" ""-tzip"" ""$filename"" ""-o$to"" ""-y""";
 		Start-Process $script:Zip "$arguments" -Wait -WindowStyle Minimized
 	} else {
-		Write-host "    - Use the decompression software that comes with the system`n"
+		Write-host "    - Use the decompression software that comes with the system"
 		Expand-Archive -LiteralPath $filename -DestinationPath $to -force
 	}
 }
@@ -390,11 +426,11 @@ function Open-App {
 	param(
 		$filename,
 		$param,
-		$pp
+		$mode
 	)
 
 	if ((Test-Path $filename -PathType Leaf)) {
-		Switch ($pp)
+		Switch ($mode)
 		{
 			Fast {
 				Write-Host "    - Fast running: $filename`n    - parameter: $param`n"
@@ -431,7 +467,7 @@ function Obtain-And-Install {
 	Write-Host "`n   INSTALLING SOFTWARE"
 	Write-Host "   ---------------------------------------------------"
 	for ($i=0; $i -lt $app.Count; $i++) {
-		Start-Install-Software -appname $app[$i][0] -status $app[$i][1] -act $app[$i][2] -pp $app[$i][3] -types $app[$i][4] -todisk $app[$i][5] -structure $app[$i][6] -filename $app[$i][7] -packer $app[$i][8] -url $app[$i][9] -param $app[$i][10]
+		Start-Install-Software -appname $app[$i][0] -status $app[$i][1] -act $app[$i][2] -mode $app[$i][3] -todisk $app[$i][4] -structure $app[$i][5] -url $app[$i][6] -packer $app[$i][7] -types $app[$i][8] -filename $app[$i][9] -param $app[$i][10]
 	}
 }
 
@@ -454,7 +490,7 @@ function Get-Mainpage {
 	Write-Host "`n   Author: Yi ( http://fengyi.tel )
 
    From: Yi's Solution
-   buildstring: 5.1.2.6.bk_release.210120-1208
+   buildstring: 5.1.2.8.bk_release.210120-1208
 
    INSTALLED SOFTWARE LIST ( total $($app.Count) items )
    ---------------------------------------------------"
