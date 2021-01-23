@@ -4,9 +4,9 @@ You are welcome to install the software using PowerShell
 -
 
     The main function:
-      1. The installation package does not exist locally, activate the download;
-      2. You can specify the drive letter of the Apps, if not specified, search in the order of [d-z],
-         Only the available disks are searched, and the default current system disk is not searched;
+      1. There is no installation package locally, activate the download function;
+      2. The drive letter can be specified, and the current system drive will be excluded after setting automatic.
+       When no available disk is found, the default setting is the current system disk;
       3. Search file name supports fuzzy search, wildcard *;
       4. Support decompression package processing, etc.
 
@@ -15,9 +15,9 @@ You are welcome to install the software using PowerShell
       - Instl.ps1     - ( PowerShell 5.0 或更高 )
 
     主要功能：
-      1. 本地不存在安装包，激活下载；
-      2. 可指定软件包盘符，未指定则按 [d-z] 顺序搜索，
-         仅搜索可用盘，未搜索到默认当前系统盘；
+      1. 本地不存在安装包，激活下载功能；
+      2. 可指定盘符，设置自动后将排除当前系统盘，
+         搜索不到可用盘时，默认设置为当前系统盘；
       3. 搜索文件名支持模糊查找，通配符 *；
       4. 支持解压包处理等。
 

@@ -4,14 +4,14 @@
 #  欢迎您使用 PowerShell 安装软件
 #
 #  主要功能：
-#    1. 本地不存在安装包，激活下载；
-#    2. 可指定软件包盘符，未指定则按 [d-z] 顺序搜索，
-#       仅搜索可用盘，未搜索到默认当前系统盘；
+#    1. 本地不存在安装包，激活下载功能；
+#    2. 可指定盘符，设置自动后将排除当前系统盘，
+#       搜索不到可用盘时，默认设置为当前系统盘；
 #    3. 搜索文件名支持模糊查找，通配符 *；
 #    4. 支持解压包处理等。
 #
 #  先决条件：
-#Requires -version 1.0
+#Requires -version 2.0
 #
 #  源代码：
 #  - https://github.com/ilikeyi/powershell.install.software
@@ -173,7 +173,7 @@ function Test-Available-Disk {
 		[string]$Path
 	)
 	$test_tmp_filename = "writetest-"+[guid]::NewGuid()
-	$test_filename = $Path + ":\" + $test_tmp_filename
+	$test_filename = Join-Path -Path "$($Path)" -ChildPath "$($test_tmp_filename)"
 
 	try {
 		[io.file]::OpenWrite($test_filename).close()
@@ -250,20 +250,19 @@ function Start-Install-Software {
 	Switch ($todisk)
 	{
 		auto {
-			$drives = Get-PSDrive | Select-Object -ExpandProperty 'Name' | Select-String -Pattern '^[a-z]$'
-			$newdrives = Get-PSDrive | Select-Object -ExpandProperty 'Name' | Select-String -Pattern '^[d-z]$'
+			$drives = Get-PSDrive -PSProvider FileSystem | where { -not ("$($env:SystemDrive)\" -eq $_.Root) } | Select-Object -ExpandProperty 'Root'
 			foreach ($drive in $drives) {
-				$tempoutputfoldoer = "$($drive):\$($structure)"
+				$tempoutputfoldoer = Join-Path -Path $($drive) -ChildPath "$($structure)"
 				Get-ChildItem $tempoutputfoldoer -Recurse -Include "*$($filename)*" -ErrorAction SilentlyContinue | Foreach-Object {
-					$OutTo = Join-Path -Path "$($drive):" -ChildPath "$($structure)"
+					$OutTo = Join-Path -Path "$($drive)" -ChildPath "$($structure)"
 					$OutAny = $($_.fullname)
 					break
 				}
-				foreach ($drive in $newdrives) {
+				foreach ($drive in $drives) {
 					if(Test-Available-Disk -Path $drive) {
-						$OutTo = Join-Path -Path "$($drive):" -ChildPath "$($structure)"
-						$OutAny = Join-Path -Path "$($drive):" -ChildPath "$($structure)\$($packer).$($types)"
-						$OutArchive = Join-Path -Path "$($drive):" -ChildPath "$($structure)\$($packer).zip"
+						$OutTo = Join-Path -Path "$($drive)" -ChildPath "$($structure)"
+						$OutAny = Join-Path -Path "$($drive)" -ChildPath "$($structure)\$($packer).$($types)"
+						$OutArchive = Join-Path -Path "$($drive)" -ChildPath "$($structure)\$($packer).zip"
 					} else {
 						$OutTo = Join-Path -Path $($env:SystemDrive) -ChildPath "$($structure)"
 						$OutAny = Join-Path -Path $($env:SystemDrive) -ChildPath "$($structure)\$($packer).$($types)"

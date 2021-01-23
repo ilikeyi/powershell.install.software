@@ -4,9 +4,9 @@
 #  You are welcome to install the software using PowerShell
 #
 #  The main function:
-#    1. The installation package does not exist locally, activate the download;
-#    2. You can specify the drive letter of the Apps, if not specified, search in the order of [d-z],
-#       Only the available disks are searched, and the default current system disk is not searched;
+#    1. There is no installation package locally, activate the download function;
+#    2. The drive letter can be specified, and the current system drive will be excluded after setting automatic.
+#       When no available disk is found, the default setting is the current system disk;
 #    3. Search file name supports fuzzy search, wildcard *;
 #    4. Support decompression package processing, etc.
 #
@@ -192,8 +192,9 @@ function Test-Available-Disk {
 	param (
 		[string]$Path
 	)
+
 	$test_tmp_filename = "writetest-"+[guid]::NewGuid()
-	$test_filename = $Path + ":\" + $test_tmp_filename
+	$test_filename = Join-Path -Path "$($Path)" -ChildPath "$($test_tmp_filename)"
 
 	try {
 		[io.file]::OpenWrite($test_filename).close()
@@ -313,20 +314,19 @@ function Start-Install-Software {
 	Switch ($todisk)
 	{
 		auto {
-			$drives = Get-PSDrive | Select-Object -ExpandProperty 'Name' | Select-String -Pattern '^[a-z]$'
-			$newdrives = Get-PSDrive | Select-Object -ExpandProperty 'Name' | Select-String -Pattern '^[d-z]$'
+			$drives = Get-PSDrive -PSProvider FileSystem | where { -not ("$($env:SystemDrive)\" -eq $_.Root) } | Select-Object -ExpandProperty 'Root'
 			foreach ($drive in $drives) {
-				$tempoutputfoldoer = "$($drive):\$($structure)"
+				$tempoutputfoldoer = Join-Path -Path $($drive) -ChildPath "$($structure)"
 				Get-ChildItem $tempoutputfoldoer -Recurse -Include "*$($filename)*" -ErrorAction SilentlyContinue | Foreach-Object {
-					$OutTo = Join-Path -Path "$($drive):" -ChildPath "$($structure)"
+					$OutTo = Join-Path -Path "$($drive)" -ChildPath "$($structure)"
 					$OutAny = $($_.fullname)
 					break
 				}
-				foreach ($drive in $newdrives) {
+				foreach ($drive in $drives) {
 					if(Test-Available-Disk -Path $drive) {
-						$OutTo = Join-Path -Path "$($drive):" -ChildPath "$($structure)"
-						$OutAny = Join-Path -Path "$($drive):" -ChildPath "$($structure)\$($packer).$($types)"
-						$OutArchive = Join-Path -Path "$($drive):" -ChildPath "$($structure)\$($packer).zip"
+						$OutTo = Join-Path -Path "$($drive)" -ChildPath "$($structure)"
+						$OutAny = Join-Path -Path "$($drive)" -ChildPath "$($structure)\$($packer).$($types)"
+						$OutArchive = Join-Path -Path "$($drive)" -ChildPath "$($structure)\$($packer).zip"
 					} else {
 						$OutTo = Join-Path -Path $($env:SystemDrive) -ChildPath "$($structure)"
 						$OutAny = Join-Path -Path $($env:SystemDrive) -ChildPath "$($structure)\$($packer).$($types)"
