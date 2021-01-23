@@ -205,7 +205,6 @@ function Start-Install-Software {
 			Write-Host "   正在安装 - $($appname)" -ForegroundColor Green
 		}
 		Disable {
-			Write-Host "   跳过安装 - $($appname)" -ForegroundColor Red
 			return
 		}
 	}
@@ -258,7 +257,7 @@ function Start-Install-Software {
 					if (Test-Path -Path $OutArchive) {
 						Write-Host "    - 已有安装包`n"
 					} else {
-						Write-Host "    * 开始下载`n      ^ 连接到：$url"
+						Write-Host "    * 开始下载`n      > 连接到：$url"
 						try {
 							Write-Host "      + 保存到：$OutArchive"
 							Test-Catalog -chkpath $OutTo
@@ -281,7 +280,7 @@ function Start-Install-Software {
 					if (Test-Path -Path $OutArchive) {
 						Write-Host "    - 已有安装包`n"
 					} else {
-						Write-Host "    * 开始下载`n      ^ 连接到：$url"
+						Write-Host "    * 开始下载`n      > 连接到：$url"
 						try {
 							Write-Host "      + 保存到：$OutArchive"
 							Test-Catalog -chkpath $OutTo
@@ -298,7 +297,7 @@ function Start-Install-Software {
 						Write-Host "    - 已有安装包`n"
 						break
 					} else {
-						Write-Host "    * 开始下载`n      ^ 连接到：$url"
+						Write-Host "    * 开始下载`n      > 连接到：$url"
 						try {
 							Write-Host "      + 保存到：$OutArchive"
 							Test-Catalog -chkpath $newoutputfoldoer
@@ -317,7 +316,7 @@ function Start-Install-Software {
 					if ((Test-Path -Path $OutArchive)) {
 						Write-Host "    - 已有安装包`n"
 					} else {
-						Write-Host "    * 开始下载      ^ 连接到：$url"
+						Write-Host "    * 开始下载      > 连接到：$url"
 						try {
 							Write-Host "      + 保存到：$OutArchive"
 							Test-Catalog -chkpath $OutTo
@@ -338,7 +337,7 @@ function Start-Install-Software {
 			if ((Test-Path $OutAny -PathType Leaf)) {
 				Open-App -filename $OutAny -param $param -pp $pp
 			} else {
-				Write-Host "    * 开始下载`n      ^ 连接到：$url"
+				Write-Host "    * 开始下载`n      > 连接到：$url"
 				try {
 					Write-Host "      + 保存到：$OutAny"
 					Test-Catalog -chkpath $OutTo
@@ -429,7 +428,7 @@ function Wait-Exit {
 }
 
 function Obtain-And-Install {
-	Write-Host "`n   正在安装软件..."
+	Write-Host "`n   正在安装软件中"
 	Write-Host "   ---------------------------------------------------"
 	for ($i=0; $i -lt $app.Count; $i++) {
 		Start-Install-Software -appname $app[$i][0] -status $app[$i][1] -act $app[$i][2] -pp $app[$i][3] -types $app[$i][4] -todisk $app[$i][5] -structure $app[$i][6] -filename $app[$i][7] -packer $app[$i][8] -url $app[$i][9] -param $app[$i][10]
@@ -463,10 +462,10 @@ function Get-Mainpage {
 		Switch ($app[$i][1])
 		{
 			Enable {
-				Write-Host "   等待 - $($app[$i][0])" -ForegroundColor Green
+				Write-Host "   等待安装 - $($app[$i][0])" -ForegroundColor Green
 			}
 			Disable {
-				Write-Host "   跳过 - $($app[$i][0])" -ForegroundColor Red
+				Write-Host "   跳过安装 - $($app[$i][0])" -ForegroundColor Red
 			}
 		}
 	}
