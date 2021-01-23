@@ -11,7 +11,7 @@
 #    4. Support decompression package processing, etc.
 #
 #  Prerequisites:
-#    - PowerShell 1.0 Or higher
+#Requires -version 1.0
 #
 #  Source code:
 #  https://github.com/ilikeyi/powershell.install.software
@@ -31,20 +31,31 @@ $app = @(
 	 "Disable",                                           # Status: Enable = enabled, Disable = disabled
 	 "Install",                                           # Action: Install = install, NoInst = do not install after download, Unzip = only extract after download, To = install to directory
 	 "wait",                                              # Operating mode: Wait = wait for the end of the run, Fast = run directly
-	 "exe",                                               # File type: exe, zip, or custom file type
-	 "auto",                                              # Drive letter: Auto = full disk search, A-Z = designated drive letter or custom path
-	 "Installation package\Drive",                        # Directory structure, for example: change AUTO to C, merge result: C:\Yi\Apps\Drive
+	 "exe",                                               # File type: exe, archive or custom file type
+	 "auto",                                              # Drive letter: Auto = full disk search, (A:)-(Z:) = designated drive letter or custom path ( \\IP\ )
+	 "Installation package\Driver\Graphics card",         # Directory structure, for example: change AUTO to C, merge result: C:\Installation package\Driver\Graphics card
 	 "*-desktop-win10-*-international-dch-whql",          # Match file name, support fuzzy function (*)
 	 "460.89-desktop-win10-64bit-international-dch-whql", # The absolute file name of the website download, please do not fill in the suffix
 	 "https://us.download.nvidia.cn/Windows/460.89/",     # Site path prefix, ending with /
 	 "-s -clean -noreboot -noeula"),                      # Parameters
+	("Yi's Personalized theme pack",
+	 "Disable",
+	 "Install",
+	 "fast",
+	 "deskthemepack",
+	 "auto",
+	 "Installation package\Theme pack",
+	 "Yi*",
+	 "Yi",
+	 "https://fengyi.tel/",
+	 ""),
 	("Sysinternals Suite",
 	 "Disable",
 	 "To",
 	 "wait",
 	 "zip",
-	 "auto",
-	 "Installation package",
+	 $env:SystemDrive,
+	 "",
 	 "SysinternalsSuite",
 	 "SysinternalsSuite",
 	 "https://download.sysinternals.com/files/",
@@ -77,7 +88,7 @@ $app = @(
 	 "wait",
 	 "exe",
 	 "auto",
-	 "Installation package\AIO",
+	 "Installation package\Develop software",
 	 "python-*",
 	 "python-3.9.1-amd64",
 	 "https://www.python.org/ftp/python/3.9.1/",
@@ -88,10 +99,10 @@ $app = @(
 	 "wait",
 	 "exe",
 	 "auto",
-	 "Installation package\Music",
+	 "Installation package\Music software",
 	 "kugou*",
 	 "kugou9175",
-	 "https://downmini.yun.kugou.com/web",
+	 "https://downmini.yun.kugou.com/web/",
 	 "/S"),
 	("NetEase Cloud Music",
 	 "Disable",
@@ -99,7 +110,7 @@ $app = @(
 	 "wait",
 	 "exe",
 	 "auto",
-	 "Installation package\Music",
+	 "Installation package\Music software",
 	 "cloudmusicsetup*",
 	 "cloudmusicsetup2.7.5.198554",
 	 "https://d1.music.126.net/dmusic/",
@@ -110,7 +121,7 @@ $app = @(
 	 "fast",
 	 "exe",
 	 "auto",
-	 "Installation package\Music",
+	 "Installation package\Music software",
 	 "QQMusicSetup",
 	 "QQMusicSetup",
 	 "https://dldir1.qq.com/music/clntupate/",
@@ -121,7 +132,7 @@ $app = @(
 	 "wait",
 	 "exe",
 	 "auto",
-	 "Installation package\social",
+	 "Installation package\Social application",
 	 "PCQQ2020",
 	 "PCQQ2020",
 	 "https://down.qq.com/qqweb/PCQQ/PCQQ_EXE/",
@@ -132,19 +143,20 @@ $app = @(
 	 "wait",
 	 "exe",
 	 "auto",
-	 "Installation package\social",
+	 "Installation package\Social application",
 	 "WeChatSetup",
 	 "WeChatSetup",
 	 "https://dldir1.qq.com/weixin/Windows/",
 	 "/S")
 )
 
-function Test-Disk {
+function Test-Available-Disk {
 	param (
 		[string]$Path
 	)
 	$test_tmp_filename = "writetest-"+[guid]::NewGuid()
 	$test_filename = $Path + ":\" + $test_tmp_filename
+
 	try {
 		[io.file]::OpenWrite($test_filename).close()
 
@@ -158,7 +170,7 @@ function Test-Disk {
 	}
 }
 
-function Check-SD {
+function Test-Catalog {
 	Param(
 		[string]$chkpath
 	)
@@ -172,7 +184,7 @@ function Check-SD {
 	}
 }
 
-function Get-Version {
+function Start-Install-Software {
 	param(
 		$appname,
 		$status,
@@ -190,22 +202,15 @@ function Get-Version {
 	Switch ($status)
 	{
 		Enable {
-			Write-Host "   'Installing'   - $($appname)" -ForegroundColor Green
+			Write-Host "   Installing   - $($appname)" -ForegroundColor Green
 		}
 		Disable {
-			Write-Host "   'Skip install' - $($appname)" -ForegroundColor Red
+			Write-Host "   Skip install - $($appname)" -ForegroundColor Red
 			return
 		}
 	}
 
 	$url = $url + $packer + "." + $types
-
-	switch -regex ($todisk)
-	{
-		"auto" { break }
-		"^[a-z]$" { break }
-		default { $todisk = "auto" }
-	}
 
 	Switch ($todisk)
 	{
@@ -213,49 +218,29 @@ function Get-Version {
 			$drives = Get-PSDrive | Select-Object -ExpandProperty 'Name' | Select-String -Pattern '^[a-z]$'
 			$newdrives = Get-PSDrive | Select-Object -ExpandProperty 'Name' | Select-String -Pattern '^[d-z]$'
 			foreach ($drive in $drives) {
-				$newpath = "$($drive):\$($structure)\$($filename).$($types)"
 				$tempoutputfoldoer = "$($drive):\$($structure)"
 				Get-ChildItem $tempoutputfoldoer -Recurse -Include "*$($filename)*" -ErrorAction SilentlyContinue | Foreach-Object {
-					$outputexe = $($_.fullname)
-					$outputfoldoer = "$($drive):\$($structure)"
+					$OutTo = Join-Path -Path "$($drive):" -ChildPath "$($structure)"
+					$OutAny = $($_.fullname)
 					break
 				}
 				foreach ($drive in $newdrives) {
-					if(Test-Disk -Path $drive) {
-						if ( $act -eq "To" ) {
-							$outputfoldoer = "$($drive):\$($structure)\$($packer)"
-							$outputexe = "$($drive):\$($structure)\$($packer)\$($packer).exe"
-							$outputzip = "$($drive):\$($structure)\$($packer)\$($packer).zip"
-						} else {
-							$outputfoldoer = "$($drive):\$($structure)"
-							$outputexe = "$($drive):\$($structure)\$($packer).exe"
-							$outputzip = "$($drive):\$($structure)\$($packer).zip"
-						}
-						break
+					if(Test-Available-Disk -Path $drive) {
+						$OutTo = Join-Path -Path "$($drive):" -ChildPath "$($structure)"
+						$OutAny = Join-Path -Path "$($drive):" -ChildPath "$($structure)\$($packer).$($types)"
+						$OutArchive = Join-Path -Path "$($drive):" -ChildPath "$($structure)\$($packer).zip"
 					} else {
-						if ( $act -eq "To") {
-							$outputfoldoer = "$($env:SystemDrive)\$($structure)\$($packer)"
-							$outputexe = "$($env:SystemDrive)\$($structure)\$($packer)\$($packer).exe"
-							$outputzip = "$($env:SystemDrive)\$($structure)\$($packer)\$($packer).zip"
-						} else {
-							$outputfoldoer = "$($env:SystemDrive)\$($structure)"
-							$outputexe = "$($env:SystemDrive)\$($structure)\$($packer).exe"
-							$outputzip = "$($env:SystemDrive)\$($structure)\$($packer).zip"
-						}
+						$OutTo = Join-Path -Path $($env:SystemDrive) -ChildPath "$($structure)"
+						$OutAny = Join-Path -Path $($env:SystemDrive) -ChildPath "$($structure)\$($packer).$($types)"
+						$OutArchive = Join-Path -Path $($env:SystemDrive) -ChildPath "$($structure)\$($packer).zip"
 					}
 				}
 			}
 		}
 		default {
-			if ( $act -eq "To") {
-				$outputfoldoer = "$($todisk)\$($structure)\$($packer)"
-				$outputexe = "$($todisk)\$($structure)\$($packer)\$($packer).exe"
-				$outputzip = "$($todisk)\$($structure)\$($packer)\$($packer).zip"
-			} else {
-				$outputfoldoer = "$($todisk)\$($structure)"
-				$outputexe = "$($todisk)\$($structure)\$($packer).exe"
-				$outputzip = "$($todisk)\$($structure)\$($packer).zip"
-			}
+			$OutTo = Join-Path -Path $($todisk) -ChildPath "$($structure)"
+			$OutAny = Join-Path -Path $($todisk) -ChildPath "$($structure)\$($packer).$($types)"
+			$OutArchive = Join-Path -Path $($todisk) -ChildPath "$($structure)\$($packer).zip"
 		}
 	}
 
@@ -265,85 +250,103 @@ function Get-Version {
 			Switch ($act)
 			{
 				Install {
-					Get-ChildItem $outputfoldoer -Recurse -Include "*$($filename)*.exe" -ErrorAction SilentlyContinue | Foreach-Object {
-						Write-Host "    - Existing installation package"
-						Get-RunApp -filename $($_.fullname) -param $param -pp $pp
+					Get-ChildItem $OutTo -Recurse -Include "*$($filename)*.exe" -ErrorAction SilentlyContinue | Foreach-Object {
+						Write-Host "    - Locally exist: $($_.fullname)"
+						Open-App -filename $($_.fullname) -param $param -pp $pp
 						break
-						return
+					}
+					if (Test-Path -Path $OutArchive) {
+						Write-Host "    - Existing installation package"
+					} else {
+						Write-Host "    * Start download`n      ^ Connected to: $url"
+						try {
+							Write-Host "      + Save to: $OutArchive"
+							Test-Catalog -chkpath $OutTo
+							(New-Object System.Net.WebClient).DownloadFile($url, $OutArchive) | Out-Null
+						} catch {
+							Write-Host "      - Status: Not available`n" -ForegroundColor Red
+							break
+						}
+					}
+					Write-Host "    - Unpacking"
+					Archive-Unzip -filename $OutArchive -to $OutTo
+					Write-Host "    - Unzip complete`n"
+					if ((Test-Path $OutArchive)) { remove-item -path $OutArchive -force }
+					Get-ChildItem $OutTo -Recurse -Include "*$($filename)*.exe" -ErrorAction SilentlyContinue | Foreach-Object {
+						Write-Host "    - Locally exist: $($_.fullname)"
+						Open-App -filename $($_.fullname) -param $param -pp $pp
+					}
+				}
+				NoInst {
+					if (Test-Path -Path $OutArchive) {
+						Write-Host "    - Existing installation package"
+					} else {
+						Write-Host "    * Start download`n      ^ Connected to: $url"
+						try {
+							Write-Host "      + Save to: $OutArchive"
+							Test-Catalog -chkpath $OutTo
+							(New-Object System.Net.WebClient).DownloadFile($url, $OutArchive) | Out-Null
+						} catch {
+							Write-Host "      - Status: Not available`n" -ForegroundColor Red
+							break
+						}
 					}
 				}
 				To {
-					if (Test-Path $outputfoldoer -PathType Container) {
+					$newoutputfoldoer = "$($OutTo)\$($packer)"
+					if (Test-Path $newoutputfoldoer -PathType Container) {
 						Write-Host "    - Existing installation package`n"
+						break
 					} else {
-						Write-Host "`    * Start download`n    - Connection address: $url"
-						Write-Host "`    - Save the file to: $outputzip"
+						Write-Host "    * Start download`n        ^ Connected to: $url"
 						try {
-							Write-Host "`    - Save the file to: $outputzip"
-							Check-SD -chkpath $outputfoldoer
-							(New-Object System.Net.WebClient).DownloadFile($url, $outputzip) | Out-Null
+							Write-Host "      + Save to: $OutArchive"
+							Test-Catalog -chkpath $newoutputfoldoer
+							(New-Object System.Net.WebClient).DownloadFile($url, $OutArchive) | Out-Null
 						} catch {
-							Write-Host "     - Status: Not available`n" -ForegroundColor Red
+							Write-Host "      - Status: Not available`n" -ForegroundColor Red
+							break
 						}
 						Write-Host "    - Unzip only"
-						Archive-Unzip -filename $outputzip -to $outputfoldoer
-						if ((Test-Path $outputzip)) { remove-item -path $outputzip -force }
+						Archive-Unzip -filename $OutArchive -to $newoutputfoldoer
+						Write-Host "    - Unzip complete`n"
+						if ((Test-Path $OutArchive)) { remove-item -path $OutArchive -force }
 					}
 				}
 				Unzip {
-					if ((Test-Path -Path $outputzip)) {
+					if ((Test-Path -Path $OutArchive)) {
 						Write-Host "    - Existing installation package"
 					} else {
-						Write-Host "`    * Start download    - Connection address: $url"
-						Write-Host "`    - Save the file to: $outputzip"
+						Write-Host "    * Start download      ^ Connected to: $url"
 						try {
-							Write-Host "`    - Save the file to: $outputzip"
-							Check-SD -chkpath $outputfoldoer
-							(New-Object System.Net.WebClient).DownloadFile($url, $outputzip) | Out-Null
+							Write-Host "      + Save to: $OutArchive"
+							Test-Catalog -chkpath $OutTo
+							(New-Object System.Net.WebClient).DownloadFile($url, $OutArchive) | Out-Null
 						} catch {
-							Write-Host "     - Status: Not available`n" -ForegroundColor Red
+							Write-Host "      - Status: Not available`n" -ForegroundColor Red
+							break
 						}
 					}
 					Write-Host "    - Unzip only"
-					Archive-Unzip -filename $outputzip -to $outputfoldoer
-					if ((Test-Path $outputzip)) { remove-item -path $outputzip -force }
-				}
-				Install {
-					if ((Test-Path -Path $outputzip)) {
-						Write-Host "    - Existing installation package"
-					} else {
-						Write-Host "`    * Start download`n    - Connection address: $url"
-						Write-Host "`    - Save the file to: $outputzip"
-						try {
-							Write-Host "`    - Save the file to: $outputzip"
-							Check-SD -chkpath $outputfoldoer
-							(New-Object System.Net.WebClient).DownloadFile($url, $outputzip) | Out-Null
-						} catch {
-							Write-Host "     - Status: Not available`n" -ForegroundColor Red
-						}
-					}
-					Write-Host "    - Run after decompression"
-					Archive-Unzip -filename $outputzip -to $outputfoldoer
-					if ((Test-Path $outputzip)) { remove-item -path $outputzip -force }
-					Get-ChildItem $outputfoldoer -Recurse -Include "*$($filename)*.exe" -ErrorAction SilentlyContinue | Foreach-Object {
-					    Write-Host "    - Locally exist: $($_.fullname)"
-					    Get-RunApp -filename $($_.fullname) -param $param -pp $pp
-					}
+					Archive-Unzip -filename $OutArchive -to $OutTo
+					Write-Host "    - Unzip complete`n"
+					if ((Test-Path $OutArchive)) { remove-item -path $OutArchive -force }
 				}
 			}
 		}
 		default {
-			if ((Test-Path $outputexe -PathType Leaf)) {
-				Get-RunApp -filename $outputexe -param $param -pp $pp
+			if ((Test-Path $OutAny -PathType Leaf)) {
+				Open-App -filename $OutAny -param $param -pp $pp
 			} else {
-				Write-Host "`    * Start download`n    - Connection address: $url"
+				Write-Host "    * Start download`n      ^ Connected to: $url"
 				try {
-					Write-Host "`    - Save the file to: $outputexe"
-					Check-SD -chkpath $outputfoldoer
-					(New-Object System.Net.WebClient).DownloadFile($url, $outputexe) | Out-Null
-					Get-RunApp -filename $outputexe -param $param -pp $pp
+					Write-Host "      + Save to: $OutAny"
+					Test-Catalog -chkpath $OutTo
+					(New-Object System.Net.WebClient).DownloadFile($url, $OutAny) | Out-Null
+					Open-App -filename $OutAny -param $param -pp $pp
 				} catch {
-					Write-Host "     - Status: Not available`n" -ForegroundColor Red
+					Write-Host "      - Status: Not available`n" -ForegroundColor Red
+					break
 				}
 			}
 		}
@@ -384,7 +387,7 @@ function Get-Zip {
 	return $false
 }
 
-function Get-RunApp {
+function Open-App {
 	param(
 		$filename,
 		$param,
@@ -396,38 +399,25 @@ function Get-RunApp {
 		{
 			Fast {
 				Write-Host "    - Fast running: $filename`n    - parameter: $param`n"
-				Start-Process -FilePath $filename -ArgumentList $param
+				if (([string]::IsNullOrEmpty($param))){
+					Start-Process -FilePath $filename
+				} else {
+					Start-Process -FilePath $filename -ArgumentList $param
+				}
 			}
 			Wait {
-				Write-Host "    - Waiting to run: $filename`n    - parameter: $param`n"
-				Start-Process -FilePath $filename -ArgumentList $param -Wait
+				Write-Host "    - Wait for completion: $filename`n    - parameter: $param`n"
+				if (([string]::IsNullOrEmpty($param))){
+					Start-Process -FilePath $filename -Wait
+				} else {
+					Start-Process -FilePath $filename -ArgumentList $param -Wait
+				}
 			}
 		}
 	} else {
 		Write-Host "    - No installation files were found,`n      please check the integrity: $filename`n" -ForegroundColor Red
 	}
 }
-
-cls
-Write-Host "`n   Author: Yi ( http://fengyi.tel )
-
-   From: Yi's Solution
-   buildstring: 5.1.2.2.bk_release.210120-1208
-
-   Installed software list ( total $($app.Count) items )
-   ---------------------------------------------------"
-for ($i=0; $i -lt $app.Count; $i++) {
-	Switch ($app[$i][1])
-	{
-		Enable {
-			Write-Host "   'Wait install' - $($app[$i][0])" -ForegroundColor Green
-		}
-		Disable {
-			Write-Host "   'Skip install' - $($app[$i][0])" -ForegroundColor Red
-		}
-	}
-}
-Write-Host "   ---------------------------------------------------"
 
 function Wait-Exit {
 	param(
@@ -438,34 +428,58 @@ function Wait-Exit {
 	exit
 }
 
-function Install-start {
+function Obtain-And-Install {
 	Write-Host "`n   Installing software..."
 	Write-Host "   ---------------------------------------------------"
 	for ($i=0; $i -lt $app.Count; $i++) {
-		Get-Version -appname $app[$i][0] -status $app[$i][1] -act $app[$i][2] -pp $app[$i][3] -types $app[$i][4] -todisk $app[$i][5] -structure $app[$i][6] -filename $app[$i][7] -packer $app[$i][8] -url $app[$i][9] -param $app[$i][10]
+		Start-Install-Software -appname $app[$i][0] -status $app[$i][1] -act $app[$i][2] -pp $app[$i][3] -types $app[$i][4] -todisk $app[$i][5] -structure $app[$i][6] -filename $app[$i][7] -packer $app[$i][8] -url $app[$i][9] -param $app[$i][10]
 	}
 }
 
 function Process-other {
-	Write-Host "`n    Processing other:" -ForegroundColor Green
+	Write-Host "`n   Processing other:" -ForegroundColor Green
 
-	Write-Host "    - Delete startup items"
+	Write-Host "   - Delete startup items"
 	Remove-ItemProperty -Name "Wechat" -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" -ErrorAction SilentlyContinue | Out-Null
 
-	Write-Host "    - Delete redundant shortcuts"
+	Write-Host "   - Delete redundant shortcuts"
 	Set-Location "$env:public\Desktop"
 	Remove-Item ".\Kleopatra.lnk" -Force -ErrorAction SilentlyContinue | Out-Null
 
-	Write-Host "    - Rename"
+	Write-Host "   - Rename"
 	#Rename-Item-NewName "Google Chrome.lnk"  -Path ".\New Google Chrome.lnk" -ErrorAction SilentlyContinue | Out-Null
 }
 
+function Get-Mainpage {
+	cls
+	Write-Host "`n   Author: Yi ( http://fengyi.tel )
+
+   From: Yi's Solution
+   buildstring: 5.1.2.6.bk_release.210120-1208
+
+   INSTALLED SOFTWARE LIST ( total $($app.Count) items )
+   ---------------------------------------------------"
+	for ($i=0; $i -lt $app.Count; $i++) {
+		Switch ($app[$i][1])
+		{
+			Enable {
+				Write-Host "   WAIT - $($app[$i][0])" -ForegroundColor Green
+			}
+			Disable {
+				Write-Host "   SKIP - $($app[$i][0])" -ForegroundColor Red
+			}
+		}
+	}
+	Write-Host "   ---------------------------------------------------"
+}
+
+Get-Mainpage
+
 If ($Force) {
-	Install-start
+	Obtain-And-Install
 	Process-other
 } else {
 	Write-Host "   Do you want to install the above software?" -ForegroundColor Green
-
 	$caption="Please confirm before installing the software."
 	$message="Continue installation (Y)`nCancel the installation (N)"
 	$choices = @("&Yes","&No")
@@ -475,7 +489,7 @@ If ($Force) {
 	Switch ($prompt)
 	{
 		0 {
-			Install-start
+			Obtain-And-Install
 			Process-other
 			Wait-Exit -wait 6
 		}

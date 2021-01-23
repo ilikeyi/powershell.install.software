@@ -11,7 +11,7 @@
 #    4. 支持解压包处理等。
 #
 #  先决条件：
-#    - PowerShell 5.1 或更高
+#Requires -version 3.0
 #
 #  源代码：
 #  https://github.com/ilikeyi/powershell.install.software
@@ -30,21 +30,32 @@ $app = @(
 	("Nvidia GEFORCE GAME READY DRIVER",                  # 软件包名称
 	 [Status]::Disable,                                   # 状态：Enable = 启用，Disable = 禁用
 	 [Action]::Install,                                   # 动作：Install = 安装，NoInst = 下载后不安装，Unzip = 下载后仅解压，To = 安装到目录
-	 [PP]::Wait,                                          # 运行方式：Wait = 等待运行结束，Fast = 直接运行
-	 [FileType]::exe,                                     # 文件类型：exe, zip，或自定义文件类型
+	 [Mode]::Wait,                                        # 运行方式：Wait = 等待完成，Fast = 直接运行
+	 "exe",                                               # 文件类型：exe, zip 或自定义文件类型
 	 "auto",                                              # 盘符：Auto = 全盘搜索，A-Z = 指定盘符或自定义路径
-	 "安装包\驱动",                                        # 目录结构，例如：AUTO 改成 C，合并结果：C:\Yi\Apps\Drive
+	 "安装包\驱动程序\显卡",                              # 目录结构，例如：AUTO 改成 C，合并结果：C:\安装包\驱动程序\显卡
 	 "*-desktop-win10-*-international-dch-whql",          # 匹配文件名，支持模糊功能（*）
 	 "460.89-desktop-win10-64bit-international-dch-whql", # 网站下载绝对文件名，请勿填后缀
 	 "https://us.download.nvidia.cn/Windows/460.89/",     # 网站路径前缀，/ 号结尾
 	 "-s -clean -noreboot -noeula"),                      # 参数
+	("Yi's 个性主题包",
+	 [Status]::Disable,
+	 [Action]::Install,
+	 [Mode]::Fast,
+	 "deskthemepack",
+	 "auto",
+	 "安装包\主题包",
+	 "Yi*",
+	 "Yi",
+	 "https://fengyi.tel/",
+	 ""),
 	("Sysinternals Suite",
 	 [Status]::Disable,
 	 [Action]::To,
-	 [PP]::Wait,
-	 [FileType]::zip,
-	 "auto",
-	 "安装包",
+	 [Mode]::Wait,
+	 "zip",
+	 $env:SystemDrive,
+	 "",
 	 "SysinternalsSuite",
 	 "SysinternalsSuite",
 	 "https://download.sysinternals.com/files/",
@@ -52,8 +63,8 @@ $app = @(
 	("VisualCppRedist AIO",
 	 [Status]::Disable,
 	 [Action]::Install,
-	 [PP]::Wait,
-	 [FileType]::zip,
+	 [Mode]::Wait,
+	 "zip",
 	 "auto",
 	 "安装包\AIO",
 	 "VisualCppRedist*",
@@ -63,8 +74,8 @@ $app = @(
 	("Gpg4win",
 	 [Status]::Disable,
 	 [Action]::Install,
-	 [PP]::Wait,
-	 [FileType]::exe,
+	 [Mode]::Wait,
+	 "exe",
 	 "auto",
 	 "安装包\AIO",
 	 "gpg4win*",
@@ -74,8 +85,8 @@ $app = @(
 	("Python",
 	 [Status]::Disable,
 	 [Action]::Install,
-	 [PP]::Wait,
-	 [FileType]::exe,
+	 [Mode]::Wait,
+	 "exe",
 	 "auto",
 	 "安装包\开发软件",
 	 "python-*",
@@ -85,21 +96,21 @@ $app = @(
 	("酷狗音乐",
 	 [Status]::Disable,
 	 [Action]::Install,
-	 [PP]::Wait,
-	 [FileType]::exe,
+	 [Mode]::Wait,
+	 "exe",
 	 "auto",
-	 "安装包\音乐",
+	 "安装包\音乐软件",
 	 "kugou*",
 	 "kugou9175",
-	 "https://downmini.yun.kugou.com/web",
+	 "https://downmini.yun.kugou.com/web/",
 	 "/S"),
 	("网易云音乐",
 	 [Status]::Disable,
 	 [Action]::Install,
-	 [PP]::Wait,
-	 [FileType]::exe,
+	 [Mode]::Wait,
+	 "exe",
 	 "auto",
-	 "安装包\音乐",
+	 "安装包\音乐软件",
 	 "cloudmusicsetup*",
 	 "cloudmusicsetup2.7.5.198554",
 	 "https://d1.music.126.net/dmusic/",
@@ -107,10 +118,10 @@ $app = @(
 	("QQ 音乐",
 	 [Status]::Disable,
 	 [Action]::Install,
-	 [PP]::Fast,
-	 [FileType]::exe,
+	 [Mode]::Fast,
+	 "exe",
 	 "auto",
-	 "安装包\音乐",
+	 "安装包\音乐软件",
 	 "QQMusicSetup",
 	 "QQMusicSetup",
 	 "https://dldir1.qq.com/music/clntupate/",
@@ -118,10 +129,10 @@ $app = @(
 	("腾讯 QQ 2020",
 	 [Status]::Enable,
 	 [Action]::Install,
-	 [PP]::Wait,
-	 [FileType]::exe,
+	 [Mode]::Wait,
+	 "exe",
 	 "auto",
-	 "安装包\社交",
+	 "安装包\社交软件",
 	 "PCQQ2020",
 	 "PCQQ2020",
 	 "https://down.qq.com/qqweb/PCQQ/PCQQ_EXE/",
@@ -129,10 +140,10 @@ $app = @(
 	("微信",
 	 [Status]::Enable,
 	 [Action]::Install,
-	 [PP]::Wait,
-	 [FileType]::exe,
+	 [Mode]::Wait,
+	 "exe",
 	 "auto",
-	 "安装包\社交",
+	 "安装包\社交软件",
 	 "WeChatSetup",
 	 "WeChatSetup",
 	 "https://dldir1.qq.com/weixin/Windows/",
@@ -145,9 +156,9 @@ Enum Status
 	Disable
 }
 
-Enum PP
+Enum Mode
 {
-	Wait    # 等待运行结束
+	Wait    # 等待完成
 	Fast    # 直接运行
 }
 
@@ -159,18 +170,13 @@ Enum Action
 	Unzip   # 下载后仅解压
 }
 
-Enum FileType
-{
-	exe
-	zip
-}
-
-function Test-Disk {
+function Test-Available-Disk {
 	param (
 		[string]$Path
 	)
 	$test_tmp_filename = "writetest-"+[guid]::NewGuid()
 	$test_filename = $Path + ":\" + $test_tmp_filename
+
 	try {
 		[io.file]::OpenWrite($test_filename).close()
 
@@ -227,7 +233,7 @@ function Test-URI {
 	}
 }
 
-function Check-SD {
+function Test-Catalog {
 	Param(
 		[string]$chkpath
 	)
@@ -241,7 +247,7 @@ function Check-SD {
 	}
 }
 
-function Get-Version {
+function Start-Install-Software {
 	param(
 		$appname,
 		$status,
@@ -259,22 +265,15 @@ function Get-Version {
 	Switch ($status)
 	{
 		Enable {
-			Write-Host "   '正在安装' - $($appname)" -ForegroundColor Green
+			Write-Host "   正在安装 - $($appname)" -ForegroundColor Green
 		}
 		Disable {
-			Write-Host "   '跳过安装' - $($appname)" -ForegroundColor Red
+			Write-Host "   跳过安装 - $($appname)" -ForegroundColor Red
 			return
 		}
 	}
 
 	$url = $url + $packer + "." + $types
-
-	switch -regex ($todisk)
-	{
-		"auto" { break }
-		"^[a-z]$" { break }
-		default { $todisk = "auto" }
-	}
 
 	Switch ($todisk)
 	{
@@ -282,49 +281,29 @@ function Get-Version {
 			$drives = Get-PSDrive | Select-Object -ExpandProperty 'Name' | Select-String -Pattern '^[a-z]$'
 			$newdrives = Get-PSDrive | Select-Object -ExpandProperty 'Name' | Select-String -Pattern '^[d-z]$'
 			foreach ($drive in $drives) {
-				$newpath = "$($drive):\$($structure)\$($filename).$($types)"
 				$tempoutputfoldoer = "$($drive):\$($structure)"
 				Get-ChildItem $tempoutputfoldoer -Recurse -Include "*$($filename)*" -ErrorAction SilentlyContinue | Foreach-Object {
-					$outputexe = $($_.fullname)
-					$outputfoldoer = "$($drive):\$($structure)"
+					$OutTo = Join-Path -Path "$($drive):" -ChildPath "$($structure)"
+					$OutAny = $($_.fullname)
 					break
 				}
 				foreach ($drive in $newdrives) {
-					if(Test-Disk -Path $drive) {
-						if ( $act -eq "To" ) {
-							$outputfoldoer = "$($drive):\$($structure)\$($packer)"
-							$outputexe = "$($drive):\$($structure)\$($packer)\$($packer).exe"
-							$outputzip = "$($drive):\$($structure)\$($packer)\$($packer).zip"
-						} else {
-							$outputfoldoer = "$($drive):\$($structure)"
-							$outputexe = "$($drive):\$($structure)\$($packer).exe"
-							$outputzip = "$($drive):\$($structure)\$($packer).zip"
-						}
-						break
+					if(Test-Available-Disk -Path $drive) {
+						$OutTo = Join-Path -Path "$($drive):" -ChildPath "$($structure)"
+						$OutAny = Join-Path -Path "$($drive):" -ChildPath "$($structure)\$($packer).$($types)"
+						$OutArchive = Join-Path -Path "$($drive):" -ChildPath "$($structure)\$($packer).zip"
 					} else {
-						if ( $act -eq "To") {
-							$outputfoldoer = "$($env:SystemDrive)\$($structure)\$($packer)"
-							$outputexe = "$($env:SystemDrive)\$($structure)\$($packer)\$($packer).exe"
-							$outputzip = "$($env:SystemDrive)\$($structure)\$($packer)\$($packer).zip"
-						} else {
-							$outputfoldoer = "$($env:SystemDrive)\$($structure)"
-							$outputexe = "$($env:SystemDrive)\$($structure)\$($packer).exe"
-							$outputzip = "$($env:SystemDrive)\$($structure)\$($packer).zip"
-						}
+						$OutTo = Join-Path -Path $($env:SystemDrive) -ChildPath "$($structure)"
+						$OutAny = Join-Path -Path $($env:SystemDrive) -ChildPath "$($structure)\$($packer).$($types)"
+						$OutArchive = Join-Path -Path $($env:SystemDrive) -ChildPath "$($structure)\$($packer).zip"
 					}
 				}
 			}
 		}
 		default {
-			if ( $act -eq "To") {
-				$outputfoldoer = "$($todisk)\$($structure)\$($packer)"
-				$outputexe = "$($todisk)\$($structure)\$($packer)\$($packer).exe"
-				$outputzip = "$($todisk)\$($structure)\$($packer)\$($packer).zip"
-			} else {
-				$outputfoldoer = "$($todisk)\$($structure)"
-				$outputexe = "$($todisk)\$($structure)\$($packer).exe"
-				$outputzip = "$($todisk)\$($structure)\$($packer).zip"
-			}
+			$OutTo = Join-Path -Path $($todisk) -ChildPath "$($structure)"
+			$OutAny = Join-Path -Path $($todisk) -ChildPath "$($structure)\$($packer).$($types)"
+			$OutArchive = Join-Path -Path $($todisk) -ChildPath "$($structure)\$($packer).zip"
 		}
 	}
 
@@ -334,70 +313,77 @@ function Get-Version {
 			Switch ($act)
 			{
 				Install {
-					Get-ChildItem $outputfoldoer -Recurse -Include "*$($filename)*.exe" -ErrorAction SilentlyContinue | Foreach-Object {
-						Write-Host "    - 已有安装包"
-						Get-RunApp -filename $($_.fullname) -param $param -pp $pp
+					Get-ChildItem $OutTo -Recurse -Include "*$($filename)*.exe" -ErrorAction SilentlyContinue | Foreach-Object {
+						Write-Host "    - 本地存在：$($_.fullname)"
+						Open-App -filename $($_.fullname) -param $param -pp $pp
 						break
-						return
+					}
+					if (Test-Path -Path $OutArchive) {
+						Write-Host "    - 已有安装包`n"
+					} else {
+						Write-Host "    * 开始下载`n      ^ 连接到：$url`n      + 保存到：$OutArchive"
+						Test-Catalog -chkpath $OutTo
+						Invoke-WebRequest -Uri $url -OutFile "$($OutArchive)" -ErrorAction SilentlyContinue | Out-Null
+					}
+					Write-Host "    - 解压中"
+					Archive-Unzip -filename $OutArchive -to $OutTo
+					Write-Host "    - 解压完成`n"
+					if ((Test-Path $OutArchive)) { remove-item -path $OutArchive -force }
+					Get-ChildItem $OutTo -Recurse -Include "*$($filename)*.exe" -ErrorAction SilentlyContinue | Foreach-Object {
+						Write-Host "    - 本地存在：$($_.fullname)"
+						Open-App -filename $($_.fullname) -param $param -pp $pp
+					}
+				}
+				NoInst {
+					if (Test-Path -Path $OutArchive) {
+						Write-Host "    - 已有安装包`n"
+					} else {
+						Write-Host "    * 开始下载`n      ^ 连接到：$url`n      + 保存到：$OutArchive"
+						Test-Catalog -chkpath $OutTo
+						Invoke-WebRequest -Uri $url -OutFile "$($OutArchive)" -ErrorAction SilentlyContinue | Out-Null
 					}
 				}
 				To {
-					if (Test-Path $outputfoldoer -PathType Container) {
+					$newoutputfoldoer = "$($OutTo)\$($packer)"
+					if (Test-Path $newoutputfoldoer -PathType Container) {
 						Write-Host "    - 已有安装包`n"
+						break
 					} else {
-						Write-Host "`    * 开始下载`n    - 连接地址：$url"
-						Write-Host "`    - 保存文件到：$outputzip"
-						Check-SD -chkpath $outputfoldoer
-						Invoke-WebRequest -Uri $url -OutFile $outputzip -ErrorAction SilentlyContinue | Out-Null
+						Write-Host "    * 开始下载`n      ^ 连接到：$url`n      + 保存到：$OutArchive"
+						Invoke-WebRequest -Uri $url -OutFile $OutArchive -ErrorAction SilentlyContinue | Out-Null
 						Write-Host "    - 仅解压"
-						Archive-Unzip -filename $outputzip -to $outputfoldoer
-						if ((Test-Path $outputzip)) { remove-item -path $outputzip -force }
+						Archive-Unzip -filename $OutArchive -to $newoutputfoldoer
+						Write-Host "    - 解压完成`n"
+						if ((Test-Path $OutArchive)) { remove-item -path $OutArchive -force }
 					}
 				}
 				Unzip {
-					if ((Test-Path -Path $outputzip)) {
-						Write-Host "    - 已有安装包"
+					if ((Test-Path -Path $OutArchive)) {
+						Write-Host "    - 已有安装包`n"
 					} else {
-						Write-Host "`    * 开始下载    - 连接地址：$url"
-						Write-Host "`    - 保存文件到：$outputzip"
-						Check-SD -chkpath $outputfoldoer
-						Invoke-WebRequest -Uri $url -OutFile $outputzip -ErrorAction SilentlyContinue | Out-Null
+						Write-Host "    * 开始下载`n      ^ 连接到：$url`n      + 保存到：$OutArchive"
+						Test-Catalog -chkpath $OutTo
+						Invoke-WebRequest -Uri $url -OutFile $OutArchive -ErrorAction SilentlyContinue | Out-Null
 					}
 					Write-Host "    - 仅解压"
-					Archive-Unzip -filename $outputzip -to $outputfoldoer
-					if ((Test-Path $outputzip)) { remove-item -path $outputzip -force }
-				}
-				Install {
-					if ((Test-Path -Path $outputzip)) {
-						Write-Host "    - 已有安装包"
-					} else {
-						Write-Host "`    * 开始下载`n    - 连接地址：$url"
-						Write-Host "`    - 保存文件到：$outputzip"
-						Check-SD -chkpath $outputfoldoer
-						Invoke-WebRequest -Uri $url -OutFile "$($outputzip)" -ErrorAction SilentlyContinue | Out-Null
-					}
-					Write-Host "    - 解压后运行"
-					Archive-Unzip -filename $outputzip -to $outputfoldoer
-					if ((Test-Path $outputzip)) { remove-item -path $outputzip -force }
-					Get-ChildItem $outputfoldoer -Recurse -Include "*$($filename)*.exe" -ErrorAction SilentlyContinue | Foreach-Object {
-					    Write-Host "    - 本地存在：$($_.fullname)"
-					    Get-RunApp -filename $($_.fullname) -param $param -pp $pp
-					}
+					Archive-Unzip -filename $OutArchive -to $OutTo
+					Write-Host "    - 解压完成`n"
+					if ((Test-Path $OutArchive)) { remove-item -path $OutArchive -force }
 				}
 			}
 		}
 		default {
-			if ((Test-Path $outputexe -PathType Leaf)) {
-				Get-RunApp -filename $outputexe -param $param -pp $pp
+			if ((Test-Path $OutAny -PathType Leaf)) {
+				Open-App -filename $OutAny -param $param -pp $pp
 			} else {
-				Write-Host "`    * 开始下载`n    - 连接地址：$url"
+				Write-Host "    * 开始下载`n      ^ 连接到：$url"
 				if (test-uri $url) {
-					Write-Host "`    - 保存文件到：$outputexe"
-					Check-SD -chkpath $outputfoldoer
-					Invoke-WebRequest -Uri $url -OutFile $outputexe -ErrorAction SilentlyContinue | Out-Null
-					Get-RunApp -filename $outputexe -param $param -pp $pp
+					Write-Host "      + 保存到：$OutAny"
+					Test-Catalog -chkpath $OutTo
+					Invoke-WebRequest -Uri $url -OutFile $OutAny -ErrorAction SilentlyContinue | Out-Null
+					Open-App -filename $OutAny -param $param -pp $pp
 				} else {
-					Write-Host "     - 状态：不可用`n" -ForegroundColor Red
+					Write-Host "      - 状态：不可用`n" -ForegroundColor Red
 				}
 			}
 		}
@@ -411,11 +397,11 @@ function Archive-Unzip {
 	)
 
 	if (Get-Zip) {
-		Write-host "    - 使用 $script:Zip 解压软件`n"
+		Write-host "    - 使用 $script:Zip 解压软件"
 		$arguments = "x ""-r"" ""-tzip"" ""$filename"" ""-o$to"" ""-y""";
 		Start-Process $script:Zip "$arguments" -Wait -WindowStyle Minimized
 	} else {
-		Write-host "    - 使用系统自带的解压软件`n"
+		Write-host "    - 使用系统自带的解压软件"
 		Expand-Archive -LiteralPath $filename -DestinationPath $to -force
 	}
 }
@@ -438,7 +424,7 @@ function Get-Zip {
 	return $false
 }
 
-function Get-RunApp {
+function Open-App {
 	param(
 		$filename,
 		$param,
@@ -450,38 +436,25 @@ function Get-RunApp {
 		{
 			Fast {
 				Write-Host "    - 快速运行：$filename`n    - 参数：$param`n"
-				Start-Process -FilePath $filename -ArgumentList $param
+				if (([string]::IsNullOrEmpty($param))){
+					Start-Process -FilePath $filename
+				} else {
+					Start-Process -FilePath $filename -ArgumentList $param
+				}
 			}
 			Wait {
-				Write-Host "    - 等待运行：$filename`n    - 参数：$param`n"
-				Start-Process -FilePath $filename -ArgumentList $param -Wait
+				Write-Host "    - 等待完成：$filename`n    - 参数：$param`n"
+				if (([string]::IsNullOrEmpty($param))){
+					Start-Process -FilePath $filename -Wait
+				} else {
+					Start-Process -FilePath $filename -ArgumentList $param -Wait
+				}
 			}
 		}
 	} else {
 		Write-Host "    - 未发现安装文件，请检查完整性：$filename`n" -ForegroundColor Red
 	}
 }
-
-cls
-Write-Host "`n   Author: Yi ( http://fengyi.tel )
-
-   From: Yi's Solution
-   buildstring: 5.1.2.2.bk_release.210120-1208
-
-   安装软件列表 ( 共 $($app.Count) 款 )
-   ---------------------------------------------------"
-for ($i=0; $i -lt $app.Count; $i++) {
-	Switch ($app[$i][1])
-	{
-		Enable {
-			Write-Host "   '等待安装' - $($app[$i][0])" -ForegroundColor Green
-		}
-		Disable {
-			Write-Host "   '跳过安装' - $($app[$i][0])" -ForegroundColor Red
-		}
-	}
-}
-Write-Host "   ---------------------------------------------------"
 
 function Wait-Exit {
 	param(
@@ -492,38 +465,62 @@ function Wait-Exit {
 	exit
 }
 
-function Install-start {
+function Obtain-And-Install {
 	Write-Host "`n   正在安装软件..."
 	Write-Host "   ---------------------------------------------------"
 	for ($i=0; $i -lt $app.Count; $i++) {
-		Get-Version -appname $app[$i][0] -status $app[$i][1] -act $app[$i][2] -pp $app[$i][3] -types $app[$i][4] -todisk $app[$i][5] -structure $app[$i][6] -filename $app[$i][7] -packer $app[$i][8] -url $app[$i][9] -param $app[$i][10]
+		Start-Install-Software -appname $app[$i][0] -status $app[$i][1] -act $app[$i][2] -pp $app[$i][3] -types $app[$i][4] -todisk $app[$i][5] -structure $app[$i][6] -filename $app[$i][7] -packer $app[$i][8] -url $app[$i][9] -param $app[$i][10]
 	}
 }
 
 function Process-other {
-	Write-Host "`n    处理其它：" -ForegroundColor Green
+	Write-Host "`n   处理其它：" -ForegroundColor Green
 
-	Write-Host "    - 删除开机自启动项"
+	Write-Host "   - 删除开机自启动项"
 	Remove-ItemProperty -Name "Wechat" -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" -ErrorAction SilentlyContinue | Out-Null
 
-	Write-Host "    - 禁用计划任务"
+	Write-Host "   - 禁用计划任务"
 	Disable-ScheduledTask -TaskName GoogleUpdateTaskMachineCore -ErrorAction SilentlyContinue | Out-Null
 	Disable-ScheduledTask -TaskName GoogleUpdateTaskMachineUA -ErrorAction SilentlyContinue | Out-Null
 
-	Write-Host "    - 删除多余快捷方式"
+	Write-Host "   - 删除多余快捷方式"
 	Set-Location "$env:public\Desktop"
 	Remove-Item ".\Kleopatra.lnk" -Force -ErrorAction SilentlyContinue | Out-Null
 
-	Write-Host "    - 更名"
+	Write-Host "   - 更名"
 	#Rename-Item-NewName "谷歌浏览器.lnk"  -Path ".\Google Chrome.lnk" -ErrorAction SilentlyContinue | Out-Null
 }
 
+function Get-Mainpage {
+	cls
+	Write-Host "`n   Author: Yi ( http://fengyi.tel )
+
+   From: Yi's Solution
+   buildstring: 5.1.2.6.bk_release.210120-1208
+
+   安装软件列表 ( 共 $($app.Count) 款 )
+   ---------------------------------------------------"
+	for ($i=0; $i -lt $app.Count; $i++) {
+		Switch ($app[$i][1])
+		{
+			Enable {
+				Write-Host "   等待 - $($app[$i][0])" -ForegroundColor Green
+			}
+			Disable {
+				Write-Host "   跳过 - $($app[$i][0])" -ForegroundColor Red
+			}
+		}
+	}
+	Write-Host "   ---------------------------------------------------"
+}
+
+Get-Mainpage
+
 If ($Force) {
-	Install-start
+	Obtain-And-Install
 	Process-other
 } else {
 	Write-Host "   是否安装以上软件？" -ForegroundColor Green
-
 	$caption="安装软件前请确认。"
 	$message="继续安装（Y）`n取消安装（N）"
 	$choices = @("&Yes","&No")
@@ -533,7 +530,7 @@ If ($Force) {
 	Switch ($prompt)
 	{
 		0 {
-			Install-start
+			Obtain-And-Install
 			Process-other
 			Wait-Exit -wait 6
 		}
