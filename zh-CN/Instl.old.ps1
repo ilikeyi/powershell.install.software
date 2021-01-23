@@ -32,7 +32,7 @@ $appname   ("Gpg4win",                   软件包名称
 $status     "Disable",                   状态：Enable - 启用；Disable - 禁用
 $act        "Install",                   动作：Install - 安装；NoInst 下载后不安装；Unzip - 下载后仅解压；To - 安装到目录
 $mode       "wait",                      运行方式：Wait - 等待完成；Fast - 直接运行
-$todisk     "auto",                      设置 Auto 自动从 A-Z 盘开始搜索；指定盘符 [A:]-[Z:]；指定路径：\\192.168.1.1
+$todisk     "auto",                      设置自动后将排除当前系统盘，搜索不到可用盘时，默认设置为当前系统盘；指定盘符 [A:]-[Z:]；指定路径：\\192.168.1.1
 $structure  "安装包\AIO",                目录结构
 $url        "https://files.gpg4win.org", 网站地址
 $packer     "gpg4win-3.1.15",            从网站下载的文件名

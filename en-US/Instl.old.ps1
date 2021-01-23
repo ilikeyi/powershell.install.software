@@ -32,7 +32,7 @@ $appname   ("Gpg4win",                   Package name
 $status     "Disable",                   Status: Enable - enabled; Disable - disabled
 $act        "Install",                   Action: Install - install; NoInst - does not install after download; Unzip - only extract after download; To - install to directory
 $mode       "wait",                      Operation mode: Wait - wait for completion; Fast - run directly
-$todisk     "auto",                      Set Auto to search automatically from the A-Z disk; specify the drive letter [A:]-[Z:]; specify the path: \\192.168.1.1
+$todisk     "auto",                      After setting automatic, the current system disk will be excluded. If no available disk is found, the default setting is the current system disk; specify the drive letter [A:]-[Z:]; specify the path: \\192.168.1.1
 $structure  "Installation package\AIO",  Directory Structure
 $url        "https://files.gpg4win.org", Website address
 $packer     "gpg4win-3.1.15",            File name downloaded from website
