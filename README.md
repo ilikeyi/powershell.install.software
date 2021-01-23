@@ -1,5 +1,7 @@
-#    You are welcome to install the software using PowerShell
-#    欢迎您使用 PowerShell 安装软件
+You are welcome to install the software using PowerShell
+-
+欢迎您使用 PowerShell 安装软件
+-
 
     The main function:
       1. The installation package does not exist locally, activate the download;
