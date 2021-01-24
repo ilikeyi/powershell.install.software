@@ -35,8 +35,8 @@ $mode       [Mode]::Wait,                Operation mode: Wait - wait for complet
 $todisk     "auto",                      After setting automatic, the current system disk will be excluded. If no available disk is found, the default setting is the current system disk; specify the drive letter [A:]-[Z:]; specify the path: \\192.168.1.1
 $structure  "Installation package\AIO",  Directory Structure
 $url        "https://files.gpg4win.org", Website address
-$packer     "gpg4win-3.1.15",            File name downloaded from website
-$types      "exe",                       File type downloaded from the website: exe, zip or custom file type; result: https://files.gpg4win.org/gpg4win-3.1.15.exe
+$packer     "gpg4win-latest",            File name downloaded from website
+$types      "exe",                       File type downloaded from the website: exe, zip or custom file type; result: https://files.gpg4win.org/gpg4win-latest.exe
 $filename   "gpg4win*",                  File name fuzzy search (*)
 $param      "/S"),                       Operating parameters
 ```
@@ -51,8 +51,8 @@ $mode       [Mode]::Wait,                运行方式：Wait - 等待完成；Fa
 $todisk     "auto",                      设置自动后将排除当前系统盘，搜索不到可用盘时，默认设置为当前系统盘；指定盘符 [A:]-[Z:]；指定路径：\\192.168.1.1
 $structure  "安装包\AIO",                目录结构
 $url        "https://files.gpg4win.org", 网站地址
-$packer     "gpg4win-3.1.15",            从网站下载的文件名
-$types      "exe",                       从网站下载的文件类型：exe, zip 或自定义文件类型；结果：https://files.gpg4win.org/gpg4win-3.1.15.exe
+$packer     "gpg4win-latest",            从网站下载的文件名
+$types      "exe",                       从网站下载的文件类型：exe, zip 或自定义文件类型；结果：https://files.gpg4win.org/gpg4win-latest.exe
 $filename   "gpg4win*",                  文件名模糊查找（*）
 $param      "/S"),                       运行参数
 ```

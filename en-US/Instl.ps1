@@ -35,8 +35,8 @@ $mode       [Mode]::Wait,                Operation mode: Wait - wait for complet
 $todisk     "auto",                      After setting automatic, the current system disk will be excluded. If no available disk is found, the default setting is the current system disk; specify the drive letter [A:]-[Z:]; specify the path: \\192.168.1.1
 $structure  "Installation package\AIO",  Directory Structure
 $url        "https://files.gpg4win.org", Website address
-$packer     "gpg4win-3.1.15",            File name downloaded from website
-$types      "exe",                       File type downloaded from the website: exe, zip or custom file type; result: https://files.gpg4win.org/gpg4win-3.1.15.exe
+$packer     "gpg4win-latest",            File name downloaded from website
+$types      "exe",                       File type downloaded from the website: exe, zip or custom file type; result: https://files.gpg4win.org/gpg4win-latest.exe
 $filename   "gpg4win*",                  File name fuzzy search (*)
 $param      "/S"),                       Operating parameters
 
@@ -60,7 +60,7 @@ $app = @(
 	 [Action]::Install,
 	 [Mode]::Wait,
 	 "auto",
-	 "Installation package\Driver\Graphics card",
+	 "Installation package\Device Driver\Graphics card",
 	 "https://us.download.nvidia.cn/Windows/460.89",
 	 "460.89-desktop-win10-64bit-international-dch-whql",
 	 "exe",
@@ -95,7 +95,7 @@ $app = @(
 	 "auto",
 	 "Installation package\AIO",
 	 "https://files.gpg4win.org",
-	 "gpg4win-3.1.15",
+	 "gpg4win-latest",
 	 "exe",
 	 "gpg4win*",
 	 "/S"),
@@ -531,7 +531,7 @@ function Get-Mainpage {
 	Write-Host "`n   Author: Yi ( http://fengyi.tel )
 
    From: Yi's Solution
-   buildstring: 5.2.0.0.bs_release.210120-1208
+   buildstring: 5.2.0.1.bs_release.210120-1208
 
    INSTALLED SOFTWARE LIST ( total $($app.Count) items )
    ---------------------------------------------------"
