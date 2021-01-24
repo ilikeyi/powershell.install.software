@@ -354,16 +354,20 @@ function Start-Install-Software {
 						break
 					}
 					if (Test-Path -Path $OutArchive) {
-						Write-Host "    - Existing installation package`n"
+						Write-Host "    - Existing installation package"
 					} else {
 						Write-Host "    * Start download`n      > Connected to: $url`n      + Save to: $OutArchive"
 						Test-Catalog -chkpath $OutTo
 						Invoke-WebRequest -Uri $url -OutFile "$($OutArchive)" -ErrorAction SilentlyContinue | Out-Null
 					}
-					Write-Host "    - Unpacking"
-					Archive-Unzip -filename $OutArchive -to $OutTo
-					Write-Host "    - Unzip complete"
-					if ((Test-Path $OutArchive)) { remove-item -path $OutArchive -force }
+					if (Test-Path -Path $OutArchive) {
+						Write-Host "    - Unpacking"
+						Archive-Unzip -filename $OutArchive -to $OutTo
+						Write-Host "    - Unzip complete"
+						if ((Test-Path $OutArchive)) { remove-item -path $OutArchive -force }
+					} else {
+						Write-Host "    - An error occurred during download`n" -ForegroundColor Red
+					}
 					Get-ChildItem $OutTo -Recurse -Include "*$($filename)*.exe" -ErrorAction SilentlyContinue | Foreach-Object {
 						Write-Host "    - Locally exist: $($_.fullname)"
 						Open-App -filename $($_.fullname) -param $param -mode $mode
@@ -371,7 +375,7 @@ function Start-Install-Software {
 				}
 				NoInst {
 					if (Test-Path -Path $OutArchive) {
-						Write-Host "    - Existing installation package`n"
+						Write-Host "    - Installed`n"
 					} else {
 						Write-Host "    * Start download`n      > Connected to: $url`n      + Save to: $OutArchive"
 						Test-Catalog -chkpath $OutTo
@@ -381,29 +385,40 @@ function Start-Install-Software {
 				To {
 					$newoutputfoldoer = "$($OutTo)\$($packer)"
 					if (Test-Path $newoutputfoldoer -PathType Container) {
-						Write-Host "    - Existing installation package`n"
+						Write-Host "    - Installed`n"
 						break
+					}
+					if (Test-Path -Path $OutArchive) {
+						Write-Host "    - Compressed package available"
 					} else {
 						Write-Host "    * Start download`n      > Connected to: $url`n      + Save to: $OutArchive"
 						Invoke-WebRequest -Uri $url -OutFile $OutArchive -ErrorAction SilentlyContinue | Out-Null
+					}
+					if (Test-Path -Path $OutArchive) {
 						Write-Host "    - Unzip only"
 						Archive-Unzip -filename $OutArchive -to $newoutputfoldoer
 						Write-Host "    - Unzip complete`n"
 						if ((Test-Path $OutArchive)) { remove-item -path $OutArchive -force }
+					} else {
+						Write-Host "    - An error occurred during download`n" -ForegroundColor Red
 					}
 				}
 				Unzip {
-					if ((Test-Path -Path $OutArchive)) {
-						Write-Host "    - Existing installation package`n"
+					if (Test-Path -Path $OutArchive) {
+						Write-Host "    - Existing installation package"
 					} else {
 						Write-Host "    * Start download`n      > Connected to: $url`n      + Save to: $OutArchive"
 						Test-Catalog -chkpath $OutTo
 						Invoke-WebRequest -Uri $url -OutFile $OutArchive -ErrorAction SilentlyContinue | Out-Null
 					}
-					Write-Host "    - Unzip only"
-					Archive-Unzip -filename $OutArchive -to $OutTo
-					Write-Host "    - Unzip complete`n"
-					if ((Test-Path $OutArchive)) { remove-item -path $OutArchive -force }
+					if (Test-Path -Path $OutArchive) {
+						Write-Host "    - Unzip only"
+						Archive-Unzip -filename $OutArchive -to $OutTo
+						Write-Host "    - Unzip complete`n"
+						if ((Test-Path $OutArchive)) { remove-item -path $OutArchive -force }
+					} else {
+						Write-Host "    - An error occurred during download`n" -ForegroundColor Red
+					}
 				}
 			}
 		}
@@ -495,7 +510,7 @@ function Wait-Exit {
 	param(
 		[int]$wait
 	)
-	Write-Host "`n   Tip: The installation script will automatically exit after $wait seconds..." -ForegroundColor Red
+	Write-Host "`n   The installation script will automatically exit after $wait seconds." -ForegroundColor Red
 	Start-Sleep -s $wait
 	exit
 }
@@ -531,7 +546,7 @@ function Get-Mainpage {
 	Write-Host "`n   Author: Yi ( http://fengyi.tel )
 
    From: Yi's Solution
-   buildstring: 5.2.0.1.bs_release.210120-1208
+   buildstring: 5.2.0.2.bs_release.210120-1208
 
    INSTALLED SOFTWARE LIST ( total $($app.Count) items )
    ---------------------------------------------------"

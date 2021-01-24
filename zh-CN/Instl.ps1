@@ -30,7 +30,7 @@ param(
 变量名       软件包配置                  描述
 $appname   ("Gpg4win",                   软件包名称
 $status     [Status]::Disable,           状态：Enable - 启用；Disable - 禁用
-$act        [Action]::Install,           动作：Install - 安装；NoInst 下载后不安装；Unzip - 下载后仅解压；To - 安装到目录
+$act        [Action]::Install,           动作：Install - 安装；NoInst - 下载后不安装；Unzip - 下载后仅解压；To - 安装到目录
 $mode       [Mode]::Wait,                运行方式：Wait - 等待完成；Fast - 直接运行
 $todisk     "auto",                      设置自动后将排除当前系统盘，搜索不到可用盘时，默认设置为当前系统盘；指定盘符 [A:]-[Z:]；指定路径：\\192.168.1.1
 $structure  "安装包\AIO",                目录结构
@@ -360,10 +360,14 @@ function Start-Install-Software {
 						Test-Catalog -chkpath $OutTo
 						Invoke-WebRequest -Uri $url -OutFile "$($OutArchive)" -ErrorAction SilentlyContinue | Out-Null
 					}
-					Write-Host "    - 解压中"
-					Archive-Unzip -filename $OutArchive -to $OutTo
-					Write-Host "    - 解压完成"
-					if ((Test-Path $OutArchive)) { remove-item -path $OutArchive -force }
+					if (Test-Path -Path $OutArchive) {
+						Write-Host "    - 解压中"
+						Archive-Unzip -filename $OutArchive -to $OutTo
+						Write-Host "    - 解压完成"
+						if ((Test-Path $OutArchive)) { remove-item -path $OutArchive -force }
+					} else {
+						Write-Host "    - 下载过程中出现错误`n" -ForegroundColor Red
+					}
 					Get-ChildItem $OutTo -Recurse -Include "*$($filename)*.exe" -ErrorAction SilentlyContinue | Foreach-Object {
 						Write-Host "    - 本地存在：$($_.fullname)"
 						Open-App -filename $($_.fullname) -param $param -mode $mode
@@ -371,7 +375,7 @@ function Start-Install-Software {
 				}
 				NoInst {
 					if (Test-Path -Path $OutArchive) {
-						Write-Host "    - 已有安装包`n"
+						Write-Host "    - 已安装`n"
 					} else {
 						Write-Host "    * 开始下载`n      > 连接到：$url`n      + 保存到：$OutArchive"
 						Test-Catalog -chkpath $OutTo
@@ -381,29 +385,40 @@ function Start-Install-Software {
 				To {
 					$newoutputfoldoer = "$($OutTo)\$($packer)"
 					if (Test-Path $newoutputfoldoer -PathType Container) {
-						Write-Host "    - 已有安装包`n"
+						Write-Host "    - 已安装`n"
 						break
+					}
+					if (Test-Path -Path $OutArchive) {
+						Write-Host "    - 已有压缩包"
 					} else {
 						Write-Host "    * 开始下载`n      > 连接到：$url`n      + 保存到：$OutArchive"
 						Invoke-WebRequest -Uri $url -OutFile $OutArchive -ErrorAction SilentlyContinue | Out-Null
+					}
+					if (Test-Path -Path $OutArchive) {
 						Write-Host "    - 仅解压"
 						Archive-Unzip -filename $OutArchive -to $newoutputfoldoer
 						Write-Host "    - 解压完成`n"
 						if ((Test-Path $OutArchive)) { remove-item -path $OutArchive -force }
+					} else {
+						Write-Host "    - 下载过程中出现错误`n" -ForegroundColor Red
 					}
 				}
 				Unzip {
-					if ((Test-Path -Path $OutArchive)) {
-						Write-Host "    - 已有安装包`n"
+					if (Test-Path -Path $OutArchive) {
+						Write-Host "    - 已有安装包"
 					} else {
 						Write-Host "    * 开始下载`n      > 连接到：$url`n      + 保存到：$OutArchive"
 						Test-Catalog -chkpath $OutTo
 						Invoke-WebRequest -Uri $url -OutFile $OutArchive -ErrorAction SilentlyContinue | Out-Null
 					}
-					Write-Host "    - 仅解压"
-					Archive-Unzip -filename $OutArchive -to $OutTo
-					Write-Host "    - 解压完成`n"
-					if ((Test-Path $OutArchive)) { remove-item -path $OutArchive -force }
+					if (Test-Path -Path $OutArchive) {
+						Write-Host "    - 仅解压"
+						Archive-Unzip -filename $OutArchive -to $OutTo
+						Write-Host "    - 解压完成`n"
+						if ((Test-Path $OutArchive)) { remove-item -path $OutArchive -force }
+					} else {
+						Write-Host "    - 下载过程中出现错误`n" -ForegroundColor Red
+					}
 				}
 			}
 		}
@@ -495,7 +510,7 @@ function Wait-Exit {
 	param(
 		[int]$wait
 	)
-	Write-Host "`n   提示：$wait 秒后自动退出安装脚本..." -ForegroundColor Red
+	Write-Host "`n   安装脚本将会在 $wait 秒后自动退出。" -ForegroundColor Red
 	Start-Sleep -s $wait
 	exit
 }
@@ -531,7 +546,7 @@ function Get-Mainpage {
 	Write-Host "`n   Author: Yi ( http://fengyi.tel )
 
    From: Yi's Solution
-   buildstring: 5.2.0.1.bs_release.210120-1208
+   buildstring: 5.2.0.2.bs_release.210120-1208
 
    安装软件列表 ( 共 $($app.Count) 款 )
    ---------------------------------------------------"

@@ -6,7 +6,7 @@ You are welcome to install the software using PowerShell
     The main function:
       1. There is no installation package locally, activate the download function;
       2. The drive letter can be specified, and the current system drive will be excluded after setting automatic.
-       When no available disk is found, the default setting is the current system disk;
+         When no available disk is found, the default setting is the current system disk;
       3. Search file name supports fuzzy search, wildcard *;
       4. Support decompression package processing, etc.
 
