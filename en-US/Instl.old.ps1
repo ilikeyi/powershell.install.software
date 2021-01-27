@@ -1,31 +1,24 @@
-﻿#
-#  Warning: In order to prevent overwriting after updating, please save as and then modify.
-#
-#  You are welcome to install the software using PowerShell
-#
-#  The main function:
-#    1. There is no installation package locally, activate the download function;
-#    2. The drive letter can be specified, and the current system drive will be excluded after setting automatic.
-#       When no available disk is found, the default setting is the current system disk;
-#    3. Search file name supports fuzzy search, wildcard *;
-#    4. Support decompression package processing, etc.
-#
-#  Prerequisites:
-#Requires -version 2.0
-#
-#  Source code:
-#  - https://github.com/ilikeyi/powershell.install.software
-#  - https://gitee.com/ilikeyi/powershell.install.software
-#
+﻿<#
+  Warning: In order to prevent overwriting after updating, please save as and then modify.
 
-# Get script parameters ( if any )
-[CmdletBinding()]
-param(
-	[parameter(Mandatory = $false, HelpMessage = "Silent")]
-	[Switch]$Force
-)
+  You are welcome to install the software using PowerShell
 
-<# Package configuration tutorial
+  The main function:
+    1. There is no installation package locally, activate the download function;
+    2. The drive letter can be specified, and the current system drive will be excluded after setting automatic.
+       When no available disk is found, the default setting is the current system disk;
+    3. Search file name supports fuzzy search, wildcard *;
+    4. Support decompression package processing, etc.
+
+  Prerequisites:
+  - PowerShell 2.0 Or higher
+
+  Source code:
+  - https://github.com/ilikeyi/powershell.install.software
+  - https://gitee.com/ilikeyi/powershell.install.software
+
+
+  Package configuration tutorial
 
 Variable    Package Configuration        Description
 $appname   ("Gpg4win",                   Package name
@@ -41,6 +34,15 @@ $filename   "gpg4win*",                  File name fuzzy search (*)
 $param      "/S"),                       Operating parameters
 
 #>
+
+#Requires -version 2.0
+
+# Get script parameters ( if any )
+[CmdletBinding()]
+param(
+	[parameter(Mandatory = $false, HelpMessage = "Silent")]
+	[Switch]$Force
+)
 
 # All software configurations
 $app = @(
@@ -503,7 +505,7 @@ function Get-Mainpage {
 	Write-Host "`n   Author: Yi ( http://fengyi.tel )
 
    From: Yi's Solution
-   buildstring: 5.2.0.2.bs_release.210120-1208
+   buildstring: 5.3.0.1.bs_release.210120-1208
 
    INSTALLED SOFTWARE LIST ( total $($app.Count) items )
    ---------------------------------------------------"
