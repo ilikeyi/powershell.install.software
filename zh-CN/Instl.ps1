@@ -1,31 +1,24 @@
-﻿#
-#  警告：为防止更新后覆盖，请另存为后再修改。
-#
-#  欢迎您使用 PowerShell 安装软件
-#
-#  主要功能：
-#    1. 本地不存在安装包，激活下载功能；
-#    2. 可指定盘符，设置自动后将排除当前系统盘，
-#       搜索不到可用盘时，默认设置为当前系统盘；
-#    3. 搜索文件名支持模糊查找，通配符 *；
-#    4. 支持解压包处理等。
-#
-#  先决条件：
-#Requires -version 5.0
-#
-#  源代码：
-#  - https://github.com/ilikeyi/powershell.install.software
-#  - https://gitee.com/ilikeyi/powershell.install.software
-#
+﻿<#
+  警告：为防止更新后覆盖，请另存为后再修改。
 
-# 获取脚本参数（如果有）
-[CmdletBinding()]
-param(
-	[parameter(Mandatory = $false, HelpMessage = "静默")]
-	[Switch]$Force
-)
+  欢迎您使用 PowerShell 安装软件
 
-<# 软件包配置教程
+  主要功能：
+    1. 本地不存在安装包，激活下载功能；
+    2. 可指定盘符，设置自动后将排除当前系统盘，
+       搜索不到可用盘时，默认设置为当前系统盘；
+    3. 搜索文件名支持模糊查找，通配符 *；
+    4. 支持解压包处理等。
+
+  先决条件：
+  - PowerShell 5.1 或更高
+
+  源代码：
+  - https://github.com/ilikeyi/powershell.install.software
+  - https://gitee.com/ilikeyi/powershell.install.software
+
+
+  软件包配置教程：
 
 变量名       软件包配置                  描述
 $appname   ("Gpg4win",                   软件包名称
@@ -41,6 +34,15 @@ $filename   "gpg4win*",                  文件名模糊查找（*）
 $param      "/S"),                       运行参数
 
 #>
+
+#Requires -version 5.0
+
+# 获取脚本参数（如果有）
+[CmdletBinding()]
+param(
+	[parameter(Mandatory = $false, HelpMessage = "静默")]
+	[Switch]$Force
+)
 
 # 所有软件配置
 $app = @(
@@ -546,7 +548,7 @@ function Get-Mainpage {
 	Write-Host "`n   Author: Yi ( http://fengyi.tel )
 
    From: Yi's Solution
-   buildstring: 5.2.0.2.bs_release.210120-1208
+   buildstring: 5.3.0.1.bs_release.210120-1208
 
    安装软件列表 ( 共 $($app.Count) 款 )
    ---------------------------------------------------"
