@@ -1,37 +1,37 @@
 ﻿<#
   警告：为防止更新后覆盖，请另存为后再修改。
 
-  欢迎您使用 PowerShell 安装软件
+  PowerShell 安装软件
 
-  主要功能：
+  .主要功能
     1. 本地不存在安装包，激活下载功能；
     2. 可指定盘符，设置自动后将排除当前系统盘，
        搜索不到可用盘时，默认设置为当前系统盘；
     3. 搜索文件名支持模糊查找，通配符 *；
     4. 支持解压包处理等。
 
-  先决条件：
+  .先决条件
   - PowerShell 2.0 或更高
 
-  源代码：
+  .连接
   - https://github.com/ilikeyi/powershell.install.software
   - https://gitee.com/ilikeyi/powershell.install.software
 
 
   软件包配置教程
 
-变量名       软件包配置                  描述
-$appname   ("Gpg4win",                   软件包名称
-$status     "Disable",                   状态：Enable - 启用；Disable - 禁用
-$act        "Install",                   动作：Install - 安装；NoInst - 下载后不安装；Unzip - 下载后仅解压；To - 安装到目录
-$mode       "wait",                      运行方式：Wait - 等待完成；Fast - 直接运行
-$todisk     "auto",                      设置自动后将排除当前系统盘，搜索不到可用盘时，默认设置为当前系统盘；指定盘符 [A:]-[Z:]；指定路径：\\192.168.1.1
-$structure  "安装包\AIO",                目录结构
-$url        "https://files.gpg4win.org", 网站地址
-$packer     "gpg4win-latest",            从网站下载的文件名
-$types      "exe",                       从网站下载的文件类型：exe, zip 或自定义文件类型；结果：https://files.gpg4win.org/gpg4win-latest.exe
-$filename   "gpg4win*",                  文件名模糊查找（*）
-$param      "/S"),                       运行参数
+ 软件包配置                   描述
+("Gpg4win",                   软件包名称
+ "Disable",                   状态：Enable - 启用；Disable - 禁用
+ "Install",                   动作：Install - 安装；NoInst - 下载后不安装；Unzip - 下载后仅解压；To - 安装到目录
+ "wait",                      运行方式：Wait - 等待完成；Fast - 直接运行
+ "auto",                      设置自动后将排除当前系统盘，搜索不到可用盘时，默认设置为当前系统盘；指定盘符 [A:]-[Z:]；指定路径：\\192.168.1.1
+ "安装包\AIO",                目录结构
+ "https://files.gpg4win.org", 网站地址
+ "gpg4win-latest",            从网站下载的文件名
+ "exe",                       从网站下载的文件类型：exe, zip 或自定义文件类型；结果：https://files.gpg4win.org/gpg4win-latest.exe
+ "gpg4win*",                  文件名模糊查找（*）
+ "/S"),                       运行参数
 
 #>
 
@@ -43,6 +43,8 @@ param(
 	[parameter(Mandatory = $false, HelpMessage = "静默")]
 	[Switch]$Force
 )
+
+$Host.UI.RawUI.WindowTitle = "PowerShell 安装软件"
 
 # 所有软件配置
 $app = @(
@@ -63,8 +65,8 @@ $app = @(
 	 "wait",
 	 "auto",
 	 "安装包\驱动程序\显卡",
-	 "https://us.download.nvidia.cn/Windows/460.89",
-	 "460.89-desktop-win10-64bit-international-dch-whql",
+	 "https://cn.download.nvidia.cn/Windows/461.40",
+	 "461.40-desktop-win10-64bit-international-dch-whql",
 	 "exe",
 	 "*-desktop-win10-*-international-dch-whql",
 	 "-s -clean -noreboot -noeula"),
@@ -152,9 +154,9 @@ $app = @(
 	 "auto",
 	 "安装包\社交软件",
 	 "https://down.qq.com/qqweb/PCQQ/PCQQ_EXE",
-	 "PCQQ2020",
+	 "PCQQ2021",
 	 "exe",
-	 "PCQQ2020",
+	 "PCQQ2021",
 	 "/S"),
 	("微信",
 	 "Enable",
@@ -249,8 +251,7 @@ function Start-Install-Software {
 
 	$url = Join-Url -Path "$($url)" -ChildPath "$($packer).$($types)"
 
-	Switch ($todisk)
-	{
+	Switch ($todisk) {
 		auto {
 			$drives = Get-PSDrive -PSProvider FileSystem | where { -not ("$($env:SystemDrive)\" -eq $_.Root) } | Select-Object -ExpandProperty 'Root'
 			foreach ($drive in $drives) {
@@ -261,7 +262,7 @@ function Start-Install-Software {
 					break
 				}
 				foreach ($drive in $drives) {
-					if(Test-Available-Disk -Path $drive) {
+					if (TestAvailableDisk -Path $drive)	{
 						$OutTo = Join-Path -Path "$($drive)" -ChildPath "$($structure)"
 						$OutAny = Join-Path -Path "$($drive)" -ChildPath "$($structure)\$($packer).$($types)"
 						$OutArchive = Join-Path -Path "$($drive)" -ChildPath "$($structure)\$($packer).zip"
@@ -275,8 +276,11 @@ function Start-Install-Software {
 		}
 		default {
 			$OutTo = Join-Path -Path $($todisk) -ChildPath "$($structure)"
+			Get-ChildItem $OutTo -Recurse -Include "*$($filename)*" -ErrorAction SilentlyContinue | Foreach-Object {
+				$OutAny = $($_.fullname)
+				break
+			}
 			$OutAny = Join-Path -Path $($todisk) -ChildPath "$($structure)\$($packer).$($types)"
-			$OutArchive = Join-Path -Path $($todisk) -ChildPath "$($structure)\$($packer).zip"
 		}
 	}
 
@@ -501,11 +505,11 @@ function Process-other {
 }
 
 function Get-Mainpage {
-	cls
+	Clear-Host
 	Write-Host "`n   Author: Yi ( http://fengyi.tel )
 
    From: Yi's Solution
-   buildstring: 5.3.0.1.bs_release.210120-1208
+   buildstring: 5.3.0.3.bs_release.210120-1208
 
    安装软件列表 ( 共 $($app.Count) 款 )
    ---------------------------------------------------"
