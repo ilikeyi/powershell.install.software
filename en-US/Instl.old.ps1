@@ -1,37 +1,37 @@
 ﻿<#
   Warning: In order to prevent overwriting after updating, please save as and then modify.
 
-  You are welcome to install the software using PowerShell
+  PowerShell installation software
 
-  The main function:
+  .THE MAIN FUNCTION
     1. There is no installation package locally, activate the download function;
     2. The drive letter can be specified, and the current system drive will be excluded after setting automatic.
        When no available disk is found, the default setting is the current system disk;
     3. Search file name supports fuzzy search, wildcard *;
     4. Support decompression package processing, etc.
 
-  Prerequisites:
+  .PREREQUISITES
   - PowerShell 2.0 Or higher
 
-  Source code:
+  .LINK
   - https://github.com/ilikeyi/powershell.install.software
   - https://gitee.com/ilikeyi/powershell.install.software
 
 
   Package configuration tutorial
 
-Variable    Package Configuration        Description
-$appname   ("Gpg4win",                   Package name
-$status     "Disable",                   Status: Enable - enabled; Disable - disabled
-$act        "Install",                   Action: Install - install; NoInst - does not install after download; Unzip - only extract after download; To - install to directory
-$mode       "wait",                      Operation mode: Wait - wait for completion; Fast - run directly
-$todisk     "auto",                      After setting automatic, the current system disk will be excluded. If no available disk is found, the default setting is the current system disk; specify the drive letter [A:]-[Z:]; specify the path: \\192.168.1.1
-$structure  "Installation package\AIO",  Directory Structure
-$url        "https://files.gpg4win.org", Website address
-$packer     "gpg4win-latest",            File name downloaded from website
-$types      "exe",                       File type downloaded from the website: exe, zip or custom file type; result: https://files.gpg4win.org/gpg4win-latest.exe
-$filename   "gpg4win*",                  File name fuzzy search (*)
-$param      "/S"),                       Operating parameters
+ Package Configuration        Description
+("Gpg4win",                   Package name
+ "Disable",                   Status: Enable - enabled; Disable - disabled
+ "Install",                   Action: Install - install; NoInst - does not install after download; Unzip - only extract after download; To - install to directory
+ "wait",                      Operation mode: Wait - wait for completion; Fast - run directly
+ "auto",                      After setting automatic, the current system disk will be excluded. If no available disk is found, the default setting is the current system disk; specify the drive letter [A:]-[Z:]; specify the path: \\192.168.1.1
+ "Installation package\AIO",  Directory Structure
+ "https://files.gpg4win.org", Website address
+ "gpg4win-latest",            File name downloaded from website
+ "exe",                       File type downloaded from the website: exe, zip or custom file type; result: https://files.gpg4win.org/gpg4win-latest.exe
+ "gpg4win*",                  File name fuzzy search (*)
+ "/S"),                       Operating parameters
 
 #>
 
@@ -43,6 +43,8 @@ param(
 	[parameter(Mandatory = $false, HelpMessage = "Silent")]
 	[Switch]$Force
 )
+
+$Host.UI.RawUI.WindowTitle = "PowerShell installation software"
 
 # All software configurations
 $app = @(
@@ -63,8 +65,8 @@ $app = @(
 	 "wait",
 	 "auto",
 	 "Installation package\Device Driver\Graphics card",
-	 "https://us.download.nvidia.cn/Windows/460.89",
-	 "460.89-desktop-win10-64bit-international-dch-whql",
+	 "https://cn.download.nvidia.cn/Windows/461.40",
+	 "461.40-desktop-win10-64bit-international-dch-whql",
 	 "exe",
 	 "*-desktop-win10-*-international-dch-whql",
 	 "-s -clean -noreboot -noeula"),
@@ -152,9 +154,9 @@ $app = @(
 	 "auto",
 	 "Installation package\Social application",
 	 "https://down.qq.com/qqweb/PCQQ/PCQQ_EXE",
-	 "PCQQ2020",
+	 "PCQQ2021",
 	 "exe",
-	 "PCQQ2020",
+	 "PCQQ2021",
 	 "/S"),
 	("WeChat",
 	 "Enable",
@@ -249,8 +251,7 @@ function Start-Install-Software {
 
 	$url = Join-Url -Path "$($url)" -ChildPath "$($packer).$($types)"
 
-	Switch ($todisk)
-	{
+	Switch ($todisk) {
 		auto {
 			$drives = Get-PSDrive -PSProvider FileSystem | where { -not ("$($env:SystemDrive)\" -eq $_.Root) } | Select-Object -ExpandProperty 'Root'
 			foreach ($drive in $drives) {
@@ -261,7 +262,7 @@ function Start-Install-Software {
 					break
 				}
 				foreach ($drive in $drives) {
-					if(Test-Available-Disk -Path $drive) {
+					if (TestAvailableDisk -Path $drive)	{
 						$OutTo = Join-Path -Path "$($drive)" -ChildPath "$($structure)"
 						$OutAny = Join-Path -Path "$($drive)" -ChildPath "$($structure)\$($packer).$($types)"
 						$OutArchive = Join-Path -Path "$($drive)" -ChildPath "$($structure)\$($packer).zip"
@@ -275,8 +276,11 @@ function Start-Install-Software {
 		}
 		default {
 			$OutTo = Join-Path -Path $($todisk) -ChildPath "$($structure)"
+			Get-ChildItem $OutTo -Recurse -Include "*$($filename)*" -ErrorAction SilentlyContinue | Foreach-Object {
+				$OutAny = $($_.fullname)
+				break
+			}
 			$OutAny = Join-Path -Path $($todisk) -ChildPath "$($structure)\$($packer).$($types)"
-			$OutArchive = Join-Path -Path $($todisk) -ChildPath "$($structure)\$($packer).zip"
 		}
 	}
 
@@ -388,14 +392,14 @@ function Start-Install-Software {
 			if ((Test-Path $OutAny -PathType Leaf)) {
 				Open-App -filename $OutAny -param $param -mode $mode
 			} else {
-				Write-Host "    * Start download`n      > Connected to: $url"
+				Write-Host "    * 开始下载`n      > 连接到：$url"
 				try {
-					Write-Host "      + Save to: $OutAny"
+					Write-Host "      + 保存到：$OutAny"
 					Test-Catalog -chkpath $OutTo
 					(New-Object System.Net.WebClient).DownloadFile($url, $OutAny) | Out-Null
 					Open-App -filename $OutAny -param $param -mode $mode
 				} catch {
-					Write-Host "      - Status: Not available`n" -ForegroundColor Red
+					Write-Host "      - 状态：不可用`n" -ForegroundColor Red
 					break
 				}
 			}
@@ -501,11 +505,11 @@ function Process-other {
 }
 
 function Get-Mainpage {
-	cls
+	Clear-Host
 	Write-Host "`n   Author: Yi ( http://fengyi.tel )
 
    From: Yi's Solution
-   buildstring: 5.3.0.1.bs_release.210120-1208
+   buildstring: 5.3.0.3.bs_release.210120-1208
 
    INSTALLED SOFTWARE LIST ( total $($app.Count) items )
    ---------------------------------------------------"
