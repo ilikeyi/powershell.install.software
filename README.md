@@ -10,7 +10,11 @@ You are welcome to install the software using PowerShell
       2. The drive letter can be specified, and the current system drive will be excluded after setting automatic.
          When no available disk is found, the default setting is the current system disk;
       3. Search file name supports fuzzy search, wildcard *;
-      4. Support decompression package processing, etc.
+      4. The file name is searched first by language structure, for example:
+         - Operating system preferred language: en-US
+         - File name: ChromeChrome
+         The preferred search condition is GoogleChrome*en-US*, and if the search is not found, search again by default file name.
+      5. Support decompression package processing, etc.
 
     Prerequisites
       - Instl.old.ps1 - ( PowerShell 2.0 或更高 )
@@ -21,7 +25,11 @@ You are welcome to install the software using PowerShell
       2. 可指定盘符，设置自动后将排除当前系统盘，
          搜索不到可用盘时，默认设置为当前系统盘；
       3. 搜索文件名支持模糊查找，通配符 *；
-      4. 支持解压包处理等。
+      4. 搜索文件名优先按语言结构来搜索，例如：
+         - 操作系统首选语言：en-US
+         - 文件名：ChromeChrome
+         优先搜索条件为 GoogleChrome*en-US*，未搜索到按默认文件名重新搜索。
+      5. 支持解压包处理等。
 
     先决条件：
       - Instl.old.ps1 - ( PowerShell 2.0 或更高 )
