@@ -8,10 +8,14 @@
     2. The drive letter can be specified, and the current system drive will be excluded after setting automatic.
        When no available disk is found, the default setting is the current system disk;
     3. Search file name supports fuzzy search, wildcard *;
-    4. Support decompression package processing, etc.
+    4. The file name is searched first by language structure, for example:
+       - Operating system preferred language: en-US
+       - File name: ChromeChrome
+       The preferred search condition is GoogleChrome*en-US*, and if the search is not found, search again by default file name.
+    5. Support decompression package processing, etc.
 
   .PREREQUISITES
-  - PowerShell 5.0 Or higher
+  - PowerShell 5.1 Or higher
 
   .LINK
   - https://github.com/ilikeyi/powershell.install.software
@@ -319,6 +323,11 @@ function Start-Install-Software {
 			$drives = Get-PSDrive -PSProvider FileSystem | where { -not ("$($env:SystemDrive)\" -eq $_.Root) } | Select-Object -ExpandProperty 'Root'
 			foreach ($drive in $drives) {
 				$tempoutputfoldoer = Join-Path -Path $($drive) -ChildPath "$($structure)"
+				Get-ChildItem $tempoutputfoldoer -Recurse -Include "*$($filename)*$((Get-Culture).Name)*" -ErrorAction SilentlyContinue | Foreach-Object {
+					$OutTo = Join-Path -Path "$($drive)" -ChildPath "$($structure)"
+					$OutAny = $($_.fullname)
+					break
+				}
 				Get-ChildItem $tempoutputfoldoer -Recurse -Include "*$($filename)*" -ErrorAction SilentlyContinue | Foreach-Object {
 					$OutTo = Join-Path -Path "$($drive)" -ChildPath "$($structure)"
 					$OutAny = $($_.fullname)
@@ -339,6 +348,10 @@ function Start-Install-Software {
 		}
 		default {
 			$OutTo = Join-Path -Path $($todisk) -ChildPath "$($structure)"
+			Get-ChildItem $OutTo -Recurse -Include "*$($filename)*$((Get-Culture).Name)*" -ErrorAction SilentlyContinue | Foreach-Object {
+				$OutAny = $($_.fullname)
+				break
+			}
 			Get-ChildItem $OutTo -Recurse -Include "*$($filename)*" -ErrorAction SilentlyContinue | Foreach-Object {
 				$OutAny = $($_.fullname)
 				break
@@ -353,6 +366,11 @@ function Start-Install-Software {
 			Switch ($act)
 			{
 				Install {
+					Get-ChildItem $OutTo -Recurse -Include "*$($filename)*$((Get-Culture).Name)*.exe" -ErrorAction SilentlyContinue | Foreach-Object {
+						Write-Host "    - Locally exist: $($_.fullname)"
+						Open-App -filename $($_.fullname) -param $param -mode $mode
+						break
+					}
 					Get-ChildItem $OutTo -Recurse -Include "*$($filename)*.exe" -ErrorAction SilentlyContinue | Foreach-Object {
 						Write-Host "    - Locally exist: $($_.fullname)"
 						Open-App -filename $($_.fullname) -param $param -mode $mode
@@ -373,9 +391,15 @@ function Start-Install-Software {
 					} else {
 						Write-Host "    - An error occurred during download`n" -ForegroundColor Red
 					}
+					Get-ChildItem $OutTo -Recurse -Include "*$($filename)*$((Get-Culture).Name)*.exe" -ErrorAction SilentlyContinue | Foreach-Object {
+						Write-Host "    - Locally exist: $($_.fullname)"
+						Open-App -filename $($_.fullname) -param $param -mode $mode
+						break
+					}
 					Get-ChildItem $OutTo -Recurse -Include "*$($filename)*.exe" -ErrorAction SilentlyContinue | Foreach-Object {
 						Write-Host "    - Locally exist: $($_.fullname)"
 						Open-App -filename $($_.fullname) -param $param -mode $mode
+						break
 					}
 				}
 				NoInst {
@@ -431,14 +455,14 @@ function Start-Install-Software {
 			if ((Test-Path $OutAny -PathType Leaf)) {
 				Open-App -filename $OutAny -param $param -mode $mode
 			} else {
-				Write-Host "    * 开始下载`n      > 连接到：$url"
+				Write-Host "    * Start download`n      > Connected to: $url"
 				try {
-					Write-Host "      + 保存到：$OutAny"
+					Write-Host "      + Save to: $OutAny"
 					Test-Catalog -chkpath $OutTo
 					(New-Object System.Net.WebClient).DownloadFile($url, $OutAny) | Out-Null
 					Open-App -filename $OutAny -param $param -mode $mode
 				} catch {
-					Write-Host "      - 状态：不可用`n" -ForegroundColor Red
+					Write-Host "      - Status: Not available`n" -ForegroundColor Red
 					break
 				}
 			}
@@ -552,7 +576,7 @@ function Get-Mainpage {
 	Write-Host "`n   Author: Yi ( http://fengyi.tel )
 
    From: Yi's Solution
-   buildstring: 5.3.0.3.bs_release.210120-1208
+   buildstring: 5.3.0.6.bs_release.210120-1208
 
    INSTALLED SOFTWARE LIST ( total $($app.Count) items )
    ---------------------------------------------------"
