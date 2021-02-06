@@ -176,7 +176,7 @@ $app = @(
 )
 # Finally, please don't put , at the end, otherwise you will understand.
 
-function Test-Available-Disk {
+function TestAvailableDisk {
 	param (
 		[string]$Path
 	)
@@ -196,7 +196,7 @@ function Test-Available-Disk {
 	}
 }
 
-function Test-Catalog {
+function CheckCatalog {
 	Param(
 		[string]$chkpath
 	)
@@ -210,7 +210,7 @@ function Test-Catalog {
 	}
 }
 
-function Join-Url {
+function JoinUrl {
 	param (
 		[parameter(Mandatory=$True, HelpMessage="Base Path")]
 		[ValidateNotNullOrEmpty()]
@@ -227,7 +227,7 @@ function Join-Url {
 	}
 }
 
-function Start-Install-Software {
+function StartInstallSoftware {
 	param(
 		$appname,
 		$status,
@@ -253,7 +253,7 @@ function Start-Install-Software {
 		}
 	}
 
-	$url = Join-Url -Path "$($url)" -ChildPath "$($packer).$($types)"
+	$url = JoinUrl -Path "$($url)" -ChildPath "$($packer).$($types)"
 
 	Switch ($todisk) {
 		auto {
@@ -305,12 +305,12 @@ function Start-Install-Software {
 				Install {
 					Get-ChildItem $OutTo -Recurse -Include "*$($filename)*$((Get-Culture).Name)*.exe" -ErrorAction SilentlyContinue | Foreach-Object {
 						Write-Host "    - Locally exist: $($_.fullname)"
-						Open-App -filename $($_.fullname) -param $param -mode $mode
+						OpenApp -filename $($_.fullname) -param $param -mode $mode
 						break
 					}
 					Get-ChildItem $OutTo -Recurse -Include "*$($filename)*.exe" -ErrorAction SilentlyContinue | Foreach-Object {
 						Write-Host "    - Locally exist: $($_.fullname)"
-						Open-App -filename $($_.fullname) -param $param -mode $mode
+						OpenApp -filename $($_.fullname) -param $param -mode $mode
 						break
 					}
 					if (Test-Path -Path $OutArchive) {
@@ -319,7 +319,7 @@ function Start-Install-Software {
 						Write-Host "    * Start download`n      > Connected to: $url"
 						try {
 							Write-Host "      + Save to: $OutArchive"
-							Test-Catalog -chkpath $OutTo
+							CheckCatalog -chkpath $OutTo
 							(New-Object System.Net.WebClient).DownloadFile($url, $OutArchive) | Out-Null
 						} catch {
 							Write-Host "      - Status: Not available`n" -ForegroundColor Red
@@ -328,7 +328,7 @@ function Start-Install-Software {
 					}
 					if (Test-Path -Path $OutArchive) {
 						Write-Host "    - Unpacking"
-						Archive-Unzip -filename $OutArchive -to $OutTo
+						Archive -filename $OutArchive -to $OutTo
 						Write-Host "    - Unzip complete"
 						if ((Test-Path $OutArchive)) { remove-item -path $OutArchive -force }
 					} else {
@@ -336,12 +336,12 @@ function Start-Install-Software {
 					}
 					Get-ChildItem $OutTo -Recurse -Include "*$($filename)*$((Get-Culture).Name)*.exe" -ErrorAction SilentlyContinue | Foreach-Object {
 						Write-Host "    - Locally exist: $($_.fullname)"
-						Open-App -filename $($_.fullname) -param $param -mode $mode
+						OpenApp -filename $($_.fullname) -param $param -mode $mode
 						break
 					}
 					Get-ChildItem $OutTo -Recurse -Include "*$($filename)*.exe" -ErrorAction SilentlyContinue | Foreach-Object {
 						Write-Host "    - Locally exist: $($_.fullname)"
-						Open-App -filename $($_.fullname) -param $param -mode $mode
+						OpenApp -filename $($_.fullname) -param $param -mode $mode
 						break
 					}
 				}
@@ -352,7 +352,7 @@ function Start-Install-Software {
 						Write-Host "    * Start download`n      > Connected to: $url"
 						try {
 							Write-Host "      + Save to: $OutArchive"
-							Test-Catalog -chkpath $OutTo
+							CheckCatalog -chkpath $OutTo
 							(New-Object System.Net.WebClient).DownloadFile($url, $OutArchive) | Out-Null
 						} catch {
 							Write-Host "      - Status: Not available`n" -ForegroundColor Red
@@ -380,7 +380,7 @@ function Start-Install-Software {
 					}
 					if (Test-Path -Path $OutArchive) {
 						Write-Host "    - Unzip only"
-						Archive-Unzip -filename $OutArchive -to $newoutputfoldoer
+						Archive -filename $OutArchive -to $newoutputfoldoer
 						Write-Host "    - Unzip complete`n"
 						if ((Test-Path $OutArchive)) { remove-item -path $OutArchive -force }
 					} else {
@@ -394,7 +394,7 @@ function Start-Install-Software {
 						Write-Host "    * Start download      > Connected to: $url"
 						try {
 							Write-Host "      + Save to: $OutArchive"
-							Test-Catalog -chkpath $OutTo
+							CheckCatalog -chkpath $OutTo
 							(New-Object System.Net.WebClient).DownloadFile($url, $OutArchive) | Out-Null
 						} catch {
 							Write-Host "      - Status: Not available`n" -ForegroundColor Red
@@ -403,7 +403,7 @@ function Start-Install-Software {
 					}
 					if (Test-Path -Path $OutArchive) {
 						Write-Host "    - Unzip only"
-						Archive-Unzip -filename $OutArchive -to $OutTo
+						Archive -filename $OutArchive -to $OutTo
 						Write-Host "    - Unzip complete`n"
 						if ((Test-Path $OutArchive)) { remove-item -path $OutArchive -force }
 					} else {
@@ -414,14 +414,14 @@ function Start-Install-Software {
 		}
 		default {
 			if ((Test-Path $OutAny -PathType Leaf)) {
-				Open-App -filename $OutAny -param $param -mode $mode
+				OpenApp -filename $OutAny -param $param -mode $mode
 			} else {
 				Write-Host "    * Start download`n      > Connected to: $url"
 				try {
 					Write-Host "      + Save to: $OutAny"
-					Test-Catalog -chkpath $OutTo
+					CheckCatalog -chkpath $OutTo
 					(New-Object System.Net.WebClient).DownloadFile($url, $OutAny) | Out-Null
-					Open-App -filename $OutAny -param $param -mode $mode
+					OpenApp -filename $OutAny -param $param -mode $mode
 				} catch {
 					Write-Host "      - Status: Not available`n" -ForegroundColor Red
 					break
@@ -431,13 +431,13 @@ function Start-Install-Software {
 	}
 }
 
-function Archive-Unzip {
+function Archive {
 	param(
 		$filename,
 		$to
 	)
 
-	if (Get-Zip) {
+	if (Compressing) {
 		Write-host "    - Use $script:Zip to unzip the software"
 		$arguments = "x ""-r"" ""-tzip"" ""$filename"" ""-o$to"" ""-y""";
 		Start-Process $script:Zip "$arguments" -Wait -WindowStyle Minimized
@@ -447,7 +447,7 @@ function Archive-Unzip {
 	}
 }
 
-function Get-Zip {
+function Compressing {
 	if (Test-Path "$env:ProgramFiles\7-Zip\7z.exe") {
 		$script:Zip = "$env:ProgramFiles\7-Zip\7z.exe"
 		return $true
@@ -465,7 +465,7 @@ function Get-Zip {
 	return $false
 }
 
-function Open-App {
+function OpenApp {
 	param(
 		$filename,
 		$param,
@@ -497,7 +497,7 @@ function Open-App {
 	}
 }
 
-function Wait-Exit {
+function WaitExit {
 	param(
 		[int]$wait
 	)
@@ -506,15 +506,15 @@ function Wait-Exit {
 	exit
 }
 
-function Obtain-And-Install {
+function ObtainAndInstall {
 	Write-Host "`n   INSTALLING SOFTWARE"
 	Write-Host "   ---------------------------------------------------"
 	for ($i=0; $i -lt $app.Count; $i++) {
-		Start-Install-Software -appname $app[$i][0] -status $app[$i][1] -act $app[$i][2] -mode $app[$i][3] -todisk $app[$i][4] -structure $app[$i][5] -url $app[$i][6] -packer $app[$i][7] -types $app[$i][8] -filename $app[$i][9] -param $app[$i][10]
+		StartInstallSoftware -appname $app[$i][0] -status $app[$i][1] -act $app[$i][2] -mode $app[$i][3] -todisk $app[$i][4] -structure $app[$i][5] -url $app[$i][6] -packer $app[$i][7] -types $app[$i][8] -filename $app[$i][9] -param $app[$i][10]
 	}
 }
 
-function Process-other {
+function ProcessOther {
 	Write-Host "`n   Processing other:" -ForegroundColor Green
 
 	Write-Host "   - Delete startup items"
@@ -528,12 +528,12 @@ function Process-other {
 	#Rename-Item-NewName "Google Chrome.lnk"  -Path ".\New Google Chrome.lnk" -ErrorAction SilentlyContinue | Out-Null
 }
 
-function Get-Mainpage {
+function Mainpage {
 	Clear-Host
 	Write-Host "`n   Author: Yi ( http://fengyi.tel )
 
    From: Yi's Solution
-   buildstring: 5.3.0.6.bs_release.210120-1208
+   buildstring: 5.3.1.0.bs_release.210120-1208
 
    INSTALLED SOFTWARE LIST ( total $($app.Count) items )
    ---------------------------------------------------"
@@ -555,12 +555,12 @@ function initialization {
 }
 
 If ($Force) {
-	Get-Mainpage
+	Mainpage
 	Initialization
-	Obtain-And-Install
-	Process-other
+	ObtainAndInstall
+	ProcessOther
 } else {
-	Get-Mainpage
+	Mainpage
 	Write-Host "   Do you want to install the above software?" -ForegroundColor Green
 	$caption="Please confirm before installing the software."
 	$message="Continue installation (Y)`nCancel the installation (N)"
@@ -572,13 +572,13 @@ If ($Force) {
 	{
 		0 {
 			Initialization
-			Obtain-And-Install
-			Process-other
-			Wait-Exit -wait 6
+			ObtainAndInstall
+			ProcessOther
+			WaitExit -wait 6
 		}
 		1 {
 			Write-Host "`n   The user has cancelled the installation."
-			Wait-Exit -wait 2
+			WaitExit -wait 2
 		}
 	}
 }
