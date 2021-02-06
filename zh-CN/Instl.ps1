@@ -196,7 +196,7 @@ Enum Action
 	Unzip   # 下载后仅解压
 }
 
-function Test-Available-Disk {
+function TestAvailableDisk {
 	param (
 		[string]$Path
 	)
@@ -217,7 +217,7 @@ function Test-Available-Disk {
 	}
 }
 
-function Test-URI {
+function TestURI {
 	Param(
 		[Parameter(Position=0,Mandatory,HelpMessage="HTTP or HTTPS")]
 		[ValidatePattern( "^(http|https)://" )]
@@ -260,7 +260,7 @@ function Test-URI {
 	}
 }
 
-function Test-Catalog {
+function CheckCatalog {
 	Param(
 		[string]$chkpath
 	)
@@ -274,7 +274,7 @@ function Test-Catalog {
 	}
 }
 
-function Join-Url {
+function JoinUrl {
 	param (
 		[parameter(Mandatory=$True, HelpMessage="Base Path")]
 		[ValidateNotNullOrEmpty()]
@@ -290,7 +290,7 @@ function Join-Url {
 	}
 }
 
-function Start-Install-Software {
+function StartInstallSoftware {
 	param(
 		$appname,
 		$status,
@@ -316,7 +316,7 @@ function Start-Install-Software {
 		}
 	}
 
-	$url = Join-Url -Path "$($url)" -ChildPath "$($packer).$($types)"
+	$url = JoinUrl -Path "$($url)" -ChildPath "$($packer).$($types)"
 
 	Switch ($todisk) {
 		auto {
@@ -368,24 +368,24 @@ function Start-Install-Software {
 				Install {
 					Get-ChildItem $OutTo -Recurse -Include "*$($filename)*$((Get-Culture).Name)*.exe" -ErrorAction SilentlyContinue | Foreach-Object {
 						Write-Host "    - 本地存在：$($_.fullname)"
-						Open-App -filename $($_.fullname) -param $param -mode $mode
+						OpenApp -filename $($_.fullname) -param $param -mode $mode
 						break
 					}
 					Get-ChildItem $OutTo -Recurse -Include "*$($filename)*.exe" -ErrorAction SilentlyContinue | Foreach-Object {
 						Write-Host "    - 本地存在：$($_.fullname)"
-						Open-App -filename $($_.fullname) -param $param -mode $mode
+						OpenApp -filename $($_.fullname) -param $param -mode $mode
 						break
 					}
 					if (Test-Path -Path $OutArchive) {
 						Write-Host "    - 已有安装包"
 					} else {
 						Write-Host "    * 开始下载`n      > 连接到：$url`n      + 保存到：$OutArchive"
-						Test-Catalog -chkpath $OutTo
+						CheckCatalog -chkpath $OutTo
 						Invoke-WebRequest -Uri $url -OutFile "$($OutArchive)" -ErrorAction SilentlyContinue | Out-Null
 					}
 					if (Test-Path -Path $OutArchive) {
 						Write-Host "    - 解压中"
-						Archive-Unzip -filename $OutArchive -to $OutTo
+						Archive -filename $OutArchive -to $OutTo
 						Write-Host "    - 解压完成"
 						if ((Test-Path $OutArchive)) { remove-item -path $OutArchive -force }
 					} else {
@@ -393,12 +393,12 @@ function Start-Install-Software {
 					}
 					Get-ChildItem $OutTo -Recurse -Include "*$($filename)*$((Get-Culture).Name)*.exe" -ErrorAction SilentlyContinue | Foreach-Object {
 						Write-Host "    - 本地存在：$($_.fullname)"
-						Open-App -filename $($_.fullname) -param $param -mode $mode
+						OpenApp -filename $($_.fullname) -param $param -mode $mode
 						break
 					}
 					Get-ChildItem $OutTo -Recurse -Include "*$($filename)*.exe" -ErrorAction SilentlyContinue | Foreach-Object {
 						Write-Host "    - 本地存在：$($_.fullname)"
-						Open-App -filename $($_.fullname) -param $param -mode $mode
+						OpenApp -filename $($_.fullname) -param $param -mode $mode
 						break
 					}
 				}
@@ -407,7 +407,7 @@ function Start-Install-Software {
 						Write-Host "    - 已安装`n"
 					} else {
 						Write-Host "    * 开始下载`n      > 连接到：$url`n      + 保存到：$OutArchive"
-						Test-Catalog -chkpath $OutTo
+						CheckCatalog -chkpath $OutTo
 						Invoke-WebRequest -Uri $url -OutFile "$($OutArchive)" -ErrorAction SilentlyContinue | Out-Null
 					}
 				}
@@ -425,7 +425,7 @@ function Start-Install-Software {
 					}
 					if (Test-Path -Path $OutArchive) {
 						Write-Host "    - 仅解压"
-						Archive-Unzip -filename $OutArchive -to $newoutputfoldoer
+						Archive -filename $OutArchive -to $newoutputfoldoer
 						Write-Host "    - 解压完成`n"
 						if ((Test-Path $OutArchive)) { remove-item -path $OutArchive -force }
 					} else {
@@ -437,12 +437,12 @@ function Start-Install-Software {
 						Write-Host "    - 已有安装包"
 					} else {
 						Write-Host "    * 开始下载`n      > 连接到：$url`n      + 保存到：$OutArchive"
-						Test-Catalog -chkpath $OutTo
+						CheckCatalog -chkpath $OutTo
 						Invoke-WebRequest -Uri $url -OutFile $OutArchive -ErrorAction SilentlyContinue | Out-Null
 					}
 					if (Test-Path -Path $OutArchive) {
 						Write-Host "    - 仅解压"
-						Archive-Unzip -filename $OutArchive -to $OutTo
+						Archive -filename $OutArchive -to $OutTo
 						Write-Host "    - 解压完成`n"
 						if ((Test-Path $OutArchive)) { remove-item -path $OutArchive -force }
 					} else {
@@ -453,30 +453,29 @@ function Start-Install-Software {
 		}
 		default {
 			if ((Test-Path $OutAny -PathType Leaf)) {
-				Open-App -filename $OutAny -param $param -mode $mode
+				OpenApp -filename $OutAny -param $param -mode $mode
 			} else {
 				Write-Host "    * 开始下载`n      > 连接到：$url"
-				try {
+				if (TestURI $url) {
 					Write-Host "      + 保存到：$OutAny"
-					Test-Catalog -chkpath $OutTo
-					(New-Object System.Net.WebClient).DownloadFile($url, $OutAny) | Out-Null
-					Open-App -filename $OutAny -param $param -mode $mode
-				} catch {
+					CheckCatalog -chkpath $OutTo
+					Invoke-WebRequest -Uri $url -OutFile $OutAny -ErrorAction SilentlyContinue | Out-Null
+					OpenApp -filename $OutAny -param $param -mode $mode
+				} else {
 					Write-Host "      - 状态：不可用`n" -ForegroundColor Red
-					break
 				}
 			}
 		}
 	}
 }
 
-function Archive-Unzip {
+function Archive {
 	param(
 		$filename,
 		$to
 	)
 
-	if (Get-Zip) {
+	if (Compressing) {
 		Write-host "    - 使用 $script:Zip 解压软件"
 		$arguments = "x ""-r"" ""-tzip"" ""$filename"" ""-o$to"" ""-y""";
 		Start-Process $script:Zip "$arguments" -Wait -WindowStyle Minimized
@@ -486,7 +485,7 @@ function Archive-Unzip {
 	}
 }
 
-function Get-Zip {
+function Compressing {
 	if (Test-Path "$env:ProgramFiles\7-Zip\7z.exe") {
 		$script:Zip = "$env:ProgramFiles\7-Zip\7z.exe"
 		return $true
@@ -504,7 +503,7 @@ function Get-Zip {
 	return $false
 }
 
-function Open-App {
+function OpenApp {
 	param(
 		$filename,
 		$param,
@@ -536,7 +535,7 @@ function Open-App {
 	}
 }
 
-function Wait-Exit {
+function WaitExit {
 	param(
 		[int]$wait
 	)
@@ -545,15 +544,15 @@ function Wait-Exit {
 	exit
 }
 
-function Obtain-And-Install {
+function ObtainAndInstall {
 	Write-Host "`n   正在安装软件中"
 	Write-Host "   ---------------------------------------------------"
 	for ($i=0; $i -lt $app.Count; $i++) {
-		Start-Install-Software -appname $app[$i][0] -status $app[$i][1] -act $app[$i][2] -mode $app[$i][3] -todisk $app[$i][4] -structure $app[$i][5] -url $app[$i][6] -packer $app[$i][7] -types $app[$i][8] -filename $app[$i][9] -param $app[$i][10]
+		StartInstallSoftware -appname $app[$i][0] -status $app[$i][1] -act $app[$i][2] -mode $app[$i][3] -todisk $app[$i][4] -structure $app[$i][5] -url $app[$i][6] -packer $app[$i][7] -types $app[$i][8] -filename $app[$i][9] -param $app[$i][10]
 	}
 }
 
-function Process-other {
+function ProcessOther {
 	Write-Host "`n   处理其它：" -ForegroundColor Green
 
 	Write-Host "   - 删除开机自启动项"
@@ -571,12 +570,12 @@ function Process-other {
 	#Rename-Item-NewName "谷歌浏览器.lnk"  -Path ".\Google Chrome.lnk" -ErrorAction SilentlyContinue | Out-Null
 }
 
-function Get-Mainpage {
+function Mainpage {
 	Clear-Host
 	Write-Host "`n   Author: Yi ( http://fengyi.tel )
 
    From: Yi's Solution
-   buildstring: 5.3.0.6.bs_release.210120-1208
+   buildstring: 5.3.1.0.bs_release.210120-1208
 
    安装软件列表 ( 共 $($app.Count) 款 )
    ---------------------------------------------------"
@@ -598,12 +597,12 @@ function initialization {
 }
 
 If ($Force) {
-	Get-Mainpage
+	Mainpage
 	Initialization
-	Obtain-And-Install
-	Process-other
+	ObtainAndInstall
+	ProcessOther
 } else {
-	Get-Mainpage
+	Mainpage
 	Write-Host "   是否安装以上软件？" -ForegroundColor Green
 	$caption="安装软件前请确认。"
 	$message="继续安装（Y）`n取消安装（N）"
@@ -615,13 +614,13 @@ If ($Force) {
 	{
 		0 {
 			Initialization
-			Obtain-And-Install
-			Process-other
-			Wait-Exit -wait 6
+			ObtainAndInstall
+			ProcessOther
+			WaitExit -wait 6
 		}
 		1 {
 			Write-Host "`n   用户已取消安装。"
-			Wait-Exit -wait 2
+			WaitExit -wait 2
 		}
 	}
 }
