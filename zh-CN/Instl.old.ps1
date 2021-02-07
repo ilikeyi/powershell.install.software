@@ -1,4 +1,5 @@
 ﻿<#
+
   警告：为防止更新后覆盖，请另存为后再修改。
 
   PowerShell 安装软件
@@ -12,7 +13,8 @@
        - 操作系统首选语言：en-US
        - 文件名：ChromeChrome
        优先搜索条件为 GoogleChrome*en-US*，未搜索到按默认文件名重新搜索。
-    5. 支持解压包处理等。
+    5. 支持运行前处理，前往 function OpenApp {} 处更改该模块；
+    6. 支持解压包处理等。
 
   .先决条件
   - PowerShell 2.0 或更高
@@ -24,18 +26,34 @@
 
   软件包配置教程
 
- 软件包配置                   描述
-("Gpg4win",                   软件包名称
- "Disable",                   状态：Enable - 启用；Disable - 禁用
- "Install",                   动作：Install - 安装；NoInst - 下载后不安装；Unzip - 下载后仅解压；To - 安装到目录
- "wait",                      运行方式：Wait - 等待完成；Fast - 直接运行
- "auto",                      设置自动后将排除当前系统盘，搜索不到可用盘时，默认设置为当前系统盘；指定盘符 [A:]-[Z:]；指定路径：\\192.168.1.1
- "安装包\AIO",                目录结构
- "https://files.gpg4win.org", 网站地址
- "gpg4win-latest",            从网站下载的文件名
- "exe",                       从网站下载的文件类型：exe, zip 或自定义文件类型；结果：https://files.gpg4win.org/gpg4win-latest.exe
- "gpg4win*",                  文件名模糊查找（*）
- "/S"),                       运行参数
+ 软件包                                                    描述
+("Windows Defender Control",                               软件包名称
+ "Enable",                                                 状态：Enable - 启用；Disable - 禁用
+ "Install",                                                动作：Install - 安装；NoInst - 下载后不安装；Unzip - 下载后仅解压；To - 安装到目录
+ "Wait",                                                   运行方式：Wait - 等待完成；Fast - 直接运行
+ "auto",                                                   设置自动后将排除当前系统盘，搜索不到可用盘时，默认设置为当前系统盘；指定盘符 [A:]-[Z:]；指定路径：\\192.168.1.1
+ "安装包\工具",                                            目录结构
+ "https://www.sordum.org/files/download/defender-control", 网站地址
+ "DefenderControl",                                        从网站下载的文件名
+ "zip",                                                    从网站下载的文件类型：exe, zip 或自定义文件类型；结果：https://files.gpg4win.org/gpg4win-latest.exe
+ "DefenderControl*",                                       文件名模糊查找（*）
+ "/D",                                                     运行参数
+ "1:DefenderControl:ini")                                  运行前：1 - 选择方案1；DefenderControl = 配置文件名；ini = 类型，前往 function OpenApp {} 处更改该模块
+
+ .制作配置文件
+
+ - 默认
+   DefenderControl.ini 复制后更改为 DefenderControl.Default.ini
+
+ - 英文
+   DefenderControl.ini 复制后更改为 DefenderControl.en-US.ini
+   打开 DefenderControl.en-US.ini，将 Language=Auto 修改为 Language=English
+
+ - 中文
+   DefenderControl.ini 复制后更改为 DefenderControl.zh-CN.ini
+   打开 DefenderControl.zh-CN.ini，将 Language=Auto 修改为 Language=Chinese_简体中文
+
+   制作完成后删除 DefenderControl.ini。
 
 #>
 
@@ -62,6 +80,7 @@ $app = @(
 	 "Yi",
 	 "deskthemepack",
 	 "Yi*",
+	 "",
 	 ""),
 	("Nvidia GEFORCE GAME READY DRIVER",
 	 "Disable",
@@ -73,7 +92,8 @@ $app = @(
 	 "461.40-desktop-win10-64bit-international-dch-whql",
 	 "exe",
 	 "*-desktop-win10-*-international-dch-whql",
-	 "-s -clean -noreboot -noeula"),
+	 "-s -clean -noreboot -noeula",
+	 ""),
 	("Sysinternals Suite",
 	 "Disable",
 	 "To",
@@ -84,6 +104,7 @@ $app = @(
 	 "SysinternalsSuite",
 	 "zip",
 	 "SysinternalsSuite",
+	 "",
 	 ""),
 	("VisualCppRedist AIO",
 	 "Disable",
@@ -95,7 +116,8 @@ $app = @(
 	 "VisualCppRedist_AIO_x86_x64_43",
 	 "zip",
 	 "VisualCppRedist*",
-	 "/y"),
+	 "/y",
+	 ""),
 	("Gpg4win",
 	 "Disable",
 	 "Install",
@@ -106,7 +128,8 @@ $app = @(
 	 "gpg4win-latest",
 	 "exe",
 	 "gpg4win*",
-	 "/S"),
+	 "/S",
+	 ""),
 	("Python",
 	 "Disable",
 	 "Install",
@@ -117,7 +140,8 @@ $app = @(
 	 "python-3.9.1-amd64",
 	 "exe",
 	 "python-*",
-	 "/quiet InstallAllUsers=1 PrependPath=1 Include_test=0"),
+	 "/quiet InstallAllUsers=1 PrependPath=1 Include_test=0",
+	 ""),
 	("酷狗音乐",
 	 "Disable",
 	 "Install",
@@ -128,7 +152,8 @@ $app = @(
 	 "kugou9175",
 	 "exe",
 	 "kugou*",
-	 "/S"),
+	 "/S",
+	 ""),
 	("网易云音乐",
 	 "Disable",
 	 "Install",
@@ -139,7 +164,8 @@ $app = @(
 	 "cloudmusicsetup2.7.5.198554",
 	 "exe",
 	 "cloudmusicsetup*",
-	 "/S"),
+	 "/S",
+	 ""),
 	("QQ 音乐",
 	 "Disable",
 	 "Install",
@@ -150,7 +176,8 @@ $app = @(
 	 "QQMusicSetup",
 	 "exe",
 	 "QQMusicSetup",
-	 "/S"),
+	 "/S",
+	 ""),
 	("腾讯 QQ 2020",
 	 "Enable",
 	 "Install",
@@ -161,7 +188,8 @@ $app = @(
 	 "PCQQ2021",
 	 "exe",
 	 "PCQQ2021",
-	 "/S"),
+	 "/S",
+	 ""),
 	("微信",
 	 "Enable",
 	 "Install",
@@ -172,7 +200,8 @@ $app = @(
 	 "WeChatSetup",
 	 "exe",
 	 "WeChatSetup",
-	 "/S")
+	 "/S",
+	 "")
 )
 # 最后 ) 结尾请勿带 , 号，否则你懂的。
 
@@ -239,7 +268,8 @@ function StartInstallSoftware {
 		$packer,
 		$types,
 		$filename,
-		$param
+		$param,
+		$method
 	)
 
 	Switch ($status)
@@ -274,11 +304,9 @@ function StartInstallSoftware {
 					if (TestAvailableDisk -Path $drive)	{
 						$OutTo = Join-Path -Path "$($drive)" -ChildPath "$($structure)"
 						$OutAny = Join-Path -Path "$($drive)" -ChildPath "$($structure)\$($packer).$($types)"
-						$OutArchive = Join-Path -Path "$($drive)" -ChildPath "$($structure)\$($packer).zip"
 					} else {
 						$OutTo = Join-Path -Path $($env:SystemDrive) -ChildPath "$($structure)"
 						$OutAny = Join-Path -Path $($env:SystemDrive) -ChildPath "$($structure)\$($packer).$($types)"
-						$OutArchive = Join-Path -Path $($env:SystemDrive) -ChildPath "$($structure)\$($packer).zip"
 					}
 				}
 			}
@@ -305,55 +333,55 @@ function StartInstallSoftware {
 				Install {
 					Get-ChildItem $OutTo -Recurse -Include "*$($filename)*$((Get-Culture).Name)*.exe" -ErrorAction SilentlyContinue | Foreach-Object {
 						Write-Host "    - 本地存在：$($_.fullname)"
-						OpenApp -filename $($_.fullname) -param $param -mode $mode
+						OpenApp -filename $($_.fullname) -param $param -mode $mode -method $method
 						break
 					}
 					Get-ChildItem $OutTo -Recurse -Include "*$($filename)*.exe" -ErrorAction SilentlyContinue | Foreach-Object {
 						Write-Host "    - 本地存在：$($_.fullname)"
-						OpenApp -filename $($_.fullname) -param $param -mode $mode
+						OpenApp -filename $($_.fullname) -param $param -mode $mode -method $method
 						break
 					}
-					if (Test-Path -Path $OutArchive) {
+					if (Test-Path -Path $OutAny) {
 						Write-Host "    - 已有安装包"
 					} else {
 						Write-Host "    * 开始下载`n      > 连接到：$url"
 						try {
-							Write-Host "      + 保存到：$OutArchive"
+							Write-Host "      + 保存到：$OutAny"
 							CheckCatalog -chkpath $OutTo
-							(New-Object System.Net.WebClient).DownloadFile($url, $OutArchive) | Out-Null
+							(New-Object System.Net.WebClient).DownloadFile($url, $OutAny) | Out-Null
 						} catch {
 							Write-Host "      - 状态：不可用`n" -ForegroundColor Red
 							break
 						}
 					}
-					if (Test-Path -Path $OutArchive) {
+					if (Test-Path -Path $OutAny) {
 						Write-Host "    - 解压中"
-						Archive -filename $OutArchive -to $OutTo
+						Archive -filename $OutAny -to $OutTo
 						Write-Host "    - 解压完成"
-						if ((Test-Path $OutArchive)) { remove-item -path $OutArchive -force }
+						if ((Test-Path $OutAny)) { remove-item -path $OutAny -force }
 					} else {
 						Write-Host "    - 下载过程中出现错误`n" -ForegroundColor Red
 					}
 					Get-ChildItem $OutTo -Recurse -Include "*$($filename)*$((Get-Culture).Name)*.exe" -ErrorAction SilentlyContinue | Foreach-Object {
 						Write-Host "    - 本地存在：$($_.fullname)"
-						OpenApp -filename $($_.fullname) -param $param -mode $mode
+						OpenApp -filename $($_.fullname) -param $param -mode $mode -method $method
 						break
 					}
 					Get-ChildItem $OutTo -Recurse -Include "*$($filename)*.exe" -ErrorAction SilentlyContinue | Foreach-Object {
 						Write-Host "    - 本地存在：$($_.fullname)"
-						OpenApp -filename $($_.fullname) -param $param -mode $mode
+						OpenApp -filename $($_.fullname) -param $param -mode $mode -method $method
 						break
 					}
 				}
 				NoInst {
-					if (Test-Path -Path $OutArchive) {
+					if (Test-Path -Path $OutAny) {
 						Write-Host "    - 已安装`n"
 					} else {
 						Write-Host "    * 开始下载`n      > 连接到：$url"
 						try {
-							Write-Host "      + 保存到：$OutArchive"
+							Write-Host "      + 保存到：$OutAny"
 							CheckCatalog -chkpath $OutTo
-							(New-Object System.Net.WebClient).DownloadFile($url, $OutArchive) | Out-Null
+							(New-Object System.Net.WebClient).DownloadFile($url, $OutAny) | Out-Null
 						} catch {
 							Write-Host "      - 状态：不可用`n" -ForegroundColor Red
 							break
@@ -366,46 +394,46 @@ function StartInstallSoftware {
 						Write-Host "    - 已安装`n"
 						break
 					}
-					if (Test-Path -Path $OutArchive) {
+					if (Test-Path -Path $OutAny) {
 						Write-Host "    - 已有压缩包"
 					} else {
 						Write-Host "    * 开始下载`n      > 连接到：$url"
 						try {
-							Write-Host "      + 保存到：$OutArchive"
-							(New-Object System.Net.WebClient).DownloadFile($url, $OutArchive) | Out-Null
+							Write-Host "      + 保存到：$OutAny"
+							(New-Object System.Net.WebClient).DownloadFile($url, $OutAny) | Out-Null
 						} catch {
 							Write-Host "      - 状态：不可用`n" -ForegroundColor Red
 							break
 						}
 					}
-					if (Test-Path -Path $OutArchive) {
+					if (Test-Path -Path $OutAny) {
 						Write-Host "    - 仅解压"
-						Archive -filename $OutArchive -to $newoutputfoldoer
+						Archive -filename $OutAny -to $newoutputfoldoer
 						Write-Host "    - 解压完成`n"
-						if ((Test-Path $OutArchive)) { remove-item -path $OutArchive -force }
+						if ((Test-Path $OutAny)) { remove-item -path $OutAny -force }
 					} else {
 						Write-Host "    - 下载过程中出现错误`n" -ForegroundColor Red
 					}
 				}
 				Unzip {
-					if (Test-Path -Path $OutArchive) {
+					if (Test-Path -Path $OutAny) {
 						Write-Host "    - 已有安装包"
 					} else {
 						Write-Host "    * 开始下载`n      > 连接到：$url"
 						try {
-							Write-Host "      + 保存到：$OutArchive"
+							Write-Host "      + 保存到：$OutAny"
 							CheckCatalog -chkpath $OutTo
-							(New-Object System.Net.WebClient).DownloadFile($url, $OutArchive) | Out-Null
+							(New-Object System.Net.WebClient).DownloadFile($url, $OutAny) | Out-Null
 						} catch {
 							Write-Host "      - 状态：不可用`n" -ForegroundColor Red
 							break
 						}
 					}
-					if (Test-Path -Path $OutArchive) {
+					if (Test-Path -Path $OutAny) {
 						Write-Host "    - 仅解压"
-						Archive -filename $OutArchive -to $OutTo
+						Archive -filename $OutAny -to $OutTo
 						Write-Host "    - 解压完成`n"
-						if ((Test-Path $OutArchive)) { remove-item -path $OutArchive -force }
+						if ((Test-Path $OutAny)) { remove-item -path $OutAny -force }
 					} else {
 						Write-Host "    - 下载过程中出现错误`n" -ForegroundColor Red
 					}
@@ -414,14 +442,14 @@ function StartInstallSoftware {
 		}
 		default {
 			if ((Test-Path $OutAny -PathType Leaf)) {
-				OpenApp -filename $OutAny -param $param -mode $mode
+				OpenApp -filename $OutAny -param $param -mode $mode -method $method
 			} else {
 				Write-Host "    * 开始下载`n      > 连接到：$url"
 				try {
 					Write-Host "      + 保存到：$OutAny"
 					CheckCatalog -chkpath $OutTo
 					(New-Object System.Net.WebClient).DownloadFile($url, $OutAny) | Out-Null
-					OpenApp -filename $OutAny -param $param -mode $mode
+					OpenApp -filename $OutAny -param $param -mode $mode -method $method
 				} catch {
 					Write-Host "      - 状态：不可用`n" -ForegroundColor Red
 					break
@@ -469,8 +497,31 @@ function OpenApp {
 	param(
 		$filename,
 		$param,
-		$mode
+		$mode,
+		$method
 	)
+
+	$Select = $method -split ":"
+	switch ($Select[0]) {
+		1 {
+			$TestCfg = "$(Split-Path $filename)\$($Select[1]).$($Select[2])"
+			$TestDefault = "$(Split-Path $filename)\$($Select[1]).default.$($Select[2])"
+			$TestLanguage = "$(Split-Path $filename)\$($Select[1]).$((Get-Culture).Name).$($Select[2])"
+			if (Test-Path $TestCfg -PathType Leaf){
+				break
+			} else {
+				if (Test-Path $TestLanguage -PathType Leaf){
+					Copy-Item -Path $TestLanguage -Destination $TestCfg -ErrorAction SilentlyContinue
+				} else {
+					if (Test-Path $TestDefault -PathType Leaf){
+						Copy-Item -Path $TestDefault -Destination $TestCfg -ErrorAction SilentlyContinue
+					}
+				}
+			}
+		}
+		default {
+		}
+	}
 
 	if ((Test-Path $filename -PathType Leaf)) {
 		Switch ($mode)
@@ -510,7 +561,7 @@ function ObtainAndInstall {
 	Write-Host "`n   正在安装软件中"
 	Write-Host "   ---------------------------------------------------"
 	for ($i=0; $i -lt $app.Count; $i++) {
-		StartInstallSoftware -appname $app[$i][0] -status $app[$i][1] -act $app[$i][2] -mode $app[$i][3] -todisk $app[$i][4] -structure $app[$i][5] -url $app[$i][6] -packer $app[$i][7] -types $app[$i][8] -filename $app[$i][9] -param $app[$i][10]
+		StartInstallSoftware -appname $app[$i][0] -status $app[$i][1] -act $app[$i][2] -mode $app[$i][3] -todisk $app[$i][4] -structure $app[$i][5] -url $app[$i][6] -packer $app[$i][7] -types $app[$i][8] -filename $app[$i][9] -param $app[$i][10] -method $app[$i][11]
 	}
 }
 
@@ -532,8 +583,8 @@ function Mainpage {
 	Clear-Host
 	Write-Host "`n   Author: Yi ( http://fengyi.tel )
 
-   From: Yi's Solution
-   buildstring: 5.3.1.0.bs_release.210120-1208
+   From: Yi's Solutions
+   buildstring: 5.3.1.1.bs_release.210120-1208
 
    安装软件列表 ( 共 $($app.Count) 款 )
    ---------------------------------------------------"
