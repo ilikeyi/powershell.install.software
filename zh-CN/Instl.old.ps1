@@ -12,7 +12,7 @@
     4. 搜索文件名优先按语言结构来搜索，例如：
        - 操作系统首选语言：en-US
        - 文件名：ChromeChrome
-       优先搜索条件为 GoogleChrome*en-US*，未搜索到按默认文件名重新搜索。
+       优先搜索条件为 GoogleChrome*en-US*，未搜索到按默认文件名重新搜索；
     5. 支持运行前处理，前往 function OpenApp {} 处更改该模块；
     6. 支持解压包处理等。
 
@@ -290,12 +290,12 @@ function StartInstallSoftware {
 			$drives = Get-PSDrive -PSProvider FileSystem | where { -not ("$($env:SystemDrive)\" -eq $_.Root) } | Select-Object -ExpandProperty 'Root'
 			foreach ($drive in $drives) {
 				$tempoutputfoldoer = Join-Path -Path $($drive) -ChildPath "$($structure)"
-				Get-ChildItem $tempoutputfoldoer -Recurse -Include "*$($filename)*$((Get-Culture).Name)*" -ErrorAction SilentlyContinue | Foreach-Object {
+				Get-ChildItem -Path $tempoutputfoldoer -File -Filter "*$($filename)*$((Get-Culture).Name)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
 					$OutTo = Join-Path -Path "$($drive)" -ChildPath "$($structure)"
 					$OutAny = $($_.fullname)
 					break
 				}
-				Get-ChildItem $tempoutputfoldoer -Recurse -Include "*$($filename)*" -ErrorAction SilentlyContinue | Foreach-Object {
+				Get-ChildItem -Path $tempoutputfoldoer -File -Filter "*$($filename)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
 					$OutTo = Join-Path -Path "$($drive)" -ChildPath "$($structure)"
 					$OutAny = $($_.fullname)
 					break
@@ -313,15 +313,15 @@ function StartInstallSoftware {
 		}
 		default {
 			$OutTo = Join-Path -Path $($todisk) -ChildPath "$($structure)"
-			Get-ChildItem $OutTo -Recurse -Include "*$($filename)*$((Get-Culture).Name)*" -ErrorAction SilentlyContinue | Foreach-Object {
-				$OutAny = $($_.fullname)
-				break
-			}
-			Get-ChildItem $OutTo -Recurse -Include "*$($filename)*" -ErrorAction SilentlyContinue | Foreach-Object {
-				$OutAny = $($_.fullname)
-				break
-			}
 			$OutAny = Join-Path -Path $($todisk) -ChildPath "$($structure)\$($packer).$($types)"
+			Get-ChildItem -Path $OutTo -File -Filter "*$($filename)*$((Get-Culture).Name)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
+				$OutAny = $($_.fullname)
+				break
+			}
+			Get-ChildItem -Path $OutTo -File -Filter "*$($filename)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
+				$OutAny = $($_.fullname)
+				break
+			}
 		}
 	}
 
@@ -331,12 +331,12 @@ function StartInstallSoftware {
 			Switch ($act)
 			{
 				Install {
-					Get-ChildItem $OutTo -Recurse -Include "*$($filename)*$((Get-Culture).Name)*.exe" -ErrorAction SilentlyContinue | Foreach-Object {
+					Get-ChildItem -Path $OutTo -File -Filter "*$($filename)*$((Get-Culture).Name)*.exe" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
 						Write-Host "    - 本地存在：$($_.fullname)"
 						OpenApp -filename $($_.fullname) -param $param -mode $mode -method $method
 						break
 					}
-					Get-ChildItem $OutTo -Recurse -Include "*$($filename)*.exe" -ErrorAction SilentlyContinue | Foreach-Object {
+					Get-ChildItem -Path $OutTo -File -Filter "*$($filename)*.exe" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
 						Write-Host "    - 本地存在：$($_.fullname)"
 						OpenApp -filename $($_.fullname) -param $param -mode $mode -method $method
 						break
@@ -344,15 +344,9 @@ function StartInstallSoftware {
 					if (Test-Path -Path $OutAny) {
 						Write-Host "    - 已有安装包"
 					} else {
-						Write-Host "    * 开始下载`n      > 连接到：$url"
-						try {
-							Write-Host "      + 保存到：$OutAny"
-							CheckCatalog -chkpath $OutTo
-							(New-Object System.Net.WebClient).DownloadFile($url, $OutAny) | Out-Null
-						} catch {
-							Write-Host "      - 状态：不可用`n" -ForegroundColor Red
-							break
-						}
+						Write-Host "    * 开始下载`n      > 连接到：$url`n      + 保存到：$OutAny"
+						CheckCatalog -chkpath $OutTo
+						Invoke-WebRequest -Uri $url -OutFile "$($OutAny)" -ErrorAction SilentlyContinue | Out-Null
 					}
 					if (Test-Path -Path $OutAny) {
 						Write-Host "    - 解压中"
@@ -362,12 +356,12 @@ function StartInstallSoftware {
 					} else {
 						Write-Host "    - 下载过程中出现错误`n" -ForegroundColor Red
 					}
-					Get-ChildItem $OutTo -Recurse -Include "*$($filename)*$((Get-Culture).Name)*.exe" -ErrorAction SilentlyContinue | Foreach-Object {
+					Get-ChildItem -Path $OutTo -File -Filter "*$($filename)*$((Get-Culture).Name)*.exe" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
 						Write-Host "    - 本地存在：$($_.fullname)"
 						OpenApp -filename $($_.fullname) -param $param -mode $mode -method $method
 						break
 					}
-					Get-ChildItem $OutTo -Recurse -Include "*$($filename)*.exe" -ErrorAction SilentlyContinue | Foreach-Object {
+					Get-ChildItem -Path $OutTo -File -Filter "*$($filename)*.exe" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
 						Write-Host "    - 本地存在：$($_.fullname)"
 						OpenApp -filename $($_.fullname) -param $param -mode $mode -method $method
 						break
@@ -377,15 +371,9 @@ function StartInstallSoftware {
 					if (Test-Path -Path $OutAny) {
 						Write-Host "    - 已安装`n"
 					} else {
-						Write-Host "    * 开始下载`n      > 连接到：$url"
-						try {
-							Write-Host "      + 保存到：$OutAny"
-							CheckCatalog -chkpath $OutTo
-							(New-Object System.Net.WebClient).DownloadFile($url, $OutAny) | Out-Null
-						} catch {
-							Write-Host "      - 状态：不可用`n" -ForegroundColor Red
-							break
-						}
+						Write-Host "    * 开始下载`n      > 连接到：$url`n      + 保存到：$OutAny"
+						CheckCatalog -chkpath $OutTo
+						Invoke-WebRequest -Uri $url -OutFile "$($OutAny)" -ErrorAction SilentlyContinue | Out-Null
 					}
 				}
 				To {
@@ -397,14 +385,8 @@ function StartInstallSoftware {
 					if (Test-Path -Path $OutAny) {
 						Write-Host "    - 已有压缩包"
 					} else {
-						Write-Host "    * 开始下载`n      > 连接到：$url"
-						try {
-							Write-Host "      + 保存到：$OutAny"
-							(New-Object System.Net.WebClient).DownloadFile($url, $OutAny) | Out-Null
-						} catch {
-							Write-Host "      - 状态：不可用`n" -ForegroundColor Red
-							break
-						}
+						Write-Host "    * 开始下载`n      > 连接到：$url`n      + 保存到：$OutAny"
+						Invoke-WebRequest -Uri $url -OutFile $OutAny -ErrorAction SilentlyContinue | Out-Null
 					}
 					if (Test-Path -Path $OutAny) {
 						Write-Host "    - 仅解压"
@@ -419,15 +401,9 @@ function StartInstallSoftware {
 					if (Test-Path -Path $OutAny) {
 						Write-Host "    - 已有安装包"
 					} else {
-						Write-Host "    * 开始下载`n      > 连接到：$url"
-						try {
-							Write-Host "      + 保存到：$OutAny"
-							CheckCatalog -chkpath $OutTo
-							(New-Object System.Net.WebClient).DownloadFile($url, $OutAny) | Out-Null
-						} catch {
-							Write-Host "      - 状态：不可用`n" -ForegroundColor Red
-							break
-						}
+						Write-Host "    * 开始下载`n      > 连接到：$url`n      + 保存到：$OutAny"
+						CheckCatalog -chkpath $OutTo
+						Invoke-WebRequest -Uri $url -OutFile $OutAny -ErrorAction SilentlyContinue | Out-Null
 					}
 					if (Test-Path -Path $OutAny) {
 						Write-Host "    - 仅解压"
@@ -445,14 +421,13 @@ function StartInstallSoftware {
 				OpenApp -filename $OutAny -param $param -mode $mode -method $method
 			} else {
 				Write-Host "    * 开始下载`n      > 连接到：$url"
-				try {
+				if (TestURI $url) {
 					Write-Host "      + 保存到：$OutAny"
 					CheckCatalog -chkpath $OutTo
-					(New-Object System.Net.WebClient).DownloadFile($url, $OutAny) | Out-Null
+					Invoke-WebRequest -Uri $url -OutFile $OutAny -ErrorAction SilentlyContinue | Out-Null
 					OpenApp -filename $OutAny -param $param -mode $mode -method $method
-				} catch {
+				} else {
 					Write-Host "      - 状态：不可用`n" -ForegroundColor Red
-					break
 				}
 			}
 		}
@@ -584,7 +559,7 @@ function Mainpage {
 	Write-Host "`n   Author: Yi ( http://fengyi.tel )
 
    From: Yi's Solutions
-   buildstring: 5.3.1.1.bs_release.210120-1208
+   buildstring: 5.3.1.2.bs_release.210120-1208
 
    安装软件列表 ( 共 $($app.Count) 款 )
    ---------------------------------------------------"

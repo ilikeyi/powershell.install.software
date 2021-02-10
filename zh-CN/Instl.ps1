@@ -24,7 +24,7 @@
   - https://gitee.com/ilikeyi/powershell.install.software
 
 
-  软件包配置教程：
+  软件包配置教程
 
  软件包                                                    描述
 ("Windows Defender Control",                               软件包名称
@@ -353,12 +353,12 @@ function StartInstallSoftware {
 			$drives = Get-PSDrive -PSProvider FileSystem | where { -not ("$($env:SystemDrive)\" -eq $_.Root) } | Select-Object -ExpandProperty 'Root'
 			foreach ($drive in $drives) {
 				$tempoutputfoldoer = Join-Path -Path $($drive) -ChildPath "$($structure)"
-				Get-ChildItem $tempoutputfoldoer -Recurse -Include "*$($filename)*$((Get-Culture).Name)*" -ErrorAction SilentlyContinue | Foreach-Object {
+				Get-ChildItem -Path $tempoutputfoldoer -File -Filter "*$($filename)*$((Get-Culture).Name)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
 					$OutTo = Join-Path -Path "$($drive)" -ChildPath "$($structure)"
 					$OutAny = $($_.fullname)
 					break
 				}
-				Get-ChildItem $tempoutputfoldoer -Recurse -Include "*$($filename)*" -ErrorAction SilentlyContinue | Foreach-Object {
+				Get-ChildItem -Path $tempoutputfoldoer -File -Filter "*$($filename)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
 					$OutTo = Join-Path -Path "$($drive)" -ChildPath "$($structure)"
 					$OutAny = $($_.fullname)
 					break
@@ -376,15 +376,15 @@ function StartInstallSoftware {
 		}
 		default {
 			$OutTo = Join-Path -Path $($todisk) -ChildPath "$($structure)"
-			Get-ChildItem $OutTo -Recurse -Include "*$($filename)*$((Get-Culture).Name)*" -ErrorAction SilentlyContinue | Foreach-Object {
-				$OutAny = $($_.fullname)
-				break
-			}
-			Get-ChildItem $OutTo -Recurse -Include "*$($filename)*" -ErrorAction SilentlyContinue | Foreach-Object {
-				$OutAny = $($_.fullname)
-				break
-			}
 			$OutAny = Join-Path -Path $($todisk) -ChildPath "$($structure)\$($packer).$($types)"
+			Get-ChildItem -Path $OutTo -File -Filter "*$($filename)*$((Get-Culture).Name)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
+				$OutAny = $($_.fullname)
+				break
+			}
+			Get-ChildItem -Path $OutTo -File -Filter "*$($filename)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
+				$OutAny = $($_.fullname)
+				break
+			}
 		}
 	}
 
@@ -394,12 +394,12 @@ function StartInstallSoftware {
 			Switch ($act)
 			{
 				Install {
-					Get-ChildItem $OutTo -Recurse -Include "*$($filename)*$((Get-Culture).Name)*.exe" -ErrorAction SilentlyContinue | Foreach-Object {
+					Get-ChildItem -Path $OutTo -File -Filter "*$($filename)*$((Get-Culture).Name)*.exe" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
 						Write-Host "    - 本地存在：$($_.fullname)"
 						OpenApp -filename $($_.fullname) -param $param -mode $mode -method $method
 						break
 					}
-					Get-ChildItem $OutTo -Recurse -Include "*$($filename)*.exe" -ErrorAction SilentlyContinue | Foreach-Object {
+					Get-ChildItem -Path $OutTo -File -Filter "*$($filename)*.exe" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
 						Write-Host "    - 本地存在：$($_.fullname)"
 						OpenApp -filename $($_.fullname) -param $param -mode $mode -method $method
 						break
@@ -419,12 +419,12 @@ function StartInstallSoftware {
 					} else {
 						Write-Host "    - 下载过程中出现错误`n" -ForegroundColor Red
 					}
-					Get-ChildItem $OutTo -Recurse -Include "*$($filename)*$((Get-Culture).Name)*.exe" -ErrorAction SilentlyContinue | Foreach-Object {
+					Get-ChildItem -Path $OutTo -File -Filter "*$($filename)*$((Get-Culture).Name)*.exe" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
 						Write-Host "    - 本地存在：$($_.fullname)"
 						OpenApp -filename $($_.fullname) -param $param -mode $mode -method $method
 						break
 					}
-					Get-ChildItem $OutTo -Recurse -Include "*$($filename)*.exe" -ErrorAction SilentlyContinue | Foreach-Object {
+					Get-ChildItem -Path $OutTo -File -Filter "*$($filename)*.exe" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
 						Write-Host "    - 本地存在：$($_.fullname)"
 						OpenApp -filename $($_.fullname) -param $param -mode $mode -method $method
 						break
@@ -626,7 +626,7 @@ function Mainpage {
 	Write-Host "`n   Author: Yi ( http://fengyi.tel )
 
    From: Yi's Solutions
-   buildstring: 5.3.1.1.bs_release.210120-1208
+   buildstring: 5.3.1.2.bs_release.210120-1208
 
    安装软件列表 ( 共 $($app.Count) 款 )
    ---------------------------------------------------"
