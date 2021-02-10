@@ -290,12 +290,12 @@ function StartInstallSoftware {
 			$drives = Get-PSDrive -PSProvider FileSystem | where { -not ("$($env:SystemDrive)\" -eq $_.Root) } | Select-Object -ExpandProperty 'Root'
 			foreach ($drive in $drives) {
 				$tempoutputfoldoer = Join-Path -Path $($drive) -ChildPath "$($structure)"
-				Get-ChildItem $tempoutputfoldoer -Recurse -Include "*$($filename)*$((Get-Culture).Name)*" -ErrorAction SilentlyContinue | Foreach-Object {
+				Get-ChildItem -Path $tempoutputfoldoer -File -Filter "*$($filename)*$((Get-Culture).Name)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
 					$OutTo = Join-Path -Path "$($drive)" -ChildPath "$($structure)"
 					$OutAny = $($_.fullname)
 					break
 				}
-				Get-ChildItem $tempoutputfoldoer -Recurse -Include "*$($filename)*" -ErrorAction SilentlyContinue | Foreach-Object {
+				Get-ChildItem -Path $tempoutputfoldoer -File -Filter "*$($filename)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
 					$OutTo = Join-Path -Path "$($drive)" -ChildPath "$($structure)"
 					$OutAny = $($_.fullname)
 					break
@@ -313,15 +313,15 @@ function StartInstallSoftware {
 		}
 		default {
 			$OutTo = Join-Path -Path $($todisk) -ChildPath "$($structure)"
-			Get-ChildItem $OutTo -Recurse -Include "*$($filename)*$((Get-Culture).Name)*" -ErrorAction SilentlyContinue | Foreach-Object {
-				$OutAny = $($_.fullname)
-				break
-			}
-			Get-ChildItem $OutTo -Recurse -Include "*$($filename)*" -ErrorAction SilentlyContinue | Foreach-Object {
-				$OutAny = $($_.fullname)
-				break
-			}
 			$OutAny = Join-Path -Path $($todisk) -ChildPath "$($structure)\$($packer).$($types)"
+			Get-ChildItem -Path $OutTo -File -Filter "*$($filename)*$((Get-Culture).Name)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
+				$OutAny = $($_.fullname)
+				break
+			}
+			Get-ChildItem -Path $OutTo -File -Filter "*$($filename)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
+				$OutAny = $($_.fullname)
+				break
+			}
 		}
 	}
 
@@ -331,12 +331,12 @@ function StartInstallSoftware {
 			Switch ($act)
 			{
 				Install {
-					Get-ChildItem $OutTo -Recurse -Include "*$($filename)*$((Get-Culture).Name)*.exe" -ErrorAction SilentlyContinue | Foreach-Object {
+					Get-ChildItem -Path $OutTo -File -Filter "*$($filename)*$((Get-Culture).Name)*.exe" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
 						Write-Host "    - Locally exist: $($_.fullname)"
 						OpenApp -filename $($_.fullname) -param $param -mode $mode -method $method
 						break
 					}
-					Get-ChildItem $OutTo -Recurse -Include "*$($filename)*.exe" -ErrorAction SilentlyContinue | Foreach-Object {
+					Get-ChildItem -Path $OutTo -File -Filter "*$($filename)*.exe" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
 						Write-Host "    - Locally exist: $($_.fullname)"
 						OpenApp -filename $($_.fullname) -param $param -mode $mode -method $method
 						break
@@ -344,15 +344,9 @@ function StartInstallSoftware {
 					if (Test-Path -Path $OutAny) {
 						Write-Host "    - Existing installation package"
 					} else {
-						Write-Host "    * Start download`n      > Connected to: $url"
-						try {
-							Write-Host "      + Save to: $OutAny"
-							CheckCatalog -chkpath $OutTo
-							(New-Object System.Net.WebClient).DownloadFile($url, $OutAny) | Out-Null
-						} catch {
-							Write-Host "      - Status: Not available`n" -ForegroundColor Red
-							break
-						}
+						Write-Host "    * Start download`n      > Connected to: $url`n      + Save to: $OutAny"
+						CheckCatalog -chkpath $OutTo
+						Invoke-WebRequest -Uri $url -OutFile "$($OutAny)" -ErrorAction SilentlyContinue | Out-Null
 					}
 					if (Test-Path -Path $OutAny) {
 						Write-Host "    - Unpacking"
@@ -362,12 +356,12 @@ function StartInstallSoftware {
 					} else {
 						Write-Host "    - An error occurred during download`n" -ForegroundColor Red
 					}
-					Get-ChildItem $OutTo -Recurse -Include "*$($filename)*$((Get-Culture).Name)*.exe" -ErrorAction SilentlyContinue | Foreach-Object {
+					Get-ChildItem -Path $OutTo -File -Filter "*$($filename)*$((Get-Culture).Name)*.exe" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
 						Write-Host "    - Locally exist: $($_.fullname)"
 						OpenApp -filename $($_.fullname) -param $param -mode $mode -method $method
 						break
 					}
-					Get-ChildItem $OutTo -Recurse -Include "*$($filename)*.exe" -ErrorAction SilentlyContinue | Foreach-Object {
+					Get-ChildItem -Path $OutTo -File -Filter "*$($filename)*.exe" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
 						Write-Host "    - Locally exist: $($_.fullname)"
 						OpenApp -filename $($_.fullname) -param $param -mode $mode -method $method
 						break
@@ -377,15 +371,9 @@ function StartInstallSoftware {
 					if (Test-Path -Path $OutAny) {
 						Write-Host "    - Installed`n"
 					} else {
-						Write-Host "    * Start download`n      > Connected to: $url"
-						try {
-							Write-Host "      + Save to: $OutAny"
-							CheckCatalog -chkpath $OutTo
-							(New-Object System.Net.WebClient).DownloadFile($url, $OutAny) | Out-Null
-						} catch {
-							Write-Host "      - Status: Not available`n" -ForegroundColor Red
-							break
-						}
+						Write-Host "    * Start download`n      > Connected to: $url`n      + Save to: $OutAny"
+						CheckCatalog -chkpath $OutTo
+						Invoke-WebRequest -Uri $url -OutFile "$($OutAny)" -ErrorAction SilentlyContinue | Out-Null
 					}
 				}
 				To {
@@ -397,14 +385,8 @@ function StartInstallSoftware {
 					if (Test-Path -Path $OutAny) {
 						Write-Host "    - Compressed package available"
 					} else {
-						Write-Host "    * Start download`n        > Connected to: $url"
-						try {
-							Write-Host "      + Save to: $OutAny"
-							(New-Object System.Net.WebClient).DownloadFile($url, $OutAny) | Out-Null
-						} catch {
-							Write-Host "      - Status: Not available`n" -ForegroundColor Red
-							break
-						}
+						Write-Host "    * Start download`n      > Connected to: $url`n      + Save to: $OutAny"
+						Invoke-WebRequest -Uri $url -OutFile $OutAny -ErrorAction SilentlyContinue | Out-Null
 					}
 					if (Test-Path -Path $OutAny) {
 						Write-Host "    - Unzip only"
@@ -419,15 +401,9 @@ function StartInstallSoftware {
 					if (Test-Path -Path $OutAny) {
 						Write-Host "    - Existing installation package"
 					} else {
-						Write-Host "    * Start download      > Connected to: $url"
-						try {
-							Write-Host "      + Save to: $OutAny"
-							CheckCatalog -chkpath $OutTo
-							(New-Object System.Net.WebClient).DownloadFile($url, $OutAny) | Out-Null
-						} catch {
-							Write-Host "      - Status: Not available`n" -ForegroundColor Red
-							break
-						}
+						Write-Host "    * Start download`n      > Connected to: $url`n      + Save to: $OutAny"
+						CheckCatalog -chkpath $OutTo
+						Invoke-WebRequest -Uri $url -OutFile $OutAny -ErrorAction SilentlyContinue | Out-Null
 					}
 					if (Test-Path -Path $OutAny) {
 						Write-Host "    - Unzip only"
@@ -445,14 +421,13 @@ function StartInstallSoftware {
 				OpenApp -filename $OutAny -param $param -mode $mode -method $method
 			} else {
 				Write-Host "    * Start download`n      > Connected to: $url"
-				try {
+				if (TestURI $url) {
 					Write-Host "      + Save to: $OutAny"
 					CheckCatalog -chkpath $OutTo
-					(New-Object System.Net.WebClient).DownloadFile($url, $OutAny) | Out-Null
+					Invoke-WebRequest -Uri $url -OutFile $OutAny -ErrorAction SilentlyContinue | Out-Null
 					OpenApp -filename $OutAny -param $param -mode $mode -method $method
-				} catch {
+				} else {
 					Write-Host "      - Status: Not available`n" -ForegroundColor Red
-					break
 				}
 			}
 		}
@@ -584,7 +559,7 @@ function Mainpage {
 	Write-Host "`n   Author: Yi ( http://fengyi.tel )
 
    From: Yi's Solutions
-   buildstring: 5.3.1.1.bs_release.210120-1208
+   buildstring: 5.3.1.2.bs_release.210120-1208
 
    INSTALLED SOFTWARE LIST ( total $($app.Count) items )
    ---------------------------------------------------"
