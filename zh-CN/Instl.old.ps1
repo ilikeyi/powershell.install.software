@@ -290,12 +290,12 @@ function StartInstallSoftware {
 			$drives = Get-PSDrive -PSProvider FileSystem | where { -not ("$($env:SystemDrive)\" -eq $_.Root) } | Select-Object -ExpandProperty 'Root'
 			foreach ($drive in $drives) {
 				$tempoutputfoldoer = Join-Path -Path $($drive) -ChildPath "$($structure)"
-				Get-ChildItem -Path $tempoutputfoldoer -File -Filter "*$($filename)*$((Get-Culture).Name)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
+				Get-ChildItem -Path $tempoutputfoldoer -Filter "*$($filename)*$((Get-Culture).Name)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
 					$OutTo = Join-Path -Path "$($drive)" -ChildPath "$($structure)"
 					$OutAny = $($_.fullname)
 					break
 				}
-				Get-ChildItem -Path $tempoutputfoldoer -File -Filter "*$($filename)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
+				Get-ChildItem -Path $tempoutputfoldoer -Filter "*$($filename)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
 					$OutTo = Join-Path -Path "$($drive)" -ChildPath "$($structure)"
 					$OutAny = $($_.fullname)
 					break
@@ -314,11 +314,11 @@ function StartInstallSoftware {
 		default {
 			$OutTo = Join-Path -Path $($todisk) -ChildPath "$($structure)"
 			$OutAny = Join-Path -Path $($todisk) -ChildPath "$($structure)\$($packer).$($types)"
-			Get-ChildItem -Path $OutTo -File -Filter "*$($filename)*$((Get-Culture).Name)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
+			Get-ChildItem -Path $OutTo -Filter "*$($filename)*$((Get-Culture).Name)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
 				$OutAny = $($_.fullname)
 				break
 			}
-			Get-ChildItem -Path $OutTo -File -Filter "*$($filename)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
+			Get-ChildItem -Path $OutTo -Filter "*$($filename)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
 				$OutAny = $($_.fullname)
 				break
 			}
@@ -331,12 +331,12 @@ function StartInstallSoftware {
 			Switch ($act)
 			{
 				Install {
-					Get-ChildItem -Path $OutTo -File -Filter "*$($filename)*$((Get-Culture).Name)*.exe" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
+					Get-ChildItem -Path $OutTo -Filter "*$($filename)*$((Get-Culture).Name)*.exe" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
 						Write-Host "    - 本地存在：$($_.fullname)"
 						OpenApp -filename $($_.fullname) -param $param -mode $mode -method $method
 						break
 					}
-					Get-ChildItem -Path $OutTo -File -Filter "*$($filename)*.exe" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
+					Get-ChildItem -Path $OutTo -Filter "*$($filename)*.exe" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
 						Write-Host "    - 本地存在：$($_.fullname)"
 						OpenApp -filename $($_.fullname) -param $param -mode $mode -method $method
 						break
@@ -344,9 +344,10 @@ function StartInstallSoftware {
 					if (Test-Path -Path $OutAny) {
 						Write-Host "    - 已有安装包"
 					} else {
-						Write-Host "    * 开始下载`n      > 连接到：$url`n      + 保存到：$OutAny"
+						Write-Host "    * 开始下载`n      > 连接到：$url"
 						CheckCatalog -chkpath $OutTo
-						Invoke-WebRequest -Uri $url -OutFile "$($OutAny)" -ErrorAction SilentlyContinue | Out-Null
+						Write-Host "      + 保存到：$OutAny"
+						(New-Object System.Net.WebClient).DownloadFile($url, $OutAny) | Out-Null
 					}
 					if (Test-Path -Path $OutAny) {
 						Write-Host "    - 解压中"
@@ -356,12 +357,12 @@ function StartInstallSoftware {
 					} else {
 						Write-Host "    - 下载过程中出现错误`n" -ForegroundColor Red
 					}
-					Get-ChildItem -Path $OutTo -File -Filter "*$($filename)*$((Get-Culture).Name)*.exe" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
+					Get-ChildItem -Path $OutTo -Filter "*$($filename)*$((Get-Culture).Name)*.exe" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
 						Write-Host "    - 本地存在：$($_.fullname)"
 						OpenApp -filename $($_.fullname) -param $param -mode $mode -method $method
 						break
 					}
-					Get-ChildItem -Path $OutTo -File -Filter "*$($filename)*.exe" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
+					Get-ChildItem -Path $OutTo -Filter "*$($filename)*.exe" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
 						Write-Host "    - 本地存在：$($_.fullname)"
 						OpenApp -filename $($_.fullname) -param $param -mode $mode -method $method
 						break
@@ -371,9 +372,10 @@ function StartInstallSoftware {
 					if (Test-Path -Path $OutAny) {
 						Write-Host "    - 已安装`n"
 					} else {
-						Write-Host "    * 开始下载`n      > 连接到：$url`n      + 保存到：$OutAny"
+						Write-Host "    * 开始下载`n      > 连接到：$url"
 						CheckCatalog -chkpath $OutTo
-						Invoke-WebRequest -Uri $url -OutFile "$($OutAny)" -ErrorAction SilentlyContinue | Out-Null
+						Write-Host "      + 保存到：$OutAny"
+						(New-Object System.Net.WebClient).DownloadFile($url, $OutAny) | Out-Null
 					}
 				}
 				To {
@@ -385,8 +387,10 @@ function StartInstallSoftware {
 					if (Test-Path -Path $OutAny) {
 						Write-Host "    - 已有压缩包"
 					} else {
-						Write-Host "    * 开始下载`n      > 连接到：$url`n      + 保存到：$OutAny"
-						Invoke-WebRequest -Uri $url -OutFile $OutAny -ErrorAction SilentlyContinue | Out-Null
+						Write-Host "    * 开始下载`n      > 连接到：$url"
+						CheckCatalog -chkpath $OutTo
+						Write-Host "      + 保存到：$OutAny"
+						(New-Object System.Net.WebClient).DownloadFile($url, $OutAny) | Out-Null
 					}
 					if (Test-Path -Path $OutAny) {
 						Write-Host "    - 仅解压"
@@ -401,9 +405,10 @@ function StartInstallSoftware {
 					if (Test-Path -Path $OutAny) {
 						Write-Host "    - 已有安装包"
 					} else {
-						Write-Host "    * 开始下载`n      > 连接到：$url`n      + 保存到：$OutAny"
+						Write-Host "    * 开始下载`n      > 连接到：$url"
 						CheckCatalog -chkpath $OutTo
-						Invoke-WebRequest -Uri $url -OutFile $OutAny -ErrorAction SilentlyContinue | Out-Null
+						Write-Host "      + Save to: $OutAny"
+						(New-Object System.Net.WebClient).DownloadFile($url, $OutAny) | Out-Null
 					}
 					if (Test-Path -Path $OutAny) {
 						Write-Host "    - 仅解压"
@@ -421,14 +426,10 @@ function StartInstallSoftware {
 				OpenApp -filename $OutAny -param $param -mode $mode -method $method
 			} else {
 				Write-Host "    * 开始下载`n      > 连接到：$url"
-				if (TestURI $url) {
-					Write-Host "      + 保存到：$OutAny"
-					CheckCatalog -chkpath $OutTo
-					Invoke-WebRequest -Uri $url -OutFile $OutAny -ErrorAction SilentlyContinue | Out-Null
-					OpenApp -filename $OutAny -param $param -mode $mode -method $method
-				} else {
-					Write-Host "      - 状态：不可用`n" -ForegroundColor Red
-				}
+				CheckCatalog -chkpath $OutTo
+				Write-Host "      + 保存到：$OutAny"
+				(New-Object System.Net.WebClient).DownloadFile($url, $OutAny) | Out-Null
+				OpenApp -filename $OutAny -param $param -mode $mode -method $method
 			}
 		}
 	}
@@ -540,6 +541,142 @@ function ObtainAndInstall {
 	}
 }
 
+function InstallGUI {
+	Add-Type -AssemblyName System.Windows.Forms
+	Add-Type -AssemblyName System.Drawing
+	[System.Windows.Forms.Application]::EnableVisualStyles()
+
+	$AllSel_Click = {
+		$Pane1.Controls | ForEach-Object {
+			if($_ -is [System.Windows.Forms.CheckBox]){ $_.Checked = $true }
+		}
+	}
+	$AllClear_Click = {
+		$Pane1.Controls | ForEach-Object {
+			if($_ -is [System.Windows.Forms.CheckBox]){ $_.Checked = $false }
+		}
+	}
+	$Canel_Click = {
+		$Install.Hide()
+		Write-Host "   用户已取消安装。" -ForegroundColor Red
+		$Install.Close()
+	}
+	$OK_Click = {
+		$Install.Hide()
+		Initialization
+		$Pane1.Controls | ForEach-Object {
+			if($_ -is [System.Windows.Forms.CheckBox]) {
+				if ($_.Checked) {
+					StartInstallSoftware -appname $app[$_.Tag][0] -status "Enable" -act $app[$_.Tag][2] -mode $app[$_.Tag][3] -todisk $app[$_.Tag][4] -structure $app[$_.Tag][5] -url $app[$_.Tag][6] -packer $app[$_.Tag][7] -types $app[$_.Tag][8] -filename $app[$_.Tag][9] -param $app[$_.Tag][10] -method $app[$_.Tag][11]
+				}
+			}
+		}		
+		ProcessOther
+		$Install.Close()
+	}
+	$Install            = New-Object system.Windows.Forms.Form -Property @{
+		autoScaleMode  = 2
+		Height         = 568
+		Width          = 450
+		Text           = "安装软件列表 ( 共 $($app.Count) 款 )"
+		TopMost        = $True
+		MaximizeBox    = $False
+		StartPosition  = "CenterScreen"
+		MinimizeBox    = $false
+		BackColor      = "#ffffff"
+	}
+	$Pane1             = New-Object system.Windows.Forms.FlowLayoutPanel -Property @{
+		Height         = 468
+		Width          = 490
+		BorderStyle    = 0
+		autoSizeMode   = 0
+		autoScroll     = $true
+		Padding        = 8
+		Dock           = 1
+	}
+	$AllSel            = New-Object system.Windows.Forms.Button -Property @{
+		UseVisualStyleBackColor = $True
+		Location       = New-Object System.Drawing.Point(10,482)
+		Height         = 36
+		Width          = 75
+		add_Click      = $AllSel_Click
+		Text           = "选择所有"
+	}
+	$AllClear          = New-Object system.Windows.Forms.Button -Property @{
+		UseVisualStyleBackColor = $True
+		Location       = New-Object System.Drawing.Point(88,482)
+		Height         = 36
+		Width          = 75
+		add_Click      = $AllClear_Click
+		Text           = "清除所有"
+	}
+	$Start             = New-Object system.Windows.Forms.Button -Property @{
+		UseVisualStyleBackColor = $True
+		Location       = New-Object System.Drawing.Point(266,482)
+		Height         = 36
+		Width          = 75
+		add_Click      = $OK_Click
+		Text           = "确定"
+	}
+	$Canel             = New-Object system.Windows.Forms.Button -Property @{
+		UseVisualStyleBackColor = $True
+		Location       = New-Object System.Drawing.Point(345,482)
+		Height         = 36
+		Width          = 75
+		add_Click      = $Canel_Click
+		Text           = "取消"
+	}
+
+	for ($i=0; $i -lt $app.Count; $i++) {
+		$CheckBox  = New-Object System.Windows.Forms.CheckBox -Property @{
+			Height = 30
+			Width  = 405
+			Text   = $app[$i][0]
+			Tag    = $i
+		}
+
+		if ($app[$i][1] -like "Enable") {
+			$CheckBox.Checked = $true
+		} else {
+			$CheckBox.Checked = $false
+		}
+		$Pane1.controls.AddRange($CheckBox)		
+	}
+
+	$Install.controls.AddRange($Pane1)
+	$Install.controls.AddRange($AllSel)
+	$Install.controls.AddRange($AllClear)
+	$Install.controls.AddRange($Start)
+	$Install.controls.AddRange($Canel)
+	$Install.FormBorderStyle = 'Fixed3D'
+	$Install.ShowDialog() | Out-Null
+}
+
+function ShowList {
+	for ($i=0; $i -lt $app.Count; $i++) {
+		Switch ($app[$i][1])
+		{
+			Enable {
+				Write-Host "   等待安装 - $($app[$i][0])" -ForegroundColor Green
+			}
+			Disable {
+				Write-Host "   跳过安装 - $($app[$i][0])" -ForegroundColor Red
+			}
+		}
+	}
+}
+
+function Mainpage {
+	Clear-Host
+	Write-Host "`n   Author: Yi ( http://fengyi.tel )
+
+   From: Yi's Solutions
+   buildstring: 5.3.1.3.bs_release.210120-1208
+
+   安装软件列表 ( 共 $($app.Count) 款 )
+   ---------------------------------------------------"
+}
+
 function ProcessOther {
 	Write-Host "`n   处理其它：" -ForegroundColor Green
 
@@ -554,57 +691,17 @@ function ProcessOther {
 	#Rename-Item-NewName "谷歌浏览器.lnk"  -Path ".\Google Chrome.lnk" -ErrorAction SilentlyContinue | Out-Null
 }
 
-function Mainpage {
-	Clear-Host
-	Write-Host "`n   Author: Yi ( http://fengyi.tel )
-
-   From: Yi's Solutions
-   buildstring: 5.3.1.2.bs_release.210120-1208
-
-   安装软件列表 ( 共 $($app.Count) 款 )
-   ---------------------------------------------------"
-	for ($i=0; $i -lt $app.Count; $i++) {
-		Switch ($app[$i][1])
-		{
-			Enable {
-				Write-Host "   等待安装 - $($app[$i][0])" -ForegroundColor Green
-			}
-			Disable {
-				Write-Host "   跳过安装 - $($app[$i][0])" -ForegroundColor Red
-			}
-		}
-	}
-	Write-Host "   ---------------------------------------------------"
-}
-
 function initialization {
 }
 
 If ($Force) {
 	Mainpage
+	ShowList
 	Initialization
 	ObtainAndInstall
 	ProcessOther
 } else {
 	Mainpage
-	Write-Host "   是否安装以上软件？" -ForegroundColor Green
-	$caption="安装软件前请确认。"
-	$message="继续安装（Y）`n取消安装（N）"
-	$choices = @("&Yes","&No")
-	$choicedesc = New-Object System.Collections.ObjectModel.Collection[System.Management.Automation.Host.ChoiceDescription] 
-	$choices | foreach  { $choicedesc.Add((New-Object "System.Management.Automation.Host.ChoiceDescription" -ArgumentList $_))} 
-	$prompt = $Host.ui.PromptForChoice($caption, $message, $choicedesc, 1)
-	Switch ($prompt)
-	{
-		0 {
-			Initialization
-			ObtainAndInstall
-			ProcessOther
-			WaitExit -wait 6
-		}
-		1 {
-			Write-Host "`n   用户已取消安装。"
-			WaitExit -wait 2
-		}
-	}
+	InstallGUI
+	WaitExit -wait 2
 }
