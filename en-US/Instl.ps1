@@ -603,6 +603,142 @@ function ObtainAndInstall {
 	}
 }
 
+function InstallGUI {
+	Add-Type -AssemblyName System.Windows.Forms
+	Add-Type -AssemblyName System.Drawing
+	[System.Windows.Forms.Application]::EnableVisualStyles()
+
+	$AllSel_Click = {
+		$Pane1.Controls | ForEach-Object {
+			if($_ -is [System.Windows.Forms.CheckBox]){ $_.Checked = $true }
+		}
+	}
+	$AllClear_Click = {
+		$Pane1.Controls | ForEach-Object {
+			if($_ -is [System.Windows.Forms.CheckBox]){ $_.Checked = $false }
+		}
+	}
+	$Canel_Click = {
+		$Install.Hide()
+		Write-Host "   The user has cancelled the installation." -ForegroundColor Red
+		$Install.Close()
+	}
+	$OK_Click = {
+		$Install.Hide()
+		Initialization
+		$Pane1.Controls | ForEach-Object {
+			if($_ -is [System.Windows.Forms.CheckBox]) {
+				if ($_.Checked) {
+					StartInstallSoftware -appname $app[$_.Tag][0] -status "Enable" -act $app[$_.Tag][2] -mode $app[$_.Tag][3] -todisk $app[$_.Tag][4] -structure $app[$_.Tag][5] -url $app[$_.Tag][6] -packer $app[$_.Tag][7] -types $app[$_.Tag][8] -filename $app[$_.Tag][9] -param $app[$_.Tag][10] -method $app[$_.Tag][11]
+				}
+			}
+		}		
+		ProcessOther
+		$Install.Close()
+	}
+	$Install            = New-Object system.Windows.Forms.Form -Property @{
+		autoScaleMode  = 2
+		Height         = 568
+		Width          = 450
+		Text           = "INSTALLED SOFTWARE LIST ( total $($app.Count) items )"
+		TopMost        = $True
+		MaximizeBox    = $False
+		StartPosition  = "CenterScreen"
+		MinimizeBox    = $false
+		BackColor      = "#ffffff"
+	}
+	$Pane1             = New-Object system.Windows.Forms.FlowLayoutPanel -Property @{
+		Height         = 468
+		Width          = 490
+		BorderStyle    = 0
+		autoSizeMode   = 0
+		autoScroll     = $true
+		Padding        = 8
+		Dock           = 1
+	}
+	$AllSel            = New-Object system.Windows.Forms.Button -Property @{
+		UseVisualStyleBackColor = $True
+		Location       = New-Object System.Drawing.Point(10,482)
+		Height         = 36
+		Width          = 75
+		add_Click      = $AllSel_Click
+		Text           = "Select all"
+	}
+	$AllClear          = New-Object system.Windows.Forms.Button -Property @{
+		UseVisualStyleBackColor = $True
+		Location       = New-Object System.Drawing.Point(88,482)
+		Height         = 36
+		Width          = 75
+		add_Click      = $AllClear_Click
+		Text           = "Clear all"
+	}
+	$Start             = New-Object system.Windows.Forms.Button -Property @{
+		UseVisualStyleBackColor = $True
+		Location       = New-Object System.Drawing.Point(266,482)
+		Height         = 36
+		Width          = 75
+		add_Click      = $OK_Click
+		Text           = "OK"
+	}
+	$Canel             = New-Object system.Windows.Forms.Button -Property @{
+		UseVisualStyleBackColor = $True
+		Location       = New-Object System.Drawing.Point(345,482)
+		Height         = 36
+		Width          = 75
+		add_Click      = $Canel_Click
+		Text           = "Cancel"
+	}
+
+	for ($i=0; $i -lt $app.Count; $i++) {
+		$CheckBox  = New-Object System.Windows.Forms.CheckBox -Property @{
+			Height = 30
+			Width  = 405
+			Text   = $app[$i][0]
+			Tag    = $i
+		}
+
+		if ($app[$i][1] -like "Enable") {
+			$CheckBox.Checked = $true
+		} else {
+			$CheckBox.Checked = $false
+		}
+		$Pane1.controls.AddRange($CheckBox)		
+	}
+
+	$Install.controls.AddRange($Pane1)
+	$Install.controls.AddRange($AllSel)
+	$Install.controls.AddRange($AllClear)
+	$Install.controls.AddRange($Start)
+	$Install.controls.AddRange($Canel)
+	$Install.FormBorderStyle = 'Fixed3D'
+	$Install.ShowDialog() | Out-Null
+}
+
+function ShowList {
+	for ($i=0; $i -lt $app.Count; $i++) {
+		Switch ($app[$i][1])
+		{
+			Enable {
+				Write-Host "   WAIT INSTALL - $($app[$i][0])" -ForegroundColor Green
+			}
+			Disable {
+				Write-Host "   SKIP INSTALL - $($app[$i][0])" -ForegroundColor Red
+			}
+		}
+	}
+}
+
+function Mainpage {
+	Clear-Host
+	Write-Host "`n   Author: Yi ( http://fengyi.tel )
+
+   From: Yi's Solutions
+   buildstring: 5.3.1.3.bs_release.210120-1208
+
+   INSTALLED SOFTWARE LIST ( total $($app.Count) items )
+   ---------------------------------------------------"
+}
+
 function ProcessOther {
 	Write-Host "`n   Processing other:" -ForegroundColor Green
 
@@ -621,57 +757,17 @@ function ProcessOther {
 	#Rename-Item-NewName "Google Chrome.lnk"  -Path ".\New Google Chrome.lnk" -ErrorAction SilentlyContinue | Out-Null
 }
 
-function Mainpage {
-	Clear-Host
-	Write-Host "`n   Author: Yi ( http://fengyi.tel )
-
-   From: Yi's Solutions
-   buildstring: 5.3.1.2.bs_release.210120-1208
-
-   INSTALLED SOFTWARE LIST ( total $($app.Count) items )
-   ---------------------------------------------------"
-	for ($i=0; $i -lt $app.Count; $i++) {
-		Switch ($app[$i][1])
-		{
-			Enable {
-				Write-Host "   WAIT INSTALL - $($app[$i][0])" -ForegroundColor Green
-			}
-			Disable {
-				Write-Host "   SKIP INSTALL - $($app[$i][0])" -ForegroundColor Red
-			}
-		}
-	}
-	Write-Host "   ---------------------------------------------------"
-}
-
 function initialization {
 }
 
 If ($Force) {
 	Mainpage
+	ShowList
 	Initialization
 	ObtainAndInstall
 	ProcessOther
 } else {
 	Mainpage
-	Write-Host "   Do you want to install the above software?" -ForegroundColor Green
-	$caption="Please confirm before installing the software."
-	$message="Continue installation (Y)`nCancel the installation (N)"
-	$choices = @("&Yes","&No")
-	$choicedesc = New-Object System.Collections.ObjectModel.Collection[System.Management.Automation.Host.ChoiceDescription] 
-	$choices | foreach  { $choicedesc.Add((New-Object "System.Management.Automation.Host.ChoiceDescription" -ArgumentList $_))} 
-	$prompt = $Host.ui.PromptForChoice($caption, $message, $choicedesc, 1)
-	Switch ($prompt)
-	{
-		0 {
-			Initialization
-			ObtainAndInstall
-			ProcessOther
-			WaitExit -wait 6
-		}
-		1 {
-			Write-Host "`n   The user has cancelled the installation."
-			WaitExit -wait 2
-		}
-	}
+	InstallGUI
+	WaitExit -wait 2
 }
