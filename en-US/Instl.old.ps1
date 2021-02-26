@@ -1,4 +1,4 @@
-﻿<#
+<#
 
   Warning: In order to prevent overwriting after updating, please save as and then modify.
 
@@ -30,7 +30,7 @@
 ("Windows Defender Control",                               Package name
  "Enable",                                                 Status: Enable - enabled; Disable - disabled
  "Install",                                                Action: Install - install; NoInst - does not install after download; Unzip - only extract after download; To - install to directory
- "Wait",                                                   Operation mode: Wait - wait for completion; Fast - run directly
+ "Fast",                                                   Operation mode: Wait - wait for completion; Fast - run directly
  "auto",                                                   After setting automatic, the current system disk will be excluded. If no available disk is found, the default setting is the current system disk; specify the drive letter [A:]-[Z:]; specify the path: \\192.168.1.1
  "Installation package\Tool",                              Directory Structure
  "https://www.sordum.org/files/download/defender-control", Website address
@@ -63,7 +63,8 @@
 [CmdletBinding()]
 param(
 	[parameter(Mandatory = $false, HelpMessage = "Silent")]
-	[Switch]$Force
+	[Switch]$Force,
+	[Switch]$Silent
 )
 
 $Host.UI.RawUI.WindowTitle = "PowerShell installation software"
@@ -85,7 +86,7 @@ $app = @(
 	("Nvidia GEFORCE GAME READY DRIVER",
 	 "Disable",
 	 "Install",
-	 "wait",
+	 "Fast",
 	 "auto",
 	 "Installation package\Device Driver\Graphics card",
 	 "https://cn.download.nvidia.cn/Windows/461.40",
@@ -97,7 +98,7 @@ $app = @(
 	("Sysinternals Suite",
 	 "Disable",
 	 "To",
-	 "wait",
+	 "Fast",
 	 $env:SystemDrive,
 	 "",
 	 "https://download.sysinternals.com/files",
@@ -109,11 +110,11 @@ $app = @(
 	("VisualCppRedist AIO",
 	 "Disable",
 	 "Install",
-	 "wait",
+	 "Fast",
 	 "auto",
 	 "Installation package\AIO",
-	 "https://github.com/abbodi1406/vcredist/releases/download/v0.43.0",
-	 "VisualCppRedist_AIO_x86_x64_43",
+	 "https://github.com/abbodi1406/vcredist/releases/download/v0.45.0",
+	 "VisualCppRedist_AIO_x86_x64_45",
 	 "zip",
 	 "VisualCppRedist*",
 	 "/y",
@@ -121,7 +122,7 @@ $app = @(
 	("Gpg4win",
 	 "Disable",
 	 "Install",
-	 "wait",
+	 "Fast",
 	 "auto",
 	 "Installation package\AIO",
 	 "https://files.gpg4win.org",
@@ -133,7 +134,7 @@ $app = @(
 	("Python",
 	 "Disable",
 	 "Install",
-	 "wait",
+	 "Fast",
 	 "auto",
 	 "Installation package\Develop software",
 	 "https://www.python.org/ftp/python/3.9.1",
@@ -145,7 +146,7 @@ $app = @(
 	("kugou music",
 	 "Disable",
 	 "Install",
-	 "wait",
+	 "Fast",
 	 "auto",
 	 "Installation package\Music software",
 	 "https://downmini.yun.kugou.com/web",
@@ -157,7 +158,7 @@ $app = @(
 	("NetEase Cloud Music",
 	 "Disable",
 	 "Install",
-	 "wait",
+	 "Fast",
 	 "auto",
 	 "Installation package\Music software",
 	 "https://d1.music.126.net/dmusic",
@@ -178,10 +179,22 @@ $app = @(
 	 "QQMusicSetup",
 	 "/S",
 	 ""),
-	("Tencent QQ 2020",
+	("Thunder 11",
+	 "Disable",
+	 "Install",
+	 "Fast",
+	 "auto",
+	 "Installation package\Download tool",
+	 "https://down.sandai.net/thunder11",
+	 "XunLeiWebSetup11.1.8.1418gw",
+	 "exe",
+	 "XunLeiWebSetup11*",
+	 "/S",
+	 ""),
+	("Tencent QQ",
 	 "Enable",
 	 "Install",
-	 "wait",
+	 "Fast",
 	 "auto",
 	 "Installation package\Social application",
 	 "https://down.qq.com/qqweb/PCQQ/PCQQ_EXE",
@@ -193,13 +206,37 @@ $app = @(
 	("WeChat",
 	 "Enable",
 	 "Install",
-	 "wait",
+	 "Fast",
 	 "auto",
 	 "Installation package\Social application",
 	 "https://dldir1.qq.com/weixin/Windows",
 	 "WeChatSetup",
 	 "exe",
 	 "WeChatSetup",
+	 "/S",
+	 ""),
+	("Tencent Video",
+	 "Disable",
+	 "Install",
+	 "Fast",
+	 "auto",
+	 "Installation package\Online TV",
+	 "https://dldir1.qq.com/qqtv",
+	 "TencentVideo11.14.4043.0",
+	 "exe",
+	 "TencentVideo*",
+	 "/S",
+	 ""),
+	("iQiyi video",
+	 "Disable",
+	 "Install",
+	 "Fast",
+	 "auto",
+	 "Installation package\Online TV",
+	 "https://dl-static.iqiyi.com/hz",
+	 "IQIYIsetup_z43",
+	 "exe",
+	 "IQIYIsetup*",
 	 "/S",
 	 "")
 )
@@ -304,6 +341,7 @@ function StartInstallSoftware {
 					if (TestAvailableDisk -Path $drive)	{
 						$OutTo = Join-Path -Path "$($drive)" -ChildPath "$($structure)"
 						$OutAny = Join-Path -Path "$($drive)" -ChildPath "$($structure)\$($packer).$($types)"
+						break
 					} else {
 						$OutTo = Join-Path -Path $($env:SystemDrive) -ChildPath "$($structure)"
 						$OutAny = Join-Path -Path $($env:SystemDrive) -ChildPath "$($structure)\$($packer).$($types)"
@@ -524,7 +562,7 @@ function OpenApp {
 	}
 }
 
-function WaitExit {
+function ToMainpage {
 	param(
 		[int]$wait
 	)
@@ -671,7 +709,7 @@ function Mainpage {
 	Write-Host "`n   Author: Yi ( http://fengyi.tel )
 
    From: Yi's Solutions
-   buildstring: 5.3.1.3.bs_release.210120-1208
+   buildstring: 5.3.1.6.bs_release.210226-1208
 
    INSTALLED SOFTWARE LIST ( total $($app.Count) items )
    ---------------------------------------------------"
@@ -682,6 +720,11 @@ function ProcessOther {
 
 	Write-Host "   - Delete startup items"
 	Remove-ItemProperty -Name "Wechat" -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" -ErrorAction SilentlyContinue | Out-Null
+	Remove-ItemProperty -Name "HCDNClient" -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" -ErrorAction SilentlyContinue | Out-Null
+	Remove-ItemProperty -Name "qqlive" -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" -ErrorAction SilentlyContinue | Out-Null
+	Remove-ItemProperty -Name "cloudmusic" -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" -ErrorAction SilentlyContinue | Out-Null
+	Remove-ItemProperty -Name "QQMusic" -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" -ErrorAction SilentlyContinue | Out-Null
+	Remove-ItemProperty -Name "Thunder" -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" -ErrorAction SilentlyContinue | Out-Null
 
 	Write-Host "   - Delete redundant shortcuts"
 	Set-Location "$env:public\Desktop"
@@ -703,5 +746,9 @@ If ($Force) {
 } else {
 	Mainpage
 	InstallGUI
-	WaitExit -wait 2
+	if ($Silent) {
+		exit
+	} else {
+		ToMainpage -wait 2
+	}
 }
