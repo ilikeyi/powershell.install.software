@@ -1,4 +1,4 @@
-﻿<#
+<#
 
   警告：为防止更新后覆盖，请另存为后再修改。
 
@@ -63,7 +63,8 @@
 [CmdletBinding()]
 param(
 	[parameter(Mandatory = $false, HelpMessage = "静默")]
-	[Switch]$Force
+	[Switch]$Force,
+	[Switch]$Silent
 )
 
 $Host.UI.RawUI.WindowTitle = "PowerShell 安装软件"
@@ -85,7 +86,7 @@ $app = @(
 	("Nvidia GEFORCE GAME READY DRIVER",
 	 "Disable",
 	 "Install",
-	 "wait",
+	 "fast",
 	 "auto",
 	 "安装包\驱动程序\显卡",
 	 "https://cn.download.nvidia.cn/Windows/461.40",
@@ -97,7 +98,7 @@ $app = @(
 	("Sysinternals Suite",
 	 "Disable",
 	 "To",
-	 "wait",
+	 "fast",
 	 $env:SystemDrive,
 	 "",
 	 "https://download.sysinternals.com/files",
@@ -109,11 +110,11 @@ $app = @(
 	("VisualCppRedist AIO",
 	 "Disable",
 	 "Install",
-	 "wait",
+	 "fast",
 	 "auto",
 	 "安装包\AIO",
-	 "https://github.com/abbodi1406/vcredist/releases/download/v0.43.0",
-	 "VisualCppRedist_AIO_x86_x64_43",
+	 "https://github.com/abbodi1406/vcredist/releases/download/v0.45.0",
+	 "VisualCppRedist_AIO_x86_x64_45",
 	 "zip",
 	 "VisualCppRedist*",
 	 "/y",
@@ -121,7 +122,7 @@ $app = @(
 	("Gpg4win",
 	 "Disable",
 	 "Install",
-	 "wait",
+	 "fast",
 	 "auto",
 	 "安装包\AIO",
 	 "https://files.gpg4win.org",
@@ -133,7 +134,7 @@ $app = @(
 	("Python",
 	 "Disable",
 	 "Install",
-	 "wait",
+	 "fast",
 	 "auto",
 	 "安装包\开发软件",
 	 "https://www.python.org/ftp/python/3.9.1",
@@ -145,7 +146,7 @@ $app = @(
 	("酷狗音乐",
 	 "Disable",
 	 "Install",
-	 "wait",
+	 "fast",
 	 "auto",
 	 "安装包\音乐软件",
 	 "https://downmini.yun.kugou.com/web",
@@ -157,7 +158,7 @@ $app = @(
 	("网易云音乐",
 	 "Disable",
 	 "Install",
-	 "wait",
+	 "fast",
 	 "auto",
 	 "安装包\音乐软件",
 	 "https://d1.music.126.net/dmusic",
@@ -178,10 +179,22 @@ $app = @(
 	 "QQMusicSetup",
 	 "/S",
 	 ""),
-	("腾讯 QQ 2020",
+	("迅雷 11",
+	 "Disable",
+	 "Install",
+	 "fast",
+	 "auto",
+	 "安装包\下载工具",
+	 "https://down.sandai.net/thunder11",
+	 "XunLeiWebSetup11.1.8.1418gw",
+	 "exe",
+	 "XunLeiWebSetup11*",
+	 "/S",
+	 ""),
+	("腾讯 QQ",
 	 "Enable",
 	 "Install",
-	 "wait",
+	 "fast",
 	 "auto",
 	 "安装包\社交软件",
 	 "https://down.qq.com/qqweb/PCQQ/PCQQ_EXE",
@@ -193,13 +206,37 @@ $app = @(
 	("微信",
 	 "Enable",
 	 "Install",
-	 "wait",
+	 "fast",
 	 "auto",
 	 "安装包\社交软件",
 	 "https://dldir1.qq.com/weixin/Windows",
 	 "WeChatSetup",
 	 "exe",
 	 "WeChatSetup",
+	 "/S",
+	 ""),
+	("腾讯视频",
+	 "Disable",
+	 "Install",
+	 "Fast",
+	 "auto",
+	 "安装包\网络电视",
+	 "https://dldir1.qq.com/qqtv",
+	 "TencentVideo11.14.4043.0",
+	 "exe",
+	 "TencentVideo*",
+	 "/S",
+	 ""),
+	("爱奇艺视频",
+	 "Disable",
+	 "Install",
+	 "Fast",
+	 "auto",
+	 "安装包\网络电视",
+	 "https://dl-static.iqiyi.com/hz",
+	 "IQIYIsetup_z43",
+	 "exe",
+	 "IQIYIsetup*",
 	 "/S",
 	 "")
 )
@@ -304,6 +341,7 @@ function StartInstallSoftware {
 					if (TestAvailableDisk -Path $drive)	{
 						$OutTo = Join-Path -Path "$($drive)" -ChildPath "$($structure)"
 						$OutAny = Join-Path -Path "$($drive)" -ChildPath "$($structure)\$($packer).$($types)"
+						break
 					} else {
 						$OutTo = Join-Path -Path $($env:SystemDrive) -ChildPath "$($structure)"
 						$OutAny = Join-Path -Path $($env:SystemDrive) -ChildPath "$($structure)\$($packer).$($types)"
@@ -524,7 +562,7 @@ function OpenApp {
 	}
 }
 
-function WaitExit {
+function ToMainpage {
 	param(
 		[int]$wait
 	)
@@ -671,7 +709,7 @@ function Mainpage {
 	Write-Host "`n   Author: Yi ( http://fengyi.tel )
 
    From: Yi's Solutions
-   buildstring: 5.3.1.3.bs_release.210120-1208
+   buildstring: 5.3.1.6.bs_release.210226-1208
 
    安装软件列表 ( 共 $($app.Count) 款 )
    ---------------------------------------------------"
@@ -682,6 +720,11 @@ function ProcessOther {
 
 	Write-Host "   - 删除开机自启动项"
 	Remove-ItemProperty -Name "Wechat" -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" -ErrorAction SilentlyContinue | Out-Null
+	Remove-ItemProperty -Name "HCDNClient" -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" -ErrorAction SilentlyContinue | Out-Null
+	Remove-ItemProperty -Name "qqlive" -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" -ErrorAction SilentlyContinue | Out-Null
+	Remove-ItemProperty -Name "cloudmusic" -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" -ErrorAction SilentlyContinue | Out-Null
+	Remove-ItemProperty -Name "QQMusic" -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" -ErrorAction SilentlyContinue | Out-Null
+	Remove-ItemProperty -Name "Thunder" -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" -ErrorAction SilentlyContinue | Out-Null
 
 	Write-Host "   - 删除多余快捷方式"
 	Set-Location "$env:public\Desktop"
@@ -703,5 +746,9 @@ If ($Force) {
 } else {
 	Mainpage
 	InstallGUI
-	WaitExit -wait 2
+	if ($Silent) {
+		exit
+	} else {
+		ToMainpage -wait 2
+	}
 }
