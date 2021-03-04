@@ -71,7 +71,6 @@ param(
 )
 
 $Global:AppQueue = @()
-$Global:AppQueue.Clear()
 
 $Host.UI.RawUI.WindowTitle = "PowerShell installation software"
 
@@ -183,7 +182,7 @@ $app = @(
 	 "QQMusicSetup",
 	 "exe",
 	 "QQMusicSetup",
-	 "/S",
+	 "",
 	 ""),
 	("Thunder 11",
 	 "Disable",
@@ -522,11 +521,10 @@ function Compressing {
 function WaitEnd {
 	Write-Host "   Waiting for the queue" -ForegroundColor Green
 	foreach ($nq in $Global:AppQueue) {
-		Write-Host "    * ID: $nq" -ForegroundColor Red
+		Write-Host "    * PID: $nq" -ForegroundColor Red
 		wait-process -id $nq -ErrorAction SilentlyContinue
 		Write-Host "    - Completed`n"
 	}
-	$Global:AppQueue.Clear()
 }
 
 function OpenApp {
@@ -563,23 +561,25 @@ function OpenApp {
 		Switch ($mode)
 		{
 			Fast {
-				Write-Host "    - Fast running:`n      $filename`n    - parameter: `n      $param`n"
+				Write-Host "    - Fast running:`n      $filename"
 				if (([string]::IsNullOrEmpty($param))){
 					Start-Process -FilePath $filename
 				} else {
+					Write-Host "    - parameter: `n      $param`n""
 					Start-Process -FilePath $filename -ArgumentList $param
 				}
 			}
 			Wait {
-				Write-Host "    - Wait for completion:`n      $filename`n    - parameter: `n      $param`n"
+				Write-Host "    - Wait for completion:`n      $filename"
 				if (([string]::IsNullOrEmpty($param))){
 					Start-Process -FilePath $filename -Wait
 				} else {
+					Write-Host "    - parameter: `n      $param`n""
 					Start-Process -FilePath $filename -ArgumentList $param -Wait
 				}
 			}
 			Queue {
-				Write-Host "    - Fast running:`n      $filename`n    - parameter:`n      $param"
+				Write-Host "    - Fast running:`n      $filename"
 				if (([string]::IsNullOrEmpty($param))) {
 					$AppRunQueue = Start-Process -FilePath $filename -passthru
 					$Global:AppQueue += $AppRunQueue.Id
@@ -587,6 +587,7 @@ function OpenApp {
 				} else {
 					$AppRunQueue = Start-Process -FilePath $filename -ArgumentList $param -passthru
 					$Global:AppQueue += $AppRunQueue.Id
+					Write-Host "    - parameter: `n      $param"
 					Write-Host "    - Add queue: $($AppRunQueue.Id)`n"
 				}
 			}
