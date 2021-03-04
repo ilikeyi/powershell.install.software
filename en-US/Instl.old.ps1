@@ -4,24 +4,27 @@
 
   PowerShell installation software
 
-  .THE MAIN FUNCTION
+  . THE MAIN FUNCTION
     1. There is no installation package locally, activate the download function;
     2. The drive letter can be specified, and the current system drive will be excluded after setting automatic.
        When no available disk is found, the default setting is the current system disk;
     3. Search file name supports fuzzy search, wildcard *;
-    4. The file name is searched first by language structure, for example:
-       - Operating system preferred language: en-US
-       - File name: ChromeChrome
-       The preferred search condition is GoogleChrome*en-US*, and if the search is not found, search again by default file name.
-    5. Support pre-processing, go to function OpenApp {} to change the module;
-    6. Support decompression package processing, etc.
+    4. Queue, add to the queue after running the installer, and wait for the end;
+    5. Search sequentially according to the preset structure:
+       * Original download address: https://fengyi.tel/Instl.Packer.Latest.exe
+         + Fuzzy file name: Instl.Packer*
+           - Condition 1: System language: en-US, search condition: Instl.Packer*en-US*
+           - Condition 2: Search for fuzzy file name: Instl.Packer*
+           - Condition 3: Search the website to download the original file name: Instl.Packer.Latest
+    6. Dynamic function: add pre-run and post-run processing, go to function OpenApp {} to change the module;
+    7. Support decompression package processing, etc.
 
-  .PREREQUISITES
-  - PowerShell 2.0 Or higher
+  . PREREQUISITES
+    - PowerShell 2.0 Or higher
 
-  .LINK
-  - https://github.com/ilikeyi/powershell.install.software
-  - https://gitee.com/ilikeyi/powershell.install.software
+  . LINK
+    - https://github.com/ilikeyi/powershell.install.software
+    - https://gitee.com/ilikeyi/powershell.install.software
 
 
   Package configuration tutorial
@@ -38,7 +41,7 @@
  "zip",                                                    File type downloaded from the website: exe, zip or custom file type; result: https://files.gpg4win.org/gpg4win-latest.exe
  "DefenderControl*",                                       File name fuzzy search (*)
  "/D",                                                     Operating parameters
- "1:DefenderControl:ini")                                  Before running: 1 - select scheme 1; DefenderControl = configuration file name; ini = type, go to function OpenApp {} to change the module
+ "1:DefenderControl:ini")                                  Dynamic module: choose option 1; DefenderControl = configuration file name; ini = type, go to function OpenApp {} to change the module
 
  .Make configuration file
 
@@ -67,6 +70,9 @@ param(
 	[Switch]$Silent
 )
 
+$Global:AppQueue = @()
+$Global:AppQueue.Clear()
+
 $Host.UI.RawUI.WindowTitle = "PowerShell installation software"
 
 # All software configurations
@@ -86,7 +92,7 @@ $app = @(
 	("Nvidia GEFORCE GAME READY DRIVER",
 	 "Disable",
 	 "Install",
-	 "Fast",
+	 "Queue",
 	 "auto",
 	 "Installation package\Device Driver\Graphics card",
 	 "https://cn.download.nvidia.cn/Windows/461.40",
@@ -110,7 +116,7 @@ $app = @(
 	("VisualCppRedist AIO",
 	 "Disable",
 	 "Install",
-	 "Fast",
+	 "Queue",
 	 "auto",
 	 "Installation package\AIO",
 	 "https://github.com/abbodi1406/vcredist/releases/download/v0.45.0",
@@ -122,7 +128,7 @@ $app = @(
 	("Gpg4win",
 	 "Disable",
 	 "Install",
-	 "Fast",
+	 "Queue",
 	 "auto",
 	 "Installation package\AIO",
 	 "https://files.gpg4win.org",
@@ -134,7 +140,7 @@ $app = @(
 	("Python",
 	 "Disable",
 	 "Install",
-	 "Fast",
+	 "Queue",
 	 "auto",
 	 "Installation package\Develop software",
 	 "https://www.python.org/ftp/python/3.9.1",
@@ -146,7 +152,7 @@ $app = @(
 	("kugou music",
 	 "Disable",
 	 "Install",
-	 "Fast",
+	 "Queue",
 	 "auto",
 	 "Installation package\Music software",
 	 "https://downmini.yun.kugou.com/web",
@@ -158,7 +164,7 @@ $app = @(
 	("NetEase Cloud Music",
 	 "Disable",
 	 "Install",
-	 "Fast",
+	 "Queue",
 	 "auto",
 	 "Installation package\Music software",
 	 "https://d1.music.126.net/dmusic",
@@ -170,7 +176,7 @@ $app = @(
 	("QQ music",
 	 "Disable",
 	 "Install",
-	 "fast",
+	 "Queue",
 	 "auto",
 	 "Installation package\Music software",
 	 "https://dldir1.qq.com/music/clntupate",
@@ -182,7 +188,7 @@ $app = @(
 	("Thunder 11",
 	 "Disable",
 	 "Install",
-	 "Fast",
+	 "Queue",
 	 "auto",
 	 "Installation package\Download tool",
 	 "https://down.sandai.net/thunder11",
@@ -194,7 +200,7 @@ $app = @(
 	("Tencent QQ",
 	 "Enable",
 	 "Install",
-	 "Fast",
+	 "Queue",
 	 "auto",
 	 "Installation package\Social application",
 	 "https://down.qq.com/qqweb/PCQQ/PCQQ_EXE",
@@ -206,7 +212,7 @@ $app = @(
 	("WeChat",
 	 "Enable",
 	 "Install",
-	 "Fast",
+	 "Queue",
 	 "auto",
 	 "Installation package\Social application",
 	 "https://dldir1.qq.com/weixin/Windows",
@@ -218,7 +224,7 @@ $app = @(
 	("Tencent Video",
 	 "Disable",
 	 "Install",
-	 "Fast",
+	 "Queue",
 	 "auto",
 	 "Installation package\Online TV",
 	 "https://dldir1.qq.com/qqtv",
@@ -230,7 +236,7 @@ $app = @(
 	("iQiyi video",
 	 "Disable",
 	 "Install",
-	 "Fast",
+	 "Queue",
 	 "auto",
 	 "Installation package\Online TV",
 	 "https://dl-static.iqiyi.com/hz",
@@ -246,6 +252,7 @@ function TestAvailableDisk {
 	param (
 		[string]$Path
 	)
+
 	$test_tmp_filename = "writetest-"+[guid]::NewGuid()
 	$test_filename = Join-Path -Path "$($Path)" -ChildPath "$($test_tmp_filename)"
 
@@ -337,6 +344,11 @@ function StartInstallSoftware {
 					$OutAny = $($_.fullname)
 					break
 				}
+				Get-ChildItem -Path $tempoutputfoldoer -Filter "*$($packer)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
+					$OutTo = Join-Path -Path "$($drive)" -ChildPath "$($structure)"
+					$OutAny = $($_.fullname)
+					break
+				}
 				foreach ($drive in $drives) {
 					if (TestAvailableDisk -Path $drive)	{
 						$OutTo = Join-Path -Path "$($drive)" -ChildPath "$($structure)"
@@ -382,9 +394,9 @@ function StartInstallSoftware {
 					if (Test-Path -Path $OutAny) {
 						Write-Host "    - Existing installation package"
 					} else {
-						Write-Host "    * Start download`n      > Connected to: $url"
+						Write-Host "    * Start download`n      > Connected to: `n        $url"
 						CheckCatalog -chkpath $OutTo
-						Write-Host "      + Save to: $OutAny"
+						Write-Host "      + Save to: `n        $OutAny"
 						(New-Object System.Net.WebClient).DownloadFile($url, $OutAny) | Out-Null
 					}
 					if (Test-Path -Path $OutAny) {
@@ -410,9 +422,9 @@ function StartInstallSoftware {
 					if (Test-Path -Path $OutAny) {
 						Write-Host "    - Installed`n"
 					} else {
-						Write-Host "    * Start download`n      > Connected to: $url"
+						Write-Host "    * Start download`n      > Connected to:`n        $url"
 						CheckCatalog -chkpath $OutTo
-						Write-Host "      + Save to: $OutAny"
+						Write-Host "      + Save to:`n        $OutAny"
 						(New-Object System.Net.WebClient).DownloadFile($url, $OutAny) | Out-Null
 					}
 				}
@@ -425,9 +437,9 @@ function StartInstallSoftware {
 					if (Test-Path -Path $OutAny) {
 						Write-Host "    - Compressed package available"
 					} else {
-						Write-Host "    * Start download`n      > Connected to: $url"
+						Write-Host "    * Start download`n      > Connected to:`n        $url"
 						CheckCatalog -chkpath $OutTo
-						Write-Host "      + Save to: $OutAny"
+						Write-Host "      + Save to:`n        $OutAny"
 						(New-Object System.Net.WebClient).DownloadFile($url, $OutAny) | Out-Null
 					}
 					if (Test-Path -Path $OutAny) {
@@ -443,9 +455,9 @@ function StartInstallSoftware {
 					if (Test-Path -Path $OutAny) {
 						Write-Host "    - Existing installation package"
 					} else {
-						Write-Host "    * Start download`n      > Connected to: $url"
+						Write-Host "    * Start download`n      > Connected to:`n        $url"
 						CheckCatalog -chkpath $OutTo
-						Write-Host "      + Save to: $OutAny"
+						Write-Host "      + Save to:`n        $OutAny"
 						(New-Object System.Net.WebClient).DownloadFile($url, $OutAny) | Out-Null
 					}
 					if (Test-Path -Path $OutAny) {
@@ -463,9 +475,9 @@ function StartInstallSoftware {
 			if ((Test-Path $OutAny -PathType Leaf)) {
 				OpenApp -filename $OutAny -param $param -mode $mode -method $method
 			} else {
-				Write-Host "    * Start download`n      > Connected to: $url"
+				Write-Host "    * Start download`n      > Connected to:`n        $url"
 				CheckCatalog -chkpath $OutTo
-				Write-Host "      + Save to: $OutAny"
+				Write-Host "      + Save to:`n        $OutAny"
 				(New-Object System.Net.WebClient).DownloadFile($url, $OutAny) | Out-Null
 				OpenApp -filename $OutAny -param $param -mode $mode -method $method
 			}
@@ -507,6 +519,16 @@ function Compressing {
 	return $false
 }
 
+function WaitEnd {
+	Write-Host "   Waiting for the queue" -ForegroundColor Green
+	foreach ($nq in $Global:AppQueue) {
+		Write-Host "    * ID: $nq" -ForegroundColor Red
+		wait-process -id $nq -ErrorAction SilentlyContinue
+		Write-Host "    - Completed`n"
+	}
+	$Global:AppQueue.Clear()
+}
+
 function OpenApp {
 	param(
 		$filename,
@@ -541,7 +563,7 @@ function OpenApp {
 		Switch ($mode)
 		{
 			Fast {
-				Write-Host "    - Fast running: $filename`n    - parameter: $param`n"
+				Write-Host "    - Fast running:`n      $filename`n    - parameter: `n      $param`n"
 				if (([string]::IsNullOrEmpty($param))){
 					Start-Process -FilePath $filename
 				} else {
@@ -549,11 +571,23 @@ function OpenApp {
 				}
 			}
 			Wait {
-				Write-Host "    - Wait for completion: $filename`n    - parameter: $param`n"
+				Write-Host "    - Wait for completion:`n      $filename`n    - parameter: `n      $param`n"
 				if (([string]::IsNullOrEmpty($param))){
 					Start-Process -FilePath $filename -Wait
 				} else {
 					Start-Process -FilePath $filename -ArgumentList $param -Wait
+				}
+			}
+			Queue {
+				Write-Host "    - Fast running:`n      $filename`n    - parameter:`n      $param"
+				if (([string]::IsNullOrEmpty($param))) {
+					$AppRunQueue = Start-Process -FilePath $filename -passthru
+					$Global:AppQueue += $AppRunQueue.Id
+					Write-Host "    - Add queue: $($AppRunQueue.Id)`n"
+				} else {
+					$AppRunQueue = Start-Process -FilePath $filename -ArgumentList $param -passthru
+					$Global:AppQueue += $AppRunQueue.Id
+					Write-Host "    - Add queue: $($AppRunQueue.Id)`n"
 				}
 			}
 		}
@@ -608,7 +642,8 @@ function InstallGUI {
 					StartInstallSoftware -appname $app[$_.Tag][0] -status "Enable" -act $app[$_.Tag][2] -mode $app[$_.Tag][3] -todisk $app[$_.Tag][4] -structure $app[$_.Tag][5] -url $app[$_.Tag][6] -packer $app[$_.Tag][7] -types $app[$_.Tag][8] -filename $app[$_.Tag][9] -param $app[$_.Tag][10] -method $app[$_.Tag][11]
 				}
 			}
-		}		
+		}
+		WaitEnd
 		ProcessOther
 		$Install.Close()
 	}
@@ -709,7 +744,7 @@ function Mainpage {
 	Write-Host "`n   Author: Yi ( http://fengyi.tel )
 
    From: Yi's Solutions
-   buildstring: 5.3.1.6.bs_release.210226-1208
+   buildstring: 6.0.0.6.bs_release.210226-1208
 
    INSTALLED SOFTWARE LIST ( total $($app.Count) items )
    ---------------------------------------------------"
@@ -742,6 +777,7 @@ If ($Force) {
 	ShowList
 	Initialization
 	ObtainAndInstall
+	WaitEnd
 	ProcessOther
 } else {
 	Mainpage
