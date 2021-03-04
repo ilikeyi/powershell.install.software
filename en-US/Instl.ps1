@@ -1,27 +1,30 @@
-﻿<#
+<#
 
   Warning: In order to prevent overwriting after updating, please save as and then modify.
 
   PowerShell installation software
 
-  .THE MAIN FUNCTION
+  . THE MAIN FUNCTION
     1. There is no installation package locally, activate the download function;
     2. The drive letter can be specified, and the current system drive will be excluded after setting automatic.
        When no available disk is found, the default setting is the current system disk;
     3. Search file name supports fuzzy search, wildcard *;
-    4. The file name is searched first by language structure, for example:
-       - Operating system preferred language: en-US
-       - File name: ChromeChrome
-       The preferred search condition is GoogleChrome*en-US*, and if the search is not found, search again by default file name.
-    5. Support pre-processing, go to function OpenApp {} to change the module;
-    6. Support decompression package processing, etc.
+    4. Queue, add to the queue after running the installer, and wait for the end;
+    5. Search sequentially according to the preset structure:
+       * Original download address: https://fengyi.tel/Instl.Packer.Latest.exe
+         + Fuzzy file name: Instl.Packer*
+           - Condition 1: System language: en-US, search condition: Instl.Packer*en-US*
+           - Condition 2: Search for fuzzy file name: Instl.Packer*
+           - Condition 3: Search the website to download the original file name: Instl.Packer.Latest
+    6. Dynamic function: add pre-run and post-run processing, go to function OpenApp {} to change the module;
+    7. Support decompression package processing, etc.
 
-  .PREREQUISITES
-  - PowerShell 5.1 Or higher
+  . PREREQUISITES
+    - PowerShell 5.1 Or higher
 
-  .LINK
-  - https://github.com/ilikeyi/powershell.install.software
-  - https://gitee.com/ilikeyi/powershell.install.software
+  . LINK
+    - https://github.com/ilikeyi/powershell.install.software
+    - https://gitee.com/ilikeyi/powershell.install.software
 
 
   Package configuration tutorial
@@ -38,7 +41,7 @@
  "zip",                                                    File type downloaded from the website: exe, zip or custom file type; result: https://files.gpg4win.org/gpg4win-latest.exe
  "DefenderControl*",                                       File name fuzzy search (*)
  "/D",                                                     Operating parameters
- "1:DefenderControl:ini")                                  Before running: 1 - select scheme 1; DefenderControl = configuration file name; ini = type, go to function OpenApp {} to change the module
+ "1:DefenderControl:ini")                                  Dynamic module: choose option 1; DefenderControl = configuration file name; ini = type, go to function OpenApp {} to change the module
 
  .Make configuration file
 
@@ -63,8 +66,12 @@
 [CmdletBinding()]
 param(
 	[parameter(Mandatory = $false, HelpMessage = "Silent")]
-	[Switch]$Force
+	[Switch]$Force,
+	[Switch]$Silent
 )
+
+$Global:AppQueue = @()
+$Global:AppQueue.Clear()
 
 $Host.UI.RawUI.WindowTitle = "PowerShell installation software"
 
@@ -85,11 +92,11 @@ $app = @(
 	("Nvidia GEFORCE GAME READY DRIVER",
 	 [Status]::Disable,
 	 [Action]::Install,
-	 [Mode]::Wait,
+	 [Mode]::Queue,
 	 "auto",
 	 "Installation package\Device Driver\Graphics card",
-	 "https://cn.download.nvidia.cn/Windows/461.40",
-	 "461.40-desktop-win10-64bit-international-dch-whql",
+	 "https://us.download.nvidia.com/Windows/461.72",
+	 "461.72-desktop-win10-64bit-international-dch-whql",
 	 "exe",
 	 "*-desktop-win10-*-international-dch-whql",
 	 "-s -clean -noreboot -noeula",
@@ -97,7 +104,7 @@ $app = @(
 	("Sysinternals Suite",
 	 [Status]::Disable,
 	 [Action]::To,
-	 [Mode]::Wait,
+	 [Mode]::Fast,
 	 $env:SystemDrive,
 	 "",
 	 "https://download.sysinternals.com/files",
@@ -109,11 +116,11 @@ $app = @(
 	("VisualCppRedist AIO",
 	 [Status]::Disable,
 	 [Action]::Install,
-	 [Mode]::Wait,
+	 [Mode]::Queue,
 	 "auto",
 	 "Installation package\AIO",
-	 "https://github.com/abbodi1406/vcredist/releases/download/v0.43.0",
-	 "VisualCppRedist_AIO_x86_x64_43",
+	 "https://github.com/abbodi1406/vcredist/releases/download/v0.45.0",
+	 "VisualCppRedist_AIO_x86_x64_45",
 	 "zip",
 	 "VisualCppRedist*",
 	 "/y",
@@ -121,7 +128,7 @@ $app = @(
 	("Gpg4win",
 	 [Status]::Disable,
 	 [Action]::Install,
-	 [Mode]::Wait,
+	 [Mode]::Queue,
 	 "auto",
 	 "Installation package\AIO",
 	 "https://files.gpg4win.org",
@@ -133,7 +140,7 @@ $app = @(
 	("Python",
 	 [Status]::Disable,
 	 [Action]::Install,
-	 [Mode]::Wait,
+	 [Mode]::Queue,
 	 "auto",
 	 "Installation package\Develop software",
 	 "https://www.python.org/ftp/python/3.9.1",
@@ -145,7 +152,7 @@ $app = @(
 	("kugou music",
 	 [Status]::Disable,
 	 [Action]::Install,
-	 [Mode]::Wait,
+	 [Mode]::Queue,
 	 "auto",
 	 "Installation package\Music software",
 	 "https://downmini.yun.kugou.com/web",
@@ -157,7 +164,7 @@ $app = @(
 	("NetEase Cloud Music",
 	 [Status]::Disable,
 	 [Action]::Install,
-	 [Mode]::Wait,
+	 [Mode]::Queue,
 	 "auto",
 	 "Installation package\Music software",
 	 "https://d1.music.126.net/dmusic",
@@ -169,7 +176,7 @@ $app = @(
 	("QQ music",
 	 [Status]::Disable,
 	 [Action]::Install,
-	 [Mode]::Fast,
+	 [Mode]::Queue,
 	 "auto",
 	 "Installation package\Music software",
 	 "https://dldir1.qq.com/music/clntupate",
@@ -178,10 +185,22 @@ $app = @(
 	 "QQMusicSetup",
 	 "/S",
 	 ""),
-	("Tencent QQ 2020",
+	("Thunder 11",
+	 [Status]::Disable,
+	 [Action]::Install,
+	 [Mode]::Queue,
+	 "auto",
+	 "Installation package\Download tool",
+	 "https://down.sandai.net/thunder11",
+	 "XunLeiWebSetup11.1.8.1418gw",
+	 "exe",
+	 "XunLeiWebSetup11*",
+	 "/S",
+	 ""),
+	("Tencent QQ",
 	 [Status]::Enable,
 	 [Action]::Install,
-	 [Mode]::Wait,
+	 [Mode]::Queue,
 	 "auto",
 	 "Installation package\Social application",
 	 "https://down.qq.com/qqweb/PCQQ/PCQQ_EXE",
@@ -193,13 +212,37 @@ $app = @(
 	("WeChat",
 	 [Status]::Enable,
 	 [Action]::Install,
-	 [Mode]::Wait,
+	 [Mode]::Queue,
 	 "auto",
 	 "Installation package\Social application",
 	 "https://dldir1.qq.com/weixin/Windows",
 	 "WeChatSetup",
 	 "exe",
 	 "WeChatSetup",
+	 "/S",
+	 ""),
+	("Tencent Video",
+	 [Status]::Disable,
+	 [Action]::Install,
+	 [Mode]::Queue,
+	 "auto",
+	 "Installation package\Online TV",
+	 "https://dldir1.qq.com/qqtv",
+	 "TencentVideo11.14.4043.0",
+	 "exe",
+	 "TencentVideo*",
+	 "/S",
+	 ""),
+	("iQiyi video",
+	 [Status]::Disable,
+	 [Action]::Install,
+	 [Mode]::Queue,
+	 "auto",
+	 "Installation package\Online TV",
+	 "https://dl-static.iqiyi.com/hz",
+	 "IQIYIsetup_z43",
+	 "exe",
+	 "IQIYIsetup*",
 	 "/S",
 	 "")
 )
@@ -215,6 +258,7 @@ Enum Mode
 {
 	Wait    # Wait for completion
 	Fast    # Run directly
+	Queue   # Queue
 }
 
 Enum Action
@@ -269,7 +313,7 @@ function TestURI {
 			}
 			$test = Invoke-WebRequest @paramHash
 			if ($Detail) {
-				$test.BaseResponse | Select ResponseURI,ContentLength,ContentType,LastModified, @{Name="Status";Expression={$Test.StatusCode}}
+				$test.BaseResponse | Select-Object ResponseURI,ContentLength,ContentType,LastModified, @{Name="Status";Expression={$Test.StatusCode}}
 			} else {
 				if ($test.statuscode -ne 200) { $False } else { $True }
 			}
@@ -350,7 +394,7 @@ function StartInstallSoftware {
 
 	Switch ($todisk) {
 		auto {
-			$drives = Get-PSDrive -PSProvider FileSystem | where { -not ("$($env:SystemDrive)\" -eq $_.Root) } | Select-Object -ExpandProperty 'Root'
+			$drives = Get-PSDrive -PSProvider FileSystem | Where-Object { -not ("$($env:SystemDrive)\" -eq $_.Root) } | Select-Object -ExpandProperty 'Root'
 			foreach ($drive in $drives) {
 				$tempoutputfoldoer = Join-Path -Path $($drive) -ChildPath "$($structure)"
 				Get-ChildItem -Path $tempoutputfoldoer -File -Filter "*$($filename)*$((Get-Culture).Name)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
@@ -363,10 +407,16 @@ function StartInstallSoftware {
 					$OutAny = $($_.fullname)
 					break
 				}
+				Get-ChildItem -Path $tempoutputfoldoer -File -Filter "*$($packer)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
+					$OutTo = Join-Path -Path "$($drive)" -ChildPath "$($structure)"
+					$OutAny = $($_.fullname)
+					break
+				}
 				foreach ($drive in $drives) {
 					if (TestAvailableDisk -Path $drive)	{
 						$OutTo = Join-Path -Path "$($drive)" -ChildPath "$($structure)"
 						$OutAny = Join-Path -Path "$($drive)" -ChildPath "$($structure)\$($packer).$($types)"
+						break
 					} else {
 						$OutTo = Join-Path -Path $($env:SystemDrive) -ChildPath "$($structure)"
 						$OutAny = Join-Path -Path $($env:SystemDrive) -ChildPath "$($structure)\$($packer).$($types)"
@@ -407,7 +457,7 @@ function StartInstallSoftware {
 					if (Test-Path -Path $OutAny) {
 						Write-Host "    - Existing installation package"
 					} else {
-						Write-Host "    * Start download`n      > Connected to: $url`n      + Save to: $OutAny"
+						Write-Host "    * Start download`n      > Connected to:`n        $url`n      + Save to:`n        $OutAny"
 						CheckCatalog -chkpath $OutTo
 						Invoke-WebRequest -Uri $url -OutFile "$($OutAny)" -ErrorAction SilentlyContinue | Out-Null
 					}
@@ -434,7 +484,7 @@ function StartInstallSoftware {
 					if (Test-Path -Path $OutAny) {
 						Write-Host "    - Installed`n"
 					} else {
-						Write-Host "    * Start download`n      > Connected to: $url`n      + Save to: $OutAny"
+						Write-Host "    * Start download`n      > Connected to:`n        $url`n      + Save to:`n        $OutAny"
 						CheckCatalog -chkpath $OutTo
 						Invoke-WebRequest -Uri $url -OutFile "$($OutAny)" -ErrorAction SilentlyContinue | Out-Null
 					}
@@ -448,7 +498,7 @@ function StartInstallSoftware {
 					if (Test-Path -Path $OutAny) {
 						Write-Host "    - Compressed package available"
 					} else {
-						Write-Host "    * Start download`n      > Connected to: $url`n      + Save to: $OutAny"
+						Write-Host "    * Start download`n      > Connected to:`n        $url`n      + Save to:`n        $OutAny"
 						Invoke-WebRequest -Uri $url -OutFile $OutAny -ErrorAction SilentlyContinue | Out-Null
 					}
 					if (Test-Path -Path $OutAny) {
@@ -464,7 +514,7 @@ function StartInstallSoftware {
 					if (Test-Path -Path $OutAny) {
 						Write-Host "    - Existing installation package"
 					} else {
-						Write-Host "    * Start download`n      > Connected to: $url`n      + Save to: $OutAny"
+						Write-Host "    * Start download`n      > Connected to:`n        $url`n      + Save to:`n        $OutAny"
 						CheckCatalog -chkpath $OutTo
 						Invoke-WebRequest -Uri $url -OutFile $OutAny -ErrorAction SilentlyContinue | Out-Null
 					}
@@ -483,9 +533,9 @@ function StartInstallSoftware {
 			if ((Test-Path $OutAny -PathType Leaf)) {
 				OpenApp -filename $OutAny -param $param -mode $mode -method $method
 			} else {
-				Write-Host "    * Start download`n      > Connected to: $url"
+				Write-Host "    * Start download`n      > Connected to:`n        $url"
 				if (TestURI $url) {
-					Write-Host "      + Save to: $OutAny"
+					Write-Host "      + Save to:`n        $OutAny"
 					CheckCatalog -chkpath $OutTo
 					Invoke-WebRequest -Uri $url -OutFile $OutAny -ErrorAction SilentlyContinue | Out-Null
 					OpenApp -filename $OutAny -param $param -mode $mode -method $method
@@ -531,6 +581,16 @@ function Compressing {
 	return $false
 }
 
+function WaitEnd {
+	Write-Host "   Waiting for the queue" -ForegroundColor Green
+	foreach ($nq in $Global:AppQueue) {
+		Write-Host "    * ID: $nq" -ForegroundColor Red
+		wait-process -id $nq -ErrorAction SilentlyContinue
+		Write-Host "    - Completed`n"
+	}
+	$Global:AppQueue.Clear()
+}
+
 function OpenApp {
 	param(
 		$filename,
@@ -565,19 +625,31 @@ function OpenApp {
 		Switch ($mode)
 		{
 			Fast {
-				Write-Host "    - Fast running: $filename`n    - parameter: $param`n"
-				if (([string]::IsNullOrEmpty($param))){
+				Write-Host "    - Fast running:`n      $filename`n    - parameter:`n      $param`n"
+				if (([string]::IsNullOrEmpty($param))) {
 					Start-Process -FilePath $filename
 				} else {
 					Start-Process -FilePath $filename -ArgumentList $param
 				}
 			}
 			Wait {
-				Write-Host "    - Wait for completion: $filename`n    - parameter: $param`n"
-				if (([string]::IsNullOrEmpty($param))){
+				Write-Host "    - Wait for completion:`n      $filename`n    - parameter:`n      $param`n"
+				if (([string]::IsNullOrEmpty($param))) {
 					Start-Process -FilePath $filename -Wait
 				} else {
 					Start-Process -FilePath $filename -ArgumentList $param -Wait
+				}
+			}
+			Queue {
+				Write-Host "    - Fast running:`n      $filename`n    - parameter:`n      $param"
+				if (([string]::IsNullOrEmpty($param))) {
+					$AppRunQueue = Start-Process -FilePath $filename -passthru
+					$Global:AppQueue += $AppRunQueue.Id
+					Write-Host "    - Add queue: $($AppRunQueue.Id)`n"
+				} else {
+					$AppRunQueue = Start-Process -FilePath $filename -ArgumentList $param -passthru
+					$Global:AppQueue += $AppRunQueue.Id
+					Write-Host "    - Add queue: $($AppRunQueue.Id)`n"
 				}
 			}
 		}
@@ -586,7 +658,7 @@ function OpenApp {
 	}
 }
 
-function WaitExit {
+function ToMainpage {
 	param(
 		[int]$wait
 	)
@@ -632,7 +704,8 @@ function InstallGUI {
 					StartInstallSoftware -appname $app[$_.Tag][0] -status "Enable" -act $app[$_.Tag][2] -mode $app[$_.Tag][3] -todisk $app[$_.Tag][4] -structure $app[$_.Tag][5] -url $app[$_.Tag][6] -packer $app[$_.Tag][7] -types $app[$_.Tag][8] -filename $app[$_.Tag][9] -param $app[$_.Tag][10] -method $app[$_.Tag][11]
 				}
 			}
-		}		
+		}
+		WaitEnd
 		ProcessOther
 		$Install.Close()
 	}
@@ -733,7 +806,7 @@ function Mainpage {
 	Write-Host "`n   Author: Yi ( http://fengyi.tel )
 
    From: Yi's Solutions
-   buildstring: 5.3.1.3.bs_release.210120-1208
+   buildstring: 6.0.0.6.bs_release.210226-1208
 
    INSTALLED SOFTWARE LIST ( total $($app.Count) items )
    ---------------------------------------------------"
@@ -744,6 +817,11 @@ function ProcessOther {
 
 	Write-Host "   - Delete startup items"
 	Remove-ItemProperty -Name "Wechat" -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" -ErrorAction SilentlyContinue | Out-Null
+	Remove-ItemProperty -Name "HCDNClient" -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" -ErrorAction SilentlyContinue | Out-Null
+	Remove-ItemProperty -Name "qqlive" -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" -ErrorAction SilentlyContinue | Out-Null
+	Remove-ItemProperty -Name "cloudmusic" -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" -ErrorAction SilentlyContinue | Out-Null
+	Remove-ItemProperty -Name "QQMusic" -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" -ErrorAction SilentlyContinue | Out-Null
+	Remove-ItemProperty -Name "Thunder" -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" -ErrorAction SilentlyContinue | Out-Null
 
 	Write-Host "   - Disable scheduled tasks"
 	Disable-ScheduledTask -TaskName GoogleUpdateTaskMachineCore -ErrorAction SilentlyContinue | Out-Null
@@ -765,9 +843,14 @@ If ($Force) {
 	ShowList
 	Initialization
 	ObtainAndInstall
+	WaitEnd
 	ProcessOther
 } else {
 	Mainpage
 	InstallGUI
-	WaitExit -wait 2
+	if ($Silent) {
+		exit
+	} else {
+		ToMainpage -wait 2
+	}
 }
