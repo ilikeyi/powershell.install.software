@@ -1,27 +1,30 @@
-﻿<#
+<#
 
   警告：为防止更新后覆盖，请另存为后再修改。
 
   PowerShell 安装软件
 
-  .主要功能
+  . 主要功能
     1. 本地不存在安装包，激活下载功能；
     2. 可指定盘符，设置自动后将排除当前系统盘，
        搜索不到可用盘时，默认设置为当前系统盘；
     3. 搜索文件名支持模糊查找，通配符 *；
-    4. 搜索文件名优先按语言结构来搜索，例如：
-       - 操作系统首选语言：en-US
-       - 文件名：ChromeChrome
-       优先搜索条件为 GoogleChrome*en-US*，未搜索到按默认文件名重新搜索；
-    5. 支持运行前处理，前往 function OpenApp {} 处更改该模块；
-    6. 支持解压包处理等。
+	4. 队列，运行安装程序后添加到队列，等待结束；
+    5. 依次按预先设置的结构搜索：
+       * 原始下载地址：https://fengyi.tel/Instl.Packer.Latest.exe
+         + 模糊文件名：Instl.Packer*
+           - 条件 1：系统语言：en-US，搜索条件：Instl.Packer*en-US*
+           - 条件 2：搜索模糊文件名：Instl.Packer*
+           - 条件 3：搜索网站下载原始文件名：Instl.Packer.Latest
+    6. 动态功能：已添加运行前，运行后处理，前往 function OpenApp {} 处更改该模块；
+    7. 支持解压包处理等。
 
-  .先决条件
-  - PowerShell 2.0 或更高
+  . 先决条件
+    - PowerShell 2.0 或更高
 
-  .连接
-  - https://github.com/ilikeyi/powershell.install.software
-  - https://gitee.com/ilikeyi/powershell.install.software
+  . 连接
+    - https://github.com/ilikeyi/powershell.install.software
+    - https://gitee.com/ilikeyi/powershell.install.software
 
 
   软件包配置教程
@@ -38,7 +41,7 @@
  "zip",                                                    从网站下载的文件类型：exe, zip 或自定义文件类型；结果：https://files.gpg4win.org/gpg4win-latest.exe
  "DefenderControl*",                                       文件名模糊查找（*）
  "/D",                                                     运行参数
- "1:DefenderControl:ini")                                  运行前：1 - 选择方案1；DefenderControl = 配置文件名；ini = 类型，前往 function OpenApp {} 处更改该模块
+ "1:DefenderControl:ini")                                  动态模块：选择方案 1；DefenderControl = 配置文件名；ini = 类型，前往 function OpenApp {} 处更改该模块
 
  .制作配置文件
 
@@ -67,6 +70,9 @@ param(
 	[Switch]$Silent
 )
 
+$Global:AppQueue = @()
+$Global:AppQueue.Clear()
+
 $Host.UI.RawUI.WindowTitle = "PowerShell 安装软件"
 
 # 所有软件配置
@@ -86,7 +92,7 @@ $app = @(
 	("Nvidia GEFORCE GAME READY DRIVER",
 	 "Disable",
 	 "Install",
-	 "fast",
+	 "Queue",
 	 "auto",
 	 "安装包\驱动程序\显卡",
 	 "https://cn.download.nvidia.cn/Windows/461.40",
@@ -110,7 +116,7 @@ $app = @(
 	("VisualCppRedist AIO",
 	 "Disable",
 	 "Install",
-	 "fast",
+	 "Queue",
 	 "auto",
 	 "安装包\AIO",
 	 "https://github.com/abbodi1406/vcredist/releases/download/v0.45.0",
@@ -122,7 +128,7 @@ $app = @(
 	("Gpg4win",
 	 "Disable",
 	 "Install",
-	 "fast",
+	 "Queue",
 	 "auto",
 	 "安装包\AIO",
 	 "https://files.gpg4win.org",
@@ -134,7 +140,7 @@ $app = @(
 	("Python",
 	 "Disable",
 	 "Install",
-	 "fast",
+	 "Queue",
 	 "auto",
 	 "安装包\开发软件",
 	 "https://www.python.org/ftp/python/3.9.1",
@@ -146,7 +152,7 @@ $app = @(
 	("酷狗音乐",
 	 "Disable",
 	 "Install",
-	 "fast",
+	 "Queue",
 	 "auto",
 	 "安装包\音乐软件",
 	 "https://downmini.yun.kugou.com/web",
@@ -158,7 +164,7 @@ $app = @(
 	("网易云音乐",
 	 "Disable",
 	 "Install",
-	 "fast",
+	 "Queue",
 	 "auto",
 	 "安装包\音乐软件",
 	 "https://d1.music.126.net/dmusic",
@@ -170,7 +176,7 @@ $app = @(
 	("QQ 音乐",
 	 "Disable",
 	 "Install",
-	 "fast",
+	 "Queue",
 	 "auto",
 	 "安装包\音乐软件",
 	 "https://dldir1.qq.com/music/clntupate",
@@ -182,7 +188,7 @@ $app = @(
 	("迅雷 11",
 	 "Disable",
 	 "Install",
-	 "fast",
+	 "Queue",
 	 "auto",
 	 "安装包\下载工具",
 	 "https://down.sandai.net/thunder11",
@@ -194,7 +200,7 @@ $app = @(
 	("腾讯 QQ",
 	 "Enable",
 	 "Install",
-	 "fast",
+	 "Queue",
 	 "auto",
 	 "安装包\社交软件",
 	 "https://down.qq.com/qqweb/PCQQ/PCQQ_EXE",
@@ -206,7 +212,7 @@ $app = @(
 	("微信",
 	 "Enable",
 	 "Install",
-	 "fast",
+	 "Queue",
 	 "auto",
 	 "安装包\社交软件",
 	 "https://dldir1.qq.com/weixin/Windows",
@@ -218,7 +224,7 @@ $app = @(
 	("腾讯视频",
 	 "Disable",
 	 "Install",
-	 "Fast",
+	 "Queue",
 	 "auto",
 	 "安装包\网络电视",
 	 "https://dldir1.qq.com/qqtv",
@@ -230,7 +236,7 @@ $app = @(
 	("爱奇艺视频",
 	 "Disable",
 	 "Install",
-	 "Fast",
+	 "Queue",
 	 "auto",
 	 "安装包\网络电视",
 	 "https://dl-static.iqiyi.com/hz",
@@ -246,6 +252,7 @@ function TestAvailableDisk {
 	param (
 		[string]$Path
 	)
+
 	$test_tmp_filename = "writetest-"+[guid]::NewGuid()
 	$test_filename = Join-Path -Path "$($Path)" -ChildPath "$($test_tmp_filename)"
 
@@ -337,6 +344,11 @@ function StartInstallSoftware {
 					$OutAny = $($_.fullname)
 					break
 				}
+				Get-ChildItem -Path $tempoutputfoldoer -Filter "*$($packer)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
+					$OutTo = Join-Path -Path "$($drive)" -ChildPath "$($structure)"
+					$OutAny = $($_.fullname)
+					break
+				}
 				foreach ($drive in $drives) {
 					if (TestAvailableDisk -Path $drive)	{
 						$OutTo = Join-Path -Path "$($drive)" -ChildPath "$($structure)"
@@ -382,9 +394,9 @@ function StartInstallSoftware {
 					if (Test-Path -Path $OutAny) {
 						Write-Host "    - 已有安装包"
 					} else {
-						Write-Host "    * 开始下载`n      > 连接到：$url"
+						Write-Host "    * 开始下载`n      > 连接到：`n        $url"
 						CheckCatalog -chkpath $OutTo
-						Write-Host "      + 保存到：$OutAny"
+						Write-Host "      + 保存到：`n        $OutAny"
 						(New-Object System.Net.WebClient).DownloadFile($url, $OutAny) | Out-Null
 					}
 					if (Test-Path -Path $OutAny) {
@@ -410,9 +422,9 @@ function StartInstallSoftware {
 					if (Test-Path -Path $OutAny) {
 						Write-Host "    - 已安装`n"
 					} else {
-						Write-Host "    * 开始下载`n      > 连接到：$url"
+						Write-Host "    * 开始下载`n      > 连接到：`n        $url"
 						CheckCatalog -chkpath $OutTo
-						Write-Host "      + 保存到：$OutAny"
+						Write-Host "      + 保存到：`n        $OutAny"
 						(New-Object System.Net.WebClient).DownloadFile($url, $OutAny) | Out-Null
 					}
 				}
@@ -425,9 +437,9 @@ function StartInstallSoftware {
 					if (Test-Path -Path $OutAny) {
 						Write-Host "    - 已有压缩包"
 					} else {
-						Write-Host "    * 开始下载`n      > 连接到：$url"
+						Write-Host "    * 开始下载`n      > 连接到：`n        $url"
 						CheckCatalog -chkpath $OutTo
-						Write-Host "      + 保存到：$OutAny"
+						Write-Host "      + 保存到：`n        $OutAny"
 						(New-Object System.Net.WebClient).DownloadFile($url, $OutAny) | Out-Null
 					}
 					if (Test-Path -Path $OutAny) {
@@ -443,9 +455,9 @@ function StartInstallSoftware {
 					if (Test-Path -Path $OutAny) {
 						Write-Host "    - 已有安装包"
 					} else {
-						Write-Host "    * 开始下载`n      > 连接到：$url"
+						Write-Host "    * 开始下载`n      > 连接到：`n        $url"
 						CheckCatalog -chkpath $OutTo
-						Write-Host "      + Save to: $OutAny"
+						Write-Host "      + Save to: `n        $OutAny"
 						(New-Object System.Net.WebClient).DownloadFile($url, $OutAny) | Out-Null
 					}
 					if (Test-Path -Path $OutAny) {
@@ -463,9 +475,9 @@ function StartInstallSoftware {
 			if ((Test-Path $OutAny -PathType Leaf)) {
 				OpenApp -filename $OutAny -param $param -mode $mode -method $method
 			} else {
-				Write-Host "    * 开始下载`n      > 连接到：$url"
+				Write-Host "    * 开始下载`n      > 连接到：`n        $url"
 				CheckCatalog -chkpath $OutTo
-				Write-Host "      + 保存到：$OutAny"
+				Write-Host "      + 保存到：`n        $OutAny"
 				(New-Object System.Net.WebClient).DownloadFile($url, $OutAny) | Out-Null
 				OpenApp -filename $OutAny -param $param -mode $mode -method $method
 			}
@@ -507,6 +519,16 @@ function Compressing {
 	return $false
 }
 
+function WaitEnd {
+	Write-Host "   正在等待队列" -ForegroundColor Green
+	foreach ($nq in $Global:AppQueue) {
+		Write-Host "    * ID: $nq" -ForegroundColor Red
+		wait-process -id $nq -ErrorAction SilentlyContinue
+		Write-Host "    - 已完成`n"
+	}
+	$Global:AppQueue.Clear()
+}
+
 function OpenApp {
 	param(
 		$filename,
@@ -541,7 +563,7 @@ function OpenApp {
 		Switch ($mode)
 		{
 			Fast {
-				Write-Host "    - 快速运行：$filename`n    - 参数：$param`n"
+				Write-Host "    - 快速运行：`n      $filename`n    - 参数：`n      $param`n"
 				if (([string]::IsNullOrEmpty($param))){
 					Start-Process -FilePath $filename
 				} else {
@@ -549,11 +571,23 @@ function OpenApp {
 				}
 			}
 			Wait {
-				Write-Host "    - 等待完成：$filename`n    - 参数：$param`n"
+				Write-Host "    - 等待完成：`n      $filename`n    - 参数：`n      $param`n"
 				if (([string]::IsNullOrEmpty($param))){
 					Start-Process -FilePath $filename -Wait
 				} else {
 					Start-Process -FilePath $filename -ArgumentList $param -Wait
+				}
+			}
+			Queue {
+				Write-Host "    - 快速运行：`n      $filename`n    - 参数：`n      $param"
+				if (([string]::IsNullOrEmpty($param))) {
+					$AppRunQueue = Start-Process -FilePath $filename -passthru
+					$Global:AppQueue += $AppRunQueue.Id
+					Write-Host "    - 添加队列：$($AppRunQueue.Id)`n"
+				} else {
+					$AppRunQueue = Start-Process -FilePath $filename -ArgumentList $param -passthru
+					$Global:AppQueue += $AppRunQueue.Id
+					Write-Host "    - 添加队列：$($AppRunQueue.Id)`n"
 				}
 			}
 		}
@@ -608,7 +642,8 @@ function InstallGUI {
 					StartInstallSoftware -appname $app[$_.Tag][0] -status "Enable" -act $app[$_.Tag][2] -mode $app[$_.Tag][3] -todisk $app[$_.Tag][4] -structure $app[$_.Tag][5] -url $app[$_.Tag][6] -packer $app[$_.Tag][7] -types $app[$_.Tag][8] -filename $app[$_.Tag][9] -param $app[$_.Tag][10] -method $app[$_.Tag][11]
 				}
 			}
-		}		
+		}
+		WaitEnd
 		ProcessOther
 		$Install.Close()
 	}
@@ -709,7 +744,7 @@ function Mainpage {
 	Write-Host "`n   Author: Yi ( http://fengyi.tel )
 
    From: Yi's Solutions
-   buildstring: 5.3.1.6.bs_release.210226-1208
+   buildstring: 6.0.0.6.bs_release.210226-1208
 
    安装软件列表 ( 共 $($app.Count) 款 )
    ---------------------------------------------------"
@@ -742,6 +777,7 @@ If ($Force) {
 	ShowList
 	Initialization
 	ObtainAndInstall
+	WaitEnd
 	ProcessOther
 } else {
 	Mainpage
