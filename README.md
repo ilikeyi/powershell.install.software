@@ -5,33 +5,39 @@ You are welcome to install the software using PowerShell
 欢迎您使用 PowerShell 安装软件
 -
 
-    The main function:
-      1. There is no installation package locally, activate the download function;
-      2. The drive letter can be specified, and the current system drive will be excluded after setting automatic.
-         When no available disk is found, the default setting is the current system disk;
-      3. Search file name supports fuzzy search, wildcard *;
-      4. The file name is searched first by language structure, for example:
-         - Operating system preferred language: en-US
-         - File name: ChromeChrome
-         The preferred search condition is GoogleChrome*en-US*, and if the search is not found, search again by default file name.
-      5. Support pre-processing, go to function OpenApp {} to change the module;
-      6. Support decompression package processing, etc.
+  . THE MAIN FUNCTION
+    1. There is no installation package locally, activate the download function;
+    2. The drive letter can be specified, and the current system drive will be excluded after setting automatic.
+       When no available disk is found, the default setting is the current system disk;
+    3. Search file name supports fuzzy search, wildcard *;
+    4. Queue, add to the queue after running the installer, and wait for the end;
+    5. Search sequentially according to the preset structure:
+       * Original download address: https://fengyi.tel/Instl.Packer.Latest.exe
+         + Fuzzy file name: Instl.Packer*
+           - Condition 1: System language: en-US, search condition: Instl.Packer*en-US*
+           - Condition 2: Search for fuzzy file name: Instl.Packer*
+           - Condition 3: Search the website to download the original file name: Instl.Packer.Latest
+    6. Dynamic function: add pre-run and post-run processing, go to function OpenApp {} to change the module;
+    7. Support decompression package processing, etc.
 
     Prerequisites
       - Instl.old.ps1 - ( PowerShell 2.0 或更高 )
       - Instl.ps1     - ( PowerShell 5.0 或更高 )
 
-    主要功能：
-      1. 本地不存在安装包，激活下载功能；
-      2. 可指定盘符，设置自动后将排除当前系统盘，
-         搜索不到可用盘时，默认设置为当前系统盘；
-      3. 搜索文件名支持模糊查找，通配符 *；
-      4. 搜索文件名优先按语言结构来搜索，例如：
-         - 操作系统首选语言：en-US
-         - 文件名：ChromeChrome
-         优先搜索条件为 GoogleChrome*en-US*，未搜索到按默认文件名重新搜索。
-      5. 支持运行前处理，前往 function OpenApp {} 处更改该模块；
-      6. 支持解压包处理等。
+  . 主要功能
+    1. 本地不存在安装包，激活下载功能；
+    2. 可指定盘符，设置自动后将排除当前系统盘，
+       搜索不到可用盘时，默认设置为当前系统盘；
+    3. 搜索文件名支持模糊查找，通配符 *；
+	4. 队列，运行安装程序后添加到队列，等待结束；
+    5. 依次按预先设置的结构搜索：
+       * 原始下载地址：https://fengyi.tel/Instl.Packer.Latest.exe
+         + 模糊文件名：Instl.Packer*
+           - 条件 1：系统语言：en-US，搜索条件：Instl.Packer*en-US*
+           - 条件 2：搜索模糊文件名：Instl.Packer*
+           - 条件 3：搜索网站下载原始文件名：Instl.Packer.Latest
+    6. 动态功能：已添加运行前，运行后处理，前往 function OpenApp {} 处更改该模块；
+    7. 支持解压包处理等。
 
     先决条件：
       - Instl.old.ps1 - ( PowerShell 2.0 或更高 )
@@ -51,7 +57,7 @@ You are welcome to install the software using PowerShell
  "zip",                                                    File type downloaded from the website: exe, zip or custom file type; result: https://files.gpg4win.org/gpg4win-latest.exe
  "DefenderControl*",                                       File name fuzzy search (*)
  "/D",                                                     Operating parameters
- "1:DefenderControl:ini")                                  Before running: 1 - select scheme 1; DefenderControl = configuration file name; ini = type, go to function OpenApp {} to change the module
+ "1:DefenderControl:ini")                                  Dynamic module: choose option 1; DefenderControl = configuration file name; ini = type, go to function OpenApp {} to change the module
 
  .Make configuration file
 
@@ -83,7 +89,7 @@ You are welcome to install the software using PowerShell
  "zip",                                                    从网站下载的文件类型：exe, zip 或自定义文件类型；结果：https://files.gpg4win.org/gpg4win-latest.exe
  "DefenderControl*",                                       文件名模糊查找（*）
  "/D",                                                     运行参数
- "1:DefenderControl:ini")                                  运行前：1 - 选择方案1；DefenderControl = 配置文件名；ini = 类型，前往 function OpenApp {} 处更改该模块
+ "1:DefenderControl:ini")                                  动态模块：选择方案 1；DefenderControl = 配置文件名；ini = 类型，前往 function OpenApp {} 处更改该模块
 
  .制作配置文件
 
