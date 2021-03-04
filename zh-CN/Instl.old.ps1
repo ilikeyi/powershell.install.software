@@ -71,7 +71,6 @@ param(
 )
 
 $Global:AppQueue = @()
-$Global:AppQueue.Clear()
 
 $Host.UI.RawUI.WindowTitle = "PowerShell 安装软件"
 
@@ -183,7 +182,7 @@ $app = @(
 	 "QQMusicSetup",
 	 "exe",
 	 "QQMusicSetup",
-	 "/S",
+	 "",
 	 ""),
 	("迅雷 11",
 	 "Disable",
@@ -522,11 +521,10 @@ function Compressing {
 function WaitEnd {
 	Write-Host "   正在等待队列" -ForegroundColor Green
 	foreach ($nq in $Global:AppQueue) {
-		Write-Host "    * ID: $nq" -ForegroundColor Red
+		Write-Host "    * PID: $nq" -ForegroundColor Red
 		wait-process -id $nq -ErrorAction SilentlyContinue
 		Write-Host "    - 已完成`n"
 	}
-	$Global:AppQueue.Clear()
 }
 
 function OpenApp {
@@ -563,23 +561,25 @@ function OpenApp {
 		Switch ($mode)
 		{
 			Fast {
-				Write-Host "    - 快速运行：`n      $filename`n    - 参数：`n      $param`n"
+				Write-Host "    - 快速运行：`n      $filename"
 				if (([string]::IsNullOrEmpty($param))){
 					Start-Process -FilePath $filename
 				} else {
+					Write-Host "    - 参数：`n      $param`n"
 					Start-Process -FilePath $filename -ArgumentList $param
 				}
 			}
 			Wait {
-				Write-Host "    - 等待完成：`n      $filename`n    - 参数：`n      $param`n"
+				Write-Host "    - 等待完成：`n      $filename"
 				if (([string]::IsNullOrEmpty($param))){
 					Start-Process -FilePath $filename -Wait
 				} else {
+					Write-Host "    - 参数：`n      $param`n"
 					Start-Process -FilePath $filename -ArgumentList $param -Wait
 				}
 			}
 			Queue {
-				Write-Host "    - 快速运行：`n      $filename`n    - 参数：`n      $param"
+				Write-Host "    - 快速运行：`n      $filename"
 				if (([string]::IsNullOrEmpty($param))) {
 					$AppRunQueue = Start-Process -FilePath $filename -passthru
 					$Global:AppQueue += $AppRunQueue.Id
@@ -587,6 +587,7 @@ function OpenApp {
 				} else {
 					$AppRunQueue = Start-Process -FilePath $filename -ArgumentList $param -passthru
 					$Global:AppQueue += $AppRunQueue.Id
+					Write-Host "    - 参数：`n      $param"
 					Write-Host "    - 添加队列：$($AppRunQueue.Id)`n"
 				}
 			}
