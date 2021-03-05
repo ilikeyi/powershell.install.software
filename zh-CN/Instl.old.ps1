@@ -64,7 +64,8 @@
 
 # 获取脚本参数（如果有）
 [CmdletBinding()]
-param(
+param
+(
 	[parameter(Mandatory = $false, HelpMessage = "静默")]
 	[Switch]$Force,
 	[Switch]$Silent
@@ -247,43 +248,55 @@ $app = @(
 )
 # 最后 ) 结尾请勿带 , 号，否则你懂的。
 
-function TestAvailableDisk {
-	param (
+function TestAvailableDisk
+{
+	param
+	(
 		[string]$Path
 	)
 
 	$test_tmp_filename = "writetest-"+[guid]::NewGuid()
 	$test_filename = Join-Path -Path "$($Path)" -ChildPath "$($test_tmp_filename)"
 
-	try {
+	try
+	{
 		[io.file]::OpenWrite($test_filename).close()
 
-		if ((Test-Path -Path $test_filename)) {
+		if ((Test-Path -Path $test_filename))
+		{
 			Remove-Item $test_filename -ErrorAction SilentlyContinue
 			return $true
 		}
 		$false
-	} catch {
+	}
+	catch
+	{
 		return $false
 	}
 }
 
-function CheckCatalog {
-	Param(
+function CheckCatalog
+{
+	Param
+	(
 		[string]$chkpath
 	)
 
-	if(!(Test-Path $chkpath -PathType Container)) {
+	if (!(Test-Path $chkpath -PathType Container))
+	{
 		New-Item -Path $chkpath -ItemType Directory -ErrorAction SilentlyContinue | Out-Null
-		if(!(Test-Path $chkpath -PathType Container)) {
+		if (!(Test-Path $chkpath -PathType Container))
+		{
 			Write-Host "    - 创建目录失败：$($chkpath)`n" -ForegroundColor Red
 			return
 		}
 	}
 }
 
-function JoinUrl {
-	param (
+function JoinUrl
+{
+	param
+	(
 		[parameter(Mandatory=$True, HelpMessage="Base Path")]
 		[ValidateNotNullOrEmpty()]
 		[string] $Path,
@@ -291,16 +304,18 @@ function JoinUrl {
 		[ValidateNotNullOrEmpty()]
 		[string] $ChildPath
 	)
-	if ($Path.EndsWith('/')) {
+	if ($Path.EndsWith('/'))
+	{
 		return "$Path"+"$ChildPath"
-	}
-	else {
+	} else {
 		return "$Path/$ChildPath"
 	}
 }
 
-function StartInstallSoftware {
-	param(
+function StartInstallSoftware
+{
+	param
+	(
 		$appname,
 		$status,
 		$act,
@@ -317,10 +332,12 @@ function StartInstallSoftware {
 
 	Switch ($status)
 	{
-		Enable {
+		Enable
+		{
 			Write-Host "   正在安装 - $($appname)" -ForegroundColor Green
 		}
-		Disable {
+		Disable
+		{
 			Write-Host "   跳过安装 - $($appname)" -ForegroundColor Red
 			return
 		}
@@ -328,9 +345,11 @@ function StartInstallSoftware {
 
 	$url = JoinUrl -Path "$($url)" -ChildPath "$($packer).$($types)"
 
-	Switch ($todisk) {
-		auto {
-			$drives = Get-PSDrive -PSProvider FileSystem | where { -not ("$($env:SystemDrive)\" -eq $_.Root) } | Select-Object -ExpandProperty 'Root'
+	Switch ($todisk)
+	{
+		auto
+		{
+			$drives = Get-PSDrive -PSProvider FileSystem | Where-Object { -not ("$($env:SystemDrive)\" -eq $_.Root) } | Select-Object -ExpandProperty 'Root'
 			foreach ($drive in $drives) {
 				$tempoutputfoldoer = Join-Path -Path $($drive) -ChildPath "$($structure)"
 				Get-ChildItem -Path $tempoutputfoldoer -Filter "*$($filename)*$((Get-Culture).Name)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
@@ -349,18 +368,22 @@ function StartInstallSoftware {
 					break
 				}
 				foreach ($drive in $drives) {
-					if (TestAvailableDisk -Path $drive)	{
+					if (TestAvailableDisk -Path $drive)
+					{
 						$OutTo = Join-Path -Path "$($drive)" -ChildPath "$($structure)"
 						$OutAny = Join-Path -Path "$($drive)" -ChildPath "$($structure)\$($packer).$($types)"
 						break
-					} else {
+					}
+					else
+					{
 						$OutTo = Join-Path -Path $($env:SystemDrive) -ChildPath "$($structure)"
 						$OutAny = Join-Path -Path $($env:SystemDrive) -ChildPath "$($structure)\$($packer).$($types)"
 					}
 				}
 			}
 		}
-		default {
+		default
+		{
 			$OutTo = Join-Path -Path $($todisk) -ChildPath "$($structure)"
 			$OutAny = Join-Path -Path $($todisk) -ChildPath "$($structure)\$($packer).$($types)"
 			Get-ChildItem -Path $OutTo -Filter "*$($filename)*$((Get-Culture).Name)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
@@ -376,10 +399,12 @@ function StartInstallSoftware {
 
 	Switch ($types)
 	{
-		zip {
+		zip
+		{
 			Switch ($act)
 			{
-				Install {
+				Install
+				{
 					Get-ChildItem -Path $OutTo -Filter "*$($filename)*$((Get-Culture).Name)*.exe" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
 						Write-Host "    - 本地存在：$($_.fullname)"
 						OpenApp -filename $($_.fullname) -param $param -mode $mode -method $method
@@ -417,7 +442,8 @@ function StartInstallSoftware {
 						break
 					}
 				}
-				NoInst {
+				NoInst
+				{
 					if (Test-Path -Path $OutAny) {
 						Write-Host "    - 已安装`n"
 					} else {
@@ -427,7 +453,8 @@ function StartInstallSoftware {
 						(New-Object System.Net.WebClient).DownloadFile($url, $OutAny) | Out-Null
 					}
 				}
-				To {
+				To
+				{
 					$newoutputfoldoer = "$($OutTo)\$($packer)"
 					if (Test-Path $newoutputfoldoer -PathType Container) {
 						Write-Host "    - 已安装`n"
@@ -450,7 +477,8 @@ function StartInstallSoftware {
 						Write-Host "    - 下载过程中出现错误`n" -ForegroundColor Red
 					}
 				}
-				Unzip {
+				Unzip
+				{
 					if (Test-Path -Path $OutAny) {
 						Write-Host "    - 已有安装包"
 					} else {
@@ -470,8 +498,10 @@ function StartInstallSoftware {
 				}
 			}
 		}
-		default {
-			if ((Test-Path $OutAny -PathType Leaf)) {
+		default
+		{
+			if ((Test-Path $OutAny -PathType Leaf))
+			{
 				OpenApp -filename $OutAny -param $param -mode $mode -method $method
 			} else {
 				Write-Host "    * 开始下载`n      > 连接到：`n        $url"
@@ -484,13 +514,16 @@ function StartInstallSoftware {
 	}
 }
 
-function Archive {
-	param(
+function Archive
+{
+	param
+	(
 		$filename,
 		$to
 	)
 
-	if (Compressing) {
+	if (Compressing)
+	{
 		Write-host "    - 使用 $script:Zip 解压软件"
 		$arguments = "x ""-r"" ""-tzip"" ""$filename"" ""-o$to"" ""-y""";
 		Start-Process $script:Zip "$arguments" -Wait -WindowStyle Minimized
@@ -500,7 +533,8 @@ function Archive {
 	}
 }
 
-function Compressing {
+function Compressing
+{
 	if (Test-Path "$env:ProgramFiles\7-Zip\7z.exe") {
 		$script:Zip = "$env:ProgramFiles\7-Zip\7z.exe"
 		return $true
@@ -518,7 +552,8 @@ function Compressing {
 	return $false
 }
 
-function WaitEnd {
+function WaitEnd
+{
 	Write-Host "   正在等待队列" -ForegroundColor Green
 	foreach ($nq in $Global:AppQueue) {
 		Write-Host "    * PID: $nq" -ForegroundColor Red
@@ -527,8 +562,10 @@ function WaitEnd {
 	}
 }
 
-function OpenApp {
-	param(
+function OpenApp
+{
+	param
+	(
 		$filename,
 		$param,
 		$mode,
@@ -536,51 +573,61 @@ function OpenApp {
 	)
 
 	$Select = $method -split ":"
-	switch ($Select[0]) {
-		1 {
+	switch ($Select[0])
+	{
+		1
+		{
 			$TestCfg = "$(Split-Path $filename)\$($Select[1]).$($Select[2])"
 			$TestDefault = "$(Split-Path $filename)\$($Select[1]).default.$($Select[2])"
 			$TestLanguage = "$(Split-Path $filename)\$($Select[1]).$((Get-Culture).Name).$($Select[2])"
-			if (Test-Path $TestCfg -PathType Leaf){
+			if (Test-Path $TestCfg -PathType Leaf) {
 				break
 			} else {
-				if (Test-Path $TestLanguage -PathType Leaf){
+				if (Test-Path $TestLanguage -PathType Leaf) {
 					Copy-Item -Path $TestLanguage -Destination $TestCfg -ErrorAction SilentlyContinue
 				} else {
-					if (Test-Path $TestDefault -PathType Leaf){
+					if (Test-Path $TestDefault -PathType Leaf) {
 						Copy-Item -Path $TestDefault -Destination $TestCfg -ErrorAction SilentlyContinue
 					}
 				}
 			}
 		}
-		default {
+		default
+		{
 		}
 	}
 
-	if ((Test-Path $filename -PathType Leaf)) {
+	if ((Test-Path $filename -PathType Leaf))
+	{
 		Switch ($mode)
 		{
-			Fast {
-				Write-Host "    - 快速运行：`n      $filename"
-				if (([string]::IsNullOrEmpty($param))){
+			Fast
+			{
+				if (([string]::IsNullOrEmpty($param)))
+				{
+					Write-Host "    - 快速运行：`n      $filename`n"
 					Start-Process -FilePath $filename
 				} else {
-					Write-Host "    - 参数：`n      $param`n"
+					Write-Host "    - 快速运行：`n      $filename`n    - 参数：`n      $param`n"
 					Start-Process -FilePath $filename -ArgumentList $param
 				}
 			}
-			Wait {
-				Write-Host "    - 等待完成：`n      $filename"
-				if (([string]::IsNullOrEmpty($param))){
+			Wait
+			{
+				if (([string]::IsNullOrEmpty($param)))
+				{
+					Write-Host "    - 等待完成：`n      $filename`n"
 					Start-Process -FilePath $filename -Wait
 				} else {
-					Write-Host "    - 参数：`n      $param`n"
+					Write-Host "    - 等待完成：`n      $filename`n    - 参数：`n      $param`n"
 					Start-Process -FilePath $filename -ArgumentList $param -Wait
 				}
 			}
-			Queue {
+			Queue
+			{
 				Write-Host "    - 快速运行：`n      $filename"
-				if (([string]::IsNullOrEmpty($param))) {
+				if (([string]::IsNullOrEmpty($param)))
+				{
 					$AppRunQueue = Start-Process -FilePath $filename -passthru
 					$Global:AppQueue += $AppRunQueue.Id
 					Write-Host "    - 添加队列：$($AppRunQueue.Id)`n"
@@ -597,8 +644,10 @@ function OpenApp {
 	}
 }
 
-function ToMainpage {
-	param(
+function ToMainpage
+{
+	param
+	(
 		[int]$wait
 	)
 	Write-Host "`n   安装脚本将会在 $wait 秒后自动退出。" -ForegroundColor Red
@@ -606,7 +655,8 @@ function ToMainpage {
 	exit
 }
 
-function ObtainAndInstall {
+function ObtainAndInstall
+{
 	Write-Host "`n   正在安装软件中"
 	Write-Host "   ---------------------------------------------------"
 	for ($i=0; $i -lt $app.Count; $i++) {
@@ -614,19 +664,20 @@ function ObtainAndInstall {
 	}
 }
 
-function InstallGUI {
+function InstallGUI
+{
 	Add-Type -AssemblyName System.Windows.Forms
 	Add-Type -AssemblyName System.Drawing
 	[System.Windows.Forms.Application]::EnableVisualStyles()
 
 	$AllSel_Click = {
 		$Pane1.Controls | ForEach-Object {
-			if($_ -is [System.Windows.Forms.CheckBox]){ $_.Checked = $true }
+			if ($_ -is [System.Windows.Forms.CheckBox]) { $_.Checked = $true }
 		}
 	}
 	$AllClear_Click = {
 		$Pane1.Controls | ForEach-Object {
-			if($_ -is [System.Windows.Forms.CheckBox]){ $_.Checked = $false }
+			if ($_ -is [System.Windows.Forms.CheckBox]) { $_.Checked = $false }
 		}
 	}
 	$Canel_Click = {
@@ -638,7 +689,7 @@ function InstallGUI {
 		$Install.Hide()
 		Initialization
 		$Pane1.Controls | ForEach-Object {
-			if($_ -is [System.Windows.Forms.CheckBox]) {
+			if ($_ -is [System.Windows.Forms.CheckBox]) {
 				if ($_.Checked) {
 					StartInstallSoftware -appname $app[$_.Tag][0] -status "Enable" -act $app[$_.Tag][2] -mode $app[$_.Tag][3] -todisk $app[$_.Tag][4] -structure $app[$_.Tag][5] -url $app[$_.Tag][6] -packer $app[$_.Tag][7] -types $app[$_.Tag][8] -filename $app[$_.Tag][9] -param $app[$_.Tag][10] -method $app[$_.Tag][11]
 				}
@@ -726,21 +777,26 @@ function InstallGUI {
 	$Install.ShowDialog() | Out-Null
 }
 
-function ShowList {
-	for ($i=0; $i -lt $app.Count; $i++) {
+function ShowList
+{
+	for ($i=0; $i -lt $app.Count; $i++)
+	{
 		Switch ($app[$i][1])
 		{
-			Enable {
+			Enable
+			{
 				Write-Host "   等待安装 - $($app[$i][0])" -ForegroundColor Green
 			}
-			Disable {
+			Disable
+			{
 				Write-Host "   跳过安装 - $($app[$i][0])" -ForegroundColor Red
 			}
 		}
 	}
 }
 
-function Mainpage {
+function Mainpage
+{
 	Clear-Host
 	Write-Host "`n   Author: Yi ( http://fengyi.tel )
 
@@ -751,16 +807,27 @@ function Mainpage {
    ---------------------------------------------------"
 }
 
-function ProcessOther {
+$GroupCleanRun = @(
+	"Wechat"
+	"HCDNClient"
+	"qqlive"
+	"cloudmusic"
+	"QQMusic"
+	"Thunder"
+)
+
+function CleanRun {
+	Write-Host "   - Delete startup items"
+	foreach ($nsf in $GroupCleanRun) {
+		Remove-ItemProperty -Name $nsf -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" -ErrorAction SilentlyContinue | Out-Null
+	}
+}
+
+function ProcessOther
+{
 	Write-Host "`n   处理其它：" -ForegroundColor Green
 
-	Write-Host "   - 删除开机自启动项"
-	Remove-ItemProperty -Name "Wechat" -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" -ErrorAction SilentlyContinue | Out-Null
-	Remove-ItemProperty -Name "HCDNClient" -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" -ErrorAction SilentlyContinue | Out-Null
-	Remove-ItemProperty -Name "qqlive" -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" -ErrorAction SilentlyContinue | Out-Null
-	Remove-ItemProperty -Name "cloudmusic" -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" -ErrorAction SilentlyContinue | Out-Null
-	Remove-ItemProperty -Name "QQMusic" -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" -ErrorAction SilentlyContinue | Out-Null
-	Remove-ItemProperty -Name "Thunder" -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" -ErrorAction SilentlyContinue | Out-Null
+	CleanRun
 
 	Write-Host "   - 删除多余快捷方式"
 	Set-Location "$env:public\Desktop"
@@ -770,7 +837,8 @@ function ProcessOther {
 	#Rename-Item-NewName "谷歌浏览器.lnk"  -Path ".\Google Chrome.lnk" -ErrorAction SilentlyContinue | Out-Null
 }
 
-function initialization {
+function initialization
+{
 }
 
 If ($Force) {
