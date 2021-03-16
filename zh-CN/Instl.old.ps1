@@ -248,6 +248,131 @@ $app = @(
 )
 # 最后 ) 结尾请勿带 , 号，否则你懂的。
 
+function SetFreeDisk
+{
+	if (Get-ItemProperty -Path "HKCU:\SOFTWARE\Yi\Install" -Name "DiskTo" -ErrorAction SilentlyContinue) {
+		$GetDiskTo = Get-ItemPropertyValue -Path "HKCU:\SOFTWARE\Yi\Install" -Name "DiskTo"
+		if (TestAvailableDisk -Path $GetDiskTo)	{
+			$global:FreeDiskTo = $GetDiskTo
+			return
+		}
+	}
+
+	$drives = Get-PSDrive -PSProvider FileSystem | Where-Object { -not ("$($env:SystemDrive)\" -eq $_.Root) } | Select-Object -ExpandProperty 'Root'
+	foreach ($drive in $drives) {
+		if (TestAvailableDisk -Path $drive)	{
+			SetNewFreeDisk -value $drive
+			return
+		}
+	}
+
+	SetNewFreeDisk -value "$($env:SystemDrive)\"
+}
+
+Function SetNewFreeDisk ($value)
+{
+	$FullPath = "HKCU:\SOFTWARE\Yi\Install"
+
+	if (!(Test-Path $FullPath)) {
+		New-Item -Path $FullPath -Force -ErrorAction SilentlyContinue | Out-Null
+	}
+	New-ItemProperty -LiteralPath $FullPath -Name "DiskTo" -Value $value -PropertyType String -Force -ea SilentlyContinue | Out-Null
+
+	$global:FreeDiskTo = $value
+}
+
+Function SetFreeDiskGUI
+{
+	SetFreeDisk
+	Add-Type -AssemblyName System.Windows.Forms
+	Add-Type -AssemblyName System.Drawing
+	[System.Windows.Forms.Application]::EnableVisualStyles()
+
+	$Canel_Click = {
+		$FormSelectDiSK.Close()
+	}
+	$OK_Click = {
+		$FormSelectDiSKPane1.Controls | ForEach-Object {
+			if ($_ -is [System.Windows.Forms.RadioButton]) {
+				if ($_.Checked) {
+					$FormSelectDiSK.Hide()
+					SetNewFreeDisk -value $_.Text
+					$FormSelectDiSK.Close()
+				}
+			}
+		}
+	}
+	$FormSelectDiSK    = New-Object system.Windows.Forms.Form -Property @{
+		autoScaleMode  = 2
+		Height         = 568
+		Width          = 450
+		Text           = "更改自动选择磁盘"
+		TopMost        = $True
+		MaximizeBox    = $False
+		StartPosition  = "CenterScreen"
+		MinimizeBox    = $false
+		BackColor      = "#ffffff"
+	}
+	$FormSelectDiSKPane1 = New-Object system.Windows.Forms.FlowLayoutPanel -Property @{
+		Height         = 468
+		Width          = 490
+		BorderStyle    = 0
+		autoSizeMode   = 0
+		autoScroll     = $true
+		Padding        = 8
+		Dock           = 1
+	}
+	$Start             = New-Object system.Windows.Forms.Button -Property @{
+		UseVisualStyleBackColor = $True
+		Location       = "266,482"
+		Height         = 36
+		Width          = 75
+		add_Click      = $OK_Click
+		Text           = "确认"
+	}
+	$Canel             = New-Object system.Windows.Forms.Button -Property @{
+		UseVisualStyleBackColor = $True
+		Location       = "345,482"
+		Height         = 36
+		Width          = 75
+		add_Click      = $Canel_Click
+		Text           = "取消"
+	}
+	$FormSelectDiSK.controls.AddRange((
+		$FormSelectDiSKPane1,
+		$Start,
+		$Canel
+	))
+
+	if (Get-ItemProperty -Path "HKCU:\SOFTWARE\Yi\Install" -Name "DiskTo" -ErrorAction SilentlyContinue) {
+		$GetDiskTo = Get-ItemPropertyValue -Path "HKCU:\SOFTWARE\Yi\Install" -Name "DiskTo"
+		if (TestAvailableDisk -Path $GetDiskTo)	{
+			$btnboot   = New-Object System.Windows.Forms.RadioButton -Property @{
+				Height = 30
+				Width  = 405
+				Text   = $GetDiskTo
+				Checked = $True
+			}
+			$FormSelectDiSKPane1.controls.AddRange($btnboot)
+		}
+	}
+
+	$drives = Get-PSDrive -PSProvider FileSystem | Where-Object { -not ($global:FreeDiskTo -eq $_.Root) } | Select-Object -ExpandProperty 'Root'
+	foreach ($drive in $drives) {
+		if (TestAvailableDisk -Path $drive)	{
+			$btnboot   = New-Object System.Windows.Forms.RadioButton -Property @{
+				Height = 30
+				Width  = 405
+				Text   = $drive
+			}
+			$FormSelectDiSKPane1.controls.AddRange($btnboot)
+		}
+	}
+
+	$FormSelectDiSK.FormBorderStyle = 'Fixed3D'
+	$FormSelectDiSK.ShowDialog() | Out-Null
+}
+
 function TestAvailableDisk
 {
 	param
@@ -256,7 +381,7 @@ function TestAvailableDisk
 	)
 
 	$test_tmp_filename = "writetest-"+[guid]::NewGuid()
-	$test_filename = Join-Path -Path "$($Path)" -ChildPath "$($test_tmp_filename)"
+	$test_filename = Join-Path -Path "$($Path)" -ChildPath "$($test_tmp_filename)" -ErrorAction SilentlyContinue
 
 	try
 	{
@@ -367,19 +492,9 @@ function StartInstallSoftware
 					$OutAny = $($_.fullname)
 					break
 				}
-				foreach ($drive in $drives) {
-					if (TestAvailableDisk -Path $drive)
-					{
-						$OutTo = Join-Path -Path "$($drive)" -ChildPath "$($structure)"
-						$OutAny = Join-Path -Path "$($drive)" -ChildPath "$($structure)\$($packer).$($types)"
-						break
-					}
-					else
-					{
-						$OutTo = Join-Path -Path $($env:SystemDrive) -ChildPath "$($structure)"
-						$OutAny = Join-Path -Path $($env:SystemDrive) -ChildPath "$($structure)\$($packer).$($types)"
-					}
-				}
+				SetFreeDisk
+				$OutTo = Join-Path -Path $global:FreeDiskTo -ChildPath "$($structure)"
+				$OutAny = Join-Path -Path $global:FreeDiskTo -ChildPath "$($structure)\$($packer).$($types)"
 			}
 		}
 		default
@@ -735,6 +850,14 @@ function InstallGUI
 		add_Click      = $AllClear_Click
 		Text           = "清除所有"
 	}
+	$Setting           = New-Object system.Windows.Forms.Button -Property @{
+		UseVisualStyleBackColor = $True
+		Location       = New-Object System.Drawing.Point(187,482)
+		Height         = 36
+		Width          = 75
+		add_Click      = { SetFreeDiskGUI }
+		Text           = "设置"
+	}
 	$Start             = New-Object system.Windows.Forms.Button -Property @{
 		UseVisualStyleBackColor = $True
 		Location       = New-Object System.Drawing.Point(266,482)
@@ -768,11 +891,14 @@ function InstallGUI
 		$Pane1.controls.AddRange($CheckBox)		
 	}
 
-	$Install.controls.AddRange($Pane1)
-	$Install.controls.AddRange($AllSel)
-	$Install.controls.AddRange($AllClear)
-	$Install.controls.AddRange($Start)
-	$Install.controls.AddRange($Canel)
+	$Install.controls.AddRange((
+		$Pane1,
+		$AllSel,
+		$AllClear,
+		$Setting,
+		$Start,
+		$Canel
+	))
 	$Install.FormBorderStyle = 'Fixed3D'
 	$Install.ShowDialog() | Out-Null
 }
@@ -801,7 +927,7 @@ function Mainpage
 	Write-Host "`n   Author: Yi ( http://fengyi.tel )
 
    From: Yi's Solutions
-   buildstring: 6.0.0.6.bs_release.210226-1208
+   buildstring: 6.1.0.1.bs_release.210226-1208
 
    安装软件列表 ( 共 $($app.Count) 款 )
    ---------------------------------------------------"
@@ -841,15 +967,15 @@ function initialization
 {
 }
 
+Mainpage
+
 If ($Force) {
-	Mainpage
 	ShowList
 	Initialization
 	ObtainAndInstall
 	WaitEnd
 	ProcessOther
 } else {
-	Mainpage
 	InstallGUI
 	if ($Silent) {
 		exit
