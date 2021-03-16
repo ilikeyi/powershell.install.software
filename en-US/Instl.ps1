@@ -403,7 +403,7 @@ function TestAvailableDisk
 	)
 
 	$test_tmp_filename = "writetest-"+[guid]::NewGuid()
-	$test_filename = Join-Path -Path "$($Path)" -ChildPath "$($test_tmp_filename)"
+	$test_filename = Join-Path -Path "$($Path)" -ChildPath "$($test_tmp_filename)" -ErrorAction SilentlyContinue
 
 	try
 	{
