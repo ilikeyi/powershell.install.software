@@ -280,7 +280,7 @@ function SetFreeDisk
 		}
 	}
 
-	$drives = Get-PSDrive -PSProvider FileSystem | Where-Object { -not ("$($env:SystemDrive)\" -eq $_.Root) } | Select-Object -ExpandProperty 'Root'
+	$drives = Get-PSDrive -PSProvider FileSystem | Where-Object { -not ((JoinMainFolder -Path $env:SystemDrive) -eq $_.Root) } | Select-Object -ExpandProperty 'Root'
 	foreach ($drive in $drives) {
 		if (TestAvailableDisk -Path $drive)	{
 			SetNewFreeDisk -value $drive
@@ -288,14 +288,14 @@ function SetFreeDisk
 		}
 	}
 
-	SetNewFreeDisk -value "$($env:SystemDrive)\"
+	SetNewFreeDisk -value (JoinMainFolder -Path $env:SystemDrive)
 }
 
 Function SetNewFreeDisk ($value)
 {
 	$FullPath = "HKCU:\SOFTWARE\Yi\Install"
 
-	if (!(Test-Path $FullPath)) {
+	if (-not (Test-Path $FullPath)) {
 		New-Item -Path $FullPath -Force -ErrorAction SilentlyContinue | Out-Null
 	}
 	New-ItemProperty -LiteralPath $FullPath -Name "DiskTo" -Value $value -PropertyType String -Force -ea SilentlyContinue | Out-Null
@@ -478,10 +478,10 @@ function CheckCatalog
 		[string]$chkpath
 	)
 
-	if (!(Test-Path $chkpath -PathType Container))
+	if (-not (Test-Path $chkpath -PathType Container))
 	{
 		New-Item -Path $chkpath -ItemType Directory -ErrorAction SilentlyContinue | Out-Null
-		if (!(Test-Path $chkpath -PathType Container)) {
+		if (-not (Test-Path $chkpath -PathType Container)) {
 			Write-Host "    - 创建目录失败：$($chkpath)`n" -ForegroundColor Red
 			return
 		}
@@ -504,6 +504,20 @@ function JoinUrl
 		return "$Path"+"$ChildPath"
 	} else {
 		return "$Path/$ChildPath"
+	}
+}
+
+Function JoinMainFolder
+{
+	param
+	(
+		[string]$Path
+	)
+	if ($Path.EndsWith('\'))
+	{
+		return "$Path"
+	} else {
+		return "$Path\"
 	}
 }
 
@@ -542,7 +556,7 @@ function StartInstallSoftware
 	{
 		auto
 		{
-			$drives = Get-PSDrive -PSProvider FileSystem | Where-Object { -not ("$($env:SystemDrive)\" -eq $_.Root) } | Select-Object -ExpandProperty 'Root'
+			$drives = Get-PSDrive -PSProvider FileSystem | Where-Object { -not ((JoinMainFolder -Path $env:SystemDrive) -eq $_.Root) } | Select-Object -ExpandProperty 'Root'
 			foreach ($drive in $drives) {
 				$tempoutputfoldoer = Join-Path -Path $($drive) -ChildPath "$($structure)"
 				Get-ChildItem -Path $tempoutputfoldoer -File -Filter "*$($filename)*$((Get-Culture).Name)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
@@ -995,7 +1009,7 @@ function Mainpage
 	Write-Host "`n   Author: Yi ( http://fengyi.tel )
 
    From: Yi's Solutions
-   buildstring: 6.1.0.1.bs_release.210226-1208
+   buildstring: 6.1.0.2.bs_release.210226-1208
 
    安装软件列表 ( 共 $($app.Count) 款 )
    ---------------------------------------------------"
