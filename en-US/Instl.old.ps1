@@ -258,7 +258,7 @@ function SetFreeDisk
 		}
 	}
 
-	$drives = Get-PSDrive -PSProvider FileSystem | Where-Object { -not ("$($env:SystemDrive)\" -eq $_.Root) } | Select-Object -ExpandProperty 'Root'
+	$drives = Get-PSDrive -PSProvider FileSystem | Where-Object { -not ((JoinMainFolder -Path $env:SystemDrive) -eq $_.Root) } | Select-Object -ExpandProperty 'Root'
 	foreach ($drive in $drives) {
 		if (TestAvailableDisk -Path $drive)	{
 			SetNewFreeDisk -value $drive
@@ -266,7 +266,7 @@ function SetFreeDisk
 		}
 	}
 
-	SetNewFreeDisk -value "$($env:SystemDrive)\"
+	SetNewFreeDisk -value (JoinMainFolder -Path $env:SystemDrive)
 }
 
 Function SetNewFreeDisk ($value)
@@ -437,6 +437,20 @@ function JoinUrl
 	}
 }
 
+Function JoinMainFolder
+{
+	param
+	(
+		[string]$Path
+	)
+	if ($Path.EndsWith('\'))
+	{
+		return "$Path"
+	} else {
+		return "$Path\"
+	}
+}
+
 function StartInstallSoftware
 {
 	param
@@ -474,7 +488,7 @@ function StartInstallSoftware
 	{
 		auto
 		{
-			$drives = Get-PSDrive -PSProvider FileSystem | Where-Object { -not ("$($env:SystemDrive)\" -eq $_.Root) } | Select-Object -ExpandProperty 'Root'
+			$drives = Get-PSDrive -PSProvider FileSystem | Where-Object { -not ((JoinMainFolder -Path $env:SystemDrive) -eq $_.Root) } | Select-Object -ExpandProperty 'Root'
 			foreach ($drive in $drives) {
 				$tempoutputfoldoer = Join-Path -Path $($drive) -ChildPath "$($structure)"
 				Get-ChildItem -Path $tempoutputfoldoer -Filter "*$($filename)*$((Get-Culture).Name)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
@@ -927,7 +941,7 @@ function Mainpage
 	Write-Host "`n   Author: Yi ( http://fengyi.tel )
 
    From: Yi's Solutions
-   buildstring: 6.1.0.1.bs_release.210226-1208
+   buildstring: 6.1.0.2.bs_release.210226-1208
 
    INSTALLED SOFTWARE LIST ( total $($app.Count) items )
    ---------------------------------------------------"
