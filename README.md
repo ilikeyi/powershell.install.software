@@ -7,36 +7,40 @@ You are welcome to install the software using PowerShell
 
 ```
   . THE MAIN FUNCTION
-    1. There is no installation package locally, activate the download function;
-    2. The drive letter can be specified, and the current system drive will be excluded after setting automatic.
+    1. The installation package does not exist locally, and the download function is activated;
+    2. The default automatic download drive letter and priority download connection address can be modified by setting;
+	   The system type is automatically judged, and the download connection is automatically selected in order, and so on.
+    3. The drive letter can be specified, and the current system drive will be excluded after setting automatic.
        When no available disk is found, the default setting is the current system disk;
-    3. Search file name supports fuzzy search, wildcard *;
-    4. Queue, add to the queue after running the installer, and wait for the end;
-    5. Search sequentially according to the preset structure:
+    4. Search file name supports fuzzy search, wildcard *;
+    5. Queue, add to the queue after running the installer, and wait for the end;
+    6. Search sequentially according to the preset structure:
        * Original download address: https://fengyi.tel/Instl.Packer.Latest.exe
          + Fuzzy file name: Instl.Packer*
            - Condition 1: System language: en-US, search condition: Instl.Packer*en-US*
            - Condition 2: Search for fuzzy file name: Instl.Packer*
            - Condition 3: Search the website to download the original file name: Instl.Packer.Latest
-    6. Dynamic function: add pre-run and post-run processing, go to function OpenApp {} to change the module;
-    7. Support decompression package processing, etc.
+    7. Dynamic function: add pre-run and post-run processing, go to function OpenApp {} to change the module;
+    8. Support decompression package processing, etc.
 ```
 
 ```
   . 主要功能
     1. 本地不存在安装包，激活下载功能；
-    2. 可指定盘符，设置自动后将排除当前系统盘，
+    2. 可通过设置修改默认自动下载盘符和优先下载连接地址；
+	   自动判断系统类型，下载连接自动按顺序选择，依次类推。
+    3. 可指定盘符，设置自动后将排除当前系统盘，
        搜索不到可用盘时，默认设置为当前系统盘；
-    3. 搜索文件名支持模糊查找，通配符 *；
-    4. 队列，运行安装程序后添加到队列，等待结束；
-    5. 依次按预先设置的结构搜索：
+    4. 搜索文件名支持模糊查找，通配符 *；
+    5. 队列，运行安装程序后添加到队列，等待结束；
+    6. 依次按预先设置的结构搜索：
        * 原始下载地址：https://fengyi.tel/Instl.Packer.Latest.exe
          + 模糊文件名：Instl.Packer*
            - 条件 1：系统语言：en-US，搜索条件：Instl.Packer*en-US*
            - 条件 2：搜索模糊文件名：Instl.Packer*
            - 条件 3：搜索网站下载原始文件名：Instl.Packer.Latest
-    6. 动态功能：已添加运行前，运行后处理，前往 function OpenApp {} 处更改该模块；
-    7. 支持解压包处理等。
+    7. 动态功能：已添加运行前，运行后处理，前往 function OpenApp {} 处更改该模块；
+    8. 支持解压包处理等。
 ```
 
 
