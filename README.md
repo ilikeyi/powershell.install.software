@@ -22,9 +22,6 @@ You are welcome to install the software using PowerShell
     7. Support decompression package processing, etc.
 ```
 
-    Prerequisites
-      - Instl.en-US.ps1
-
 ```
   . 主要功能
     1. 本地不存在安装包，激活下载功能；
@@ -42,8 +39,6 @@ You are welcome to install the software using PowerShell
     7. 支持解压包处理等。
 ```
 
-    先决条件：
-      - Instl.zh-CN.ps1
 
 # Package configuration tutorial
 ```
