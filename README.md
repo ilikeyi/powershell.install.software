@@ -23,8 +23,7 @@ You are welcome to install the software using PowerShell
 ```
 
     Prerequisites
-      - Instl.old.ps1 - ( PowerShell 2.0 或更高 )
-      - Instl.ps1     - ( PowerShell 5.0 或更高 )
+      - Instl.en-US.ps1
 
 ```
   . 主要功能
@@ -44,8 +43,7 @@ You are welcome to install the software using PowerShell
 ```
 
     先决条件：
-      - Instl.old.ps1 - ( PowerShell 2.0 或更高 )
-      - Instl.ps1     - ( PowerShell 5.0 或更高 )
+      - Instl.zh-CN.ps1
 
 # Package configuration tutorial
 ```
@@ -56,9 +54,9 @@ You are welcome to install the software using PowerShell
  [Mode]::Wait,                                             Operation mode: Wait - wait for completion; Fast - run directly
  "auto",                                                   After setting automatic, the current system disk will be excluded. If no available disk is found, the default setting is the current system disk; specify the drive letter [A:]-[Z:]; specify the path: \\192.168.1.1
  "Installation package\Tool",                              Directory Structure
- "https://www.sordum.org/files/download/defender-control", Website address
- "DefenderControl",                                        File name downloaded from website
- "zip",                                                    File type downloaded from the website: exe, zip or custom file type; result: https://files.gpg4win.org/gpg4win-latest.exe
+ "https://www.sordum.org/files/download/defender-control/DefenderControl.zip", Default, including x86 download address
+ "",                                                       x64 download link
+ "",                                                       Arm64 download link
  "DefenderControl*",                                       File name fuzzy search (*)
  "/D",                                                     Operating parameters
  "1:DefenderControl:ini")                                  Dynamic module: choose option 1; DefenderControl = configuration file name; ini = type, go to function OpenApp {} to change the module
@@ -88,10 +86,10 @@ You are welcome to install the software using PowerShell
  [Mode]::Wait,                                             运行方式：Wait - 等待完成；Fast - 直接运行
  "auto",                                                   设置自动后将排除当前系统盘，搜索不到可用盘时，默认设置为当前系统盘；指定盘符 [A:]-[Z:]；指定路径：\\192.168.1.1
  "安装包\工具",                                            目录结构
- "https://www.sordum.org/files/download/defender-control", 网站地址
- "DefenderControl",                                        从网站下载的文件名
- "zip",                                                    从网站下载的文件类型：exe, zip 或自定义文件类型；结果：https://files.gpg4win.org/gpg4win-latest.exe
- "DefenderControl*",                                       文件名模糊查找（*）
+ "https://www.sordum.org/files/download/defender-control/DefenderControl.zip", 默认，含 x86 下载地址
+ "",                                                       x64 下载地址
+ "",                                                       Arm64 下载地址
+ "DefenderControl*",                                       文件名模糊查找 (*)
  "/D",                                                     运行参数
  "1:DefenderControl:ini")                                  动态模块：选择方案 1；DefenderControl = 配置文件名；ini = 类型，前往 function OpenApp {} 处更改该模块
 
