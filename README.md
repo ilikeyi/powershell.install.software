@@ -1,4 +1,4 @@
-![Installation interface](https://raw.githubusercontent.com/ilikeyi/powershell.install.software/main/Mainpage.png)
+![Installation interface](https://raw.githubusercontent.com/ilikeyi/powershell.install.software/main/Cover.png)
 
 You are welcome to install the software using PowerShell
 -
