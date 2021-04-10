@@ -1,6 +1,4 @@
-﻿<#
-
-  Warning: In order to prevent overwriting after updating, please save as and then modify.
+<#
 
   PowerShell installation software
 
@@ -11,7 +9,7 @@
     3. The drive letter can be specified, and the current system drive will be excluded after setting automatic.
        When no available disk is found, the default setting is the current system disk;
     4. Search file name supports fuzzy search, wildcard *;
-	5. Queue, add to the queue after running the installer, and wait for the end;
+    5. Queue, add to the queue after running the installer, and wait for the end;
     6. Search sequentially according to the preset structure:
        * Original download address: https://fengyi.tel/Instl.Packer.Latest.exe
          + Fuzzy file name: Instl.Packer*
@@ -72,22 +70,24 @@ param
 	[Switch]$Silent
 )
 
+$Global:UniqueID  = "Yi"
+$Global:AuthorURL = "https://fengyi.tel"
 $Global:AppQueue = @()
 
 $Host.UI.RawUI.WindowTitle = "Installation software"
 
 # All software configurations
 $app = @(
-	("Yi's Personalized theme pack",
+	("$($Global:UniqueID)'s Personalized theme pack",
 	 [Status]::Disable,
 	 [Action]::Install,
 	 [Mode]::Fast,
 	 "auto",
 	 "Installation package\Theme pack",
-	 "https://fengyi.tel/Yi.deskthemepack",
+	 "$($Global:AuthorURL)/$($Global:UniqueID).deskthemepack",
 	 "",
 	 "",
-	 "Yi*",
+	 "$($Global:UniqueID)*",
 	 "",
 	 ""),
 	("Nvidia GEFORCE GAME READY DRIVER",
@@ -272,8 +272,8 @@ Enum Action
 
 function GetArchitecture
 {
-	if (Get-ItemProperty -Path "HKCU:\SOFTWARE\Yi\Install" -Name "Architecture" -ErrorAction SilentlyContinue) {
-		$Global:InstlArchitecture = Get-ItemPropertyValue -Path "HKCU:\SOFTWARE\Yi\Install" -Name "Architecture"
+	if (Get-ItemProperty -Path "HKCU:\SOFTWARE\$($Global:UniqueID)\Install" -Name "Architecture" -ErrorAction SilentlyContinue) {
+		$Global:InstlArchitecture = Get-ItemPropertyValue -Path "HKCU:\SOFTWARE\$($Global:UniqueID)\Install" -Name "Architecture"
 		return
 	}
 
@@ -287,7 +287,7 @@ Function SetArchitecture
 		[string]$Type
 	)
 
-	$FullPath = "HKCU:\SOFTWARE\Yi\Install"
+	$FullPath = "HKCU:\SOFTWARE\$($Global:UniqueID)\Install"
 
 	if (-not (Test-Path $FullPath)) {
 		New-Item -Path $FullPath -Force -ErrorAction SilentlyContinue | Out-Null
@@ -299,8 +299,8 @@ Function SetArchitecture
 
 function SetFreeDisk
 {
-	if (Get-ItemProperty -Path "HKCU:\SOFTWARE\Yi\Install" -Name "DiskTo" -ErrorAction SilentlyContinue) {
-		$GetDiskTo = Get-ItemPropertyValue -Path "HKCU:\SOFTWARE\Yi\Install" -Name "DiskTo"
+	if (Get-ItemProperty -Path "HKCU:\SOFTWARE\$($Global:UniqueID)\Install" -Name "DiskTo" -ErrorAction SilentlyContinue) {
+		$GetDiskTo = Get-ItemPropertyValue -Path "HKCU:\SOFTWARE\$($Global:UniqueID)\Install" -Name "DiskTo"
 		if (TestAvailableDisk -Path $GetDiskTo)	{
 			$Global:FreeDiskTo = $GetDiskTo
 			return
@@ -325,7 +325,7 @@ Function SetNewFreeDisk
 		[string]$Disk
 	)
 
-	$FullPath = "HKCU:\SOFTWARE\Yi\Install"
+	$FullPath = "HKCU:\SOFTWARE\$($Global:UniqueID)\Install"
 
 	if (-not (Test-Path $FullPath)) {
 		New-Item -Path $FullPath -Force -ErrorAction SilentlyContinue | Out-Null
@@ -348,13 +348,13 @@ Function SetupGUI
 		$FormSelectDiSK.Close()
 	}
 	$OK_ArchitectureARM64_Click = {
-		$SoftwareTipsErrorMsg.Text = "The arm64 download address is preferred, and then select in order: x64, x86."
+		$SoftwareTipsErrorMsg.Text = "Prefer arm64 download address, select in order: x64, x86."
 	}
 	$OK_ArchitectureX64_Click = {
-		$SoftwareTipsErrorMsg.Text = "Choose the x64 download address first, and select in order: x86."
+		$SoftwareTipsErrorMsg.Text = "Prefer the x64 download address, and select in order: x86."
 	}
 	$OK_ArchitectureX86_Click = {
-		$SoftwareTipsErrorMsg.Text = "Select only the x86 download address."
+		$SoftwareTipsErrorMsg.Text = "Only select the x86 download address."
 	}
 	$OK_Click = {
 		$FormSelectDiSK.Hide()
@@ -390,7 +390,7 @@ Function SetupGUI
 	}
 	$GroupArchitecture = New-Object system.Windows.Forms.Panel -Property @{
 		BorderStyle    = 0
-		Height         = 30
+		Height         = 28
 		Width          = 400
 		autoSizeMode   = 1
 		Padding        = 8
@@ -449,17 +449,17 @@ Function SetupGUI
 	}
 	$Start             = New-Object system.Windows.Forms.Button -Property @{
 		UseVisualStyleBackColor = $True
-		Location       = "266,482"
+		Location       = "10,482"
 		Height         = 36
-		Width          = 75
+		Width          = 202
 		add_Click      = $OK_Click
 		Text           = "OK"
 	}
 	$Canel             = New-Object system.Windows.Forms.Button -Property @{
 		UseVisualStyleBackColor = $True
-		Location       = "345,482"
+		Location       = "218,482"
 		Height         = 36
-		Width          = 75
+		Width          = 202
 		add_Click      = $Canel_Click
 		Text           = "Cancel"
 	}
@@ -511,28 +511,35 @@ Function SetupGUI
 		}
 	}
 
-	if (Get-ItemProperty -Path "HKCU:\SOFTWARE\Yi\Install" -Name "DiskTo" -ErrorAction SilentlyContinue) {
-		$GetDiskTo = Get-ItemPropertyValue -Path "HKCU:\SOFTWARE\Yi\Install" -Name "DiskTo"
-		if (TestAvailableDisk -Path $GetDiskTo)	{
-			$btnboot   = New-Object System.Windows.Forms.RadioButton -Property @{
-				Height = 26
-				Width  = 390
-				Text   = $GetDiskTo
-				Checked = $True
-			}
-			$FormSelectDiSKPane1.controls.AddRange($btnboot)
-		}
-	}
-
-	$drives = Get-PSDrive -PSProvider FileSystem | Where-Object { -not ($Global:FreeDiskTo -eq $_.Root) } | Select-Object -ExpandProperty 'Root'
+	$drives = Get-PSDrive -PSProvider FileSystem | Select-Object -ExpandProperty 'Root'
 	foreach ($drive in $drives) {
 		if (TestAvailableDisk -Path $drive)	{
-			$btnboot   = New-Object System.Windows.Forms.RadioButton -Property @{
+			$RadioButton   = New-Object System.Windows.Forms.RadioButton -Property @{
 				Height = 26
 				Width  = 390
 				Text   = $drive
 			}
-			$FormSelectDiSKPane1.controls.AddRange($btnboot)
+
+			$FormSelectDiSKPane1.controls.AddRange($RadioButton)
+		}
+	}
+
+	$GetDiskTo = Get-ItemPropertyValue -Path "HKCU:\SOFTWARE\$($Global:UniqueID)\Install" -Name "DiskTo"
+	if (TestAvailableDisk -Path $GetDiskTo)	{
+		$FormSelectDiSKPane1.Controls | ForEach-Object {
+			if ($_ -is [System.Windows.Forms.RadioButton]) {
+				if ($_.Text -like $GetDiskTo) {
+					$_.Checked = $True
+				}
+			}
+		}
+	} else {
+		$FormSelectDiSKPane1.Controls | ForEach-Object {
+			if ($_ -is [System.Windows.Forms.RadioButton]) {
+				if ($_.Text -like (JoinMainFolder -Path $env:SystemDrive)) {
+					$_.Checked = $True
+				}
+			}
 		}
 	}
 
@@ -988,8 +995,8 @@ function Compressing
 		return $true
 	}
 
-	if (Test-Path "$env:SystemDrive\Yi\Yi\AIO\7z.exe") {
-		$script:Zip = "$env:SystemDrive\Yi\Yi\AIO\7z.exe"
+	if (Test-Path "$env:SystemDrive\$($Global:UniqueID)\$($Global:UniqueID)\AIO\7z.exe") {
+		$script:Zip = "$env:SystemDrive\$($Global:UniqueID)\$($Global:UniqueID)\AIO\7z.exe"
 		return $true
 	}
 	return $false
@@ -997,7 +1004,7 @@ function Compressing
 
 function WaitEnd
 {
-	Write-Host "   Waiting for the queue" -ForegroundColor Green
+	Write-Host "`n   Waiting for the queue" -ForegroundColor Green
 	for ($i=0; $i -lt $Global:AppQueue.Count; $i++) {
 		Write-Host "    * PID: $($Global:AppQueue[$i]['ID'])" -ForegroundColor Red
 		if ((Get-Process -ID $($Global:AppQueue[$i]['ID']) -ErrorAction SilentlyContinue).Path -eq $Global:AppQueue[$i]['PATH']) {
@@ -1171,43 +1178,27 @@ function InstallGUI
 		Padding        = 8
 		Dock           = 1
 	}
-	$AllSel            = New-Object system.Windows.Forms.Button -Property @{
+	$Setting           = New-Object system.Windows.Forms.Button -Property @{
 		UseVisualStyleBackColor = $True
 		Location       = "10,482"
 		Height         = 36
-		Width          = 75
-		add_Click      = $AllSel_Click
-		Text           = "Select all"
-	}
-	$AllClear          = New-Object system.Windows.Forms.Button -Property @{
-		UseVisualStyleBackColor = $True
-		Location       = "88,482"
-		Height         = 36
-		Width          = 75
-		add_Click      = $AllClear_Click
-		Text           = "Clear all"
-	}
-	$Setting           = New-Object system.Windows.Forms.Button -Property @{
-		UseVisualStyleBackColor = $True
-		Location       = "187,482"
-		Height         = 36
-		Width          = 75
+		Width          = 133
 		add_Click      = { SetupGUI }
 		Text           = "Set up"
 	}
 	$Start             = New-Object system.Windows.Forms.Button -Property @{
 		UseVisualStyleBackColor = $True
-		Location       = "266,482"
+		Location       = "148,482"
 		Height         = 36
-		Width          = 75
+		Width          = 133
 		add_Click      = $OK_Click
 		Text           = "OK"
 	}
 	$Canel             = New-Object system.Windows.Forms.Button -Property @{
 		UseVisualStyleBackColor = $True
-		Location       = "345,482"
+		Location       = "286,482"
 		Height         = 36
-		Width          = 75
+		Width          = 133
 		add_Click      = $Canel_Click
 		Text           = "Cancel"
 	}
@@ -1215,7 +1206,7 @@ function InstallGUI
 	for ($i=0; $i -lt $app.Count; $i++)
 	{
 		$CheckBox  = New-Object System.Windows.Forms.CheckBox -Property @{
-			Height = 30
+			Height = 28
 			Width  = 405
 			Text   = $app[$i][0]
 			Tag    = $i
@@ -1237,6 +1228,12 @@ function InstallGUI
 		$Start,
 		$Canel
 	))
+
+	$SelectMenu = New-Object System.Windows.Forms.ContextMenuStrip
+	$SelectMenu.Items.Add("Select all").add_Click($AllSel_Click)
+	$SelectMenu.Items.Add("Clear all").add_Click($AllClear_Click)
+	$Install.ContextMenuStrip = $SelectMenu
+
 	$Install.FormBorderStyle = 'Fixed3D'
 	$Install.ShowDialog() | Out-Null
 }
@@ -1262,10 +1259,10 @@ function ShowList
 function Mainpage
 {
 	Clear-Host
-	Write-Host "`n   Author: Yi ( http://fengyi.tel )
+	Write-Host "`n   Author: $($Global:UniqueID) ( $($Global:AuthorURL) )
 
-   From: Yi's Solutions
-   buildstring: 6.1.0.3.bs_release.210226-1208
+   From: $($Global:UniqueID)'s Solutions
+   buildstring: 6.1.0.4.bs_release.210226-1208
 
    INSTALLED SOFTWARE LIST ( total $($app.Count) items )
    ---------------------------------------------------"
