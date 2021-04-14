@@ -1,5 +1,7 @@
 <#
 
+  Warning: In order to prevent overwriting after updating, please save as and then modify.
+
   PowerShell installation software
 
   . THE MAIN FUNCTION
@@ -528,7 +530,7 @@ Function SetupGUI
 	if (TestAvailableDisk -Path $GetDiskTo)	{
 		$FormSelectDiSKPane1.Controls | ForEach-Object {
 			if ($_ -is [System.Windows.Forms.RadioButton]) {
-				if ($_.Text -like $GetDiskTo) {
+				if ($_.Text -eq $GetDiskTo) {
 					$_.Checked = $True
 				}
 			}
@@ -536,7 +538,7 @@ Function SetupGUI
 	} else {
 		$FormSelectDiSKPane1.Controls | ForEach-Object {
 			if ($_ -is [System.Windows.Forms.RadioButton]) {
-				if ($_.Text -like (JoinMainFolder -Path $env:SystemDrive)) {
+				if ($_.Text -eq (JoinMainFolder -Path $env:SystemDrive)) {
 					$_.Checked = $True
 				}
 			}
@@ -1006,11 +1008,11 @@ function WaitEnd
 {
 	Write-Host "`n   Waiting for the queue" -ForegroundColor Green
 	for ($i=0; $i -lt $Global:AppQueue.Count; $i++) {
-		Write-Host "    * PID: $($Global:AppQueue[$i]['ID'])" -ForegroundColor Red
+		Write-Host "    * PID: $($Global:AppQueue[$i]['ID'])".PadRight(22) -NoNewline
 		if ((Get-Process -ID $($Global:AppQueue[$i]['ID']) -ErrorAction SilentlyContinue).Path -eq $Global:AppQueue[$i]['PATH']) {
 			Wait-Process -id $($Global:AppQueue[$i]['ID']) -ErrorAction SilentlyContinue
 		}
-		Write-Host "    - Completed`n"
+		Write-Host "    - Completed"
 	}
 	$Global:AppQueue = @()
 }
@@ -1158,7 +1160,7 @@ function InstallGUI
 		ProcessOther
 		$Install.Close()
 	}
-	$Install            = New-Object system.Windows.Forms.Form -Property @{
+	$Install           = New-Object system.Windows.Forms.Form -Property @{
 		autoScaleMode  = 2
 		Height         = 568
 		Width          = 450
@@ -1262,7 +1264,7 @@ function Mainpage
 	Write-Host "`n   Author: $($Global:UniqueID) ( $($Global:AuthorURL) )
 
    From: $($Global:UniqueID)'s Solutions
-   buildstring: 6.1.0.4.bs_release.210226-1208
+   buildstring: 6.1.0.5.bs_release.210226-1208
 
    INSTALLED SOFTWARE LIST ( total $($app.Count) items )
    ---------------------------------------------------"
