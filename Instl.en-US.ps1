@@ -1,15 +1,14 @@
 <#
 
-  Warning: In order to prevent overwriting after updating, please save as and then modify.
-
   PowerShell installation software
 
-  . THE MAIN FUNCTION
-    1. The installation package does not exist locally, and the download function is activated;
-    2. The default automatic download drive letter and priority download connection address can be modified by setting;
-	   The system type is automatically judged, and the download connection is automatically selected in order, and so on.
-    3. The drive letter can be specified, and the current system drive will be excluded after setting automatic.
-       When no available disk is found, the default setting is the current system disk;
+  . The main function
+    1. If the installation package does not exist locally, activate the download function;
+    2. When using the download function, it automatically judges the system type, automatically selects in order, and so on;
+    3. Automatically select drive letter:
+        3.1    The drive letter can be specified, and the current system drive will be excluded after setting automatic.
+               If no available disk is found, return to the current system disk;
+        3.2    The minimum required remaining free space can be set, the default is 1GB;
     4. Search file name supports fuzzy search, wildcard *;
     5. Queue, add to the queue after running the installer, and wait for the end;
     6. Search sequentially according to the preset structure:
@@ -18,47 +17,47 @@
            - Condition 1: System language: en-US, search condition: Instl.Packer*en-US*
            - Condition 2: Search for fuzzy file name: Instl.Packer*
            - Condition 3: Search the website to download the original file name: Instl.Packer.Latest
-    7. Dynamic function: add pre-run and post-run processing, go to function OpenApp {} to change the module;
+    7. Dynamic function: add pre-run and post-run processing, go to Function OpenApp {} to change the module;
     8. Support decompression package processing, etc.
 
-  . PREREQUISITES
-    - PowerShell 5.1 Or higher
+  .	Prerequisites
+    - PowerShell 5.1 or higher
 
-  . LINK
+  . Link
     - https://github.com/ilikeyi/powershell.install.software
     - https://gitee.com/ilikeyi/powershell.install.software
 
 
   Package configuration tutorial
 
- Package Configuration                                     Description
-("Windows Defender Control",                               Package name
- [Status]::Enable,                                         Status: Enable - enabled; Disable - disabled
- [Action]::Install,                                        Action: Install - install; NoInst - does not install after download; Unzip - only extract after download; To - install to directory
- [Mode]::Wait,                                             Operation mode: Wait - wait for completion; Fast - run directly
- "auto",                                                   After setting automatic, the current system disk will be excluded. If no available disk is found, the default setting is the current system disk; specify the drive letter [A:]-[Z:]; specify the path: \\192.168.1.1
- "Installation package\Tool",                              Directory Structure
- "https://www.sordum.org/files/download/defender-control/DefenderControl.zip", Default, including x86 download address
- "",                                                       x64 download link
- "",                                                       Arm64 download link
- "DefenderControl*",                                       File name fuzzy search (*)
- "/D",                                                     Operating parameters
- "1:DefenderControl:ini")                                  Dynamic module: choose option 1; DefenderControl = configuration file name; ini = type, go to function OpenApp {} to change the module
+ Package Configuration                                    Description
+("Windows Defender Control",                              Package name
+ [Status]::Enable,                                        Status: Enable - enabled; Disable - disabled
+ [Action]::Install,                                       Action: Install - install; NoInst - does not install after download; Unzip - only extract after download; To - install to directory
+ [Mode]::Wait,                                            Operation mode: Wait - wait for completion; Fast - run directly
+ "auto",                                                  After setting automatic, the current system disk will be excluded. If no available disk is found, the default setting is the current system disk; specify the drive letter [A:]-[Z:]; specify the path: \\192.168.1.1
+ "Installation package\Tool",                             Directory Structure
+ "https://www.sordum.org/files/download/d-control/dControl.zip", Default, including x86 download address
+ "",                                                      x64 download link
+ "",                                                      Arm64 download link
+ "dControl*",                                             File name fuzzy search (*)
+ "/D",                                                    Operating parameters
+ "1:dControl:ini")                                        Dynamic module: choose option 1; dControl = configuration file name; ini = type, go to Function OpenApp {} to change the module
 
  .Make configuration file
 
  - default
-   DefenderControl.ini Change to DefenderControl.Default.ini
+   dControl.ini Change to dControl.Default.ini
 
  - English
-   DefenderControl.ini Change to DefenderControl.en-US.ini
-   Open DefenderControl.en-US.ini and change Language=Auto to Language=English
+   dControl.ini Change to dControl.en-US.ini
+   Open dControl.en-US.ini and change Language=Auto to Language=English
 
  - Chinese
-   DefenderControl.ini Change to DefenderControl.zh-CN.ini
-   Open DefenderControl.zh-CN.ini and change Language=Auto to Language=Chinese_简体中文
+   dControl.ini Change to dControl.zh-CN.ini
+   Open dControl.zh-CN.ini and change Language=Auto to Language=Chinese_简体中文
 
-   Delete DefenderControl.ini after making it.
+   Delete dControl.ini after making it.
 
 #>
 
@@ -72,15 +71,22 @@ param
 	[Switch]$Silent
 )
 
+# Author
 $Global:UniqueID  = "Yi"
 $Global:AuthorURL = "https://fengyi.tel"
+
+# The minimum disk size is automatically selected during initialization: 1GB
+$Global:DiskMinSize = 1
+
+# Reset queue
 $Global:AppQueue = @()
 
-$Host.UI.RawUI.WindowTitle = "Installation software"
+# Title
+$Host.UI.RawUI.WindowTitle = "Install software"
 
 # All software configurations
 $app = @(
-	("$($Global:UniqueID)'s Personalized theme pack",
+	("$($Global:UniqueID)'s Dark personality theme pack",
 	 [Status]::Disable,
 	 [Action]::Install,
 	 [Mode]::Fast,
@@ -92,14 +98,26 @@ $app = @(
 	 "$($Global:UniqueID)*",
 	 "",
 	 ""),
+	 ("$($Global:UniqueID)'s Light personalized theme pack",
+	  [Status]::Disable,
+	  [Action]::Install,
+	  [Mode]::Fast,
+	  "auto",
+	  "Installation package\Theme pack",
+	  "$($Global:AuthorURL)/$($Global:UniqueID).Light.deskthemepack",
+	  "",
+	  "",
+	  "$($Global:UniqueID)*Light*",
+	  "",
+	  ""),
 	("Nvidia GEFORCE GAME READY DRIVER",
 	 [Status]::Disable,
 	 [Action]::Install,
 	 [Mode]::Queue,
 	 "auto",
-	 "Installation package\Device Driver\Graphics card",
+	 "Installation package\Driver\Graphics card",
 	 "",
-	 "https://us.download.nvidia.cn/Windows/461.92/461.92-desktop-win10-64bit-international-dch-whql.exe",
+	 "https://us.download.nvidia.cn/Windows/466.27/466.27-desktop-win10-64bit-international-dch-whql.exe",
 	 "",
 	 "*-desktop-win10-*-international-dch-whql",
 	 "-s -clean -noreboot -noeula",
@@ -122,7 +140,7 @@ $app = @(
 	 [Mode]::Queue,
 	 "auto",
 	 "Installation package\AIO",
-	 "https://github.com/abbodi1406/vcredist/releases/download/v0.45.0/VisualCppRedist_AIO_x86_x64_45.zip",
+	 "https://github.com/abbodi1406/vcredist/releases/download/v0.47.0/VisualCppRedist_AIO_x86_x64_47.zip",
 	 "",
 	 "",
 	 "VisualCppRedist*",
@@ -145,9 +163,9 @@ $app = @(
 	 [Action]::Install,
 	 [Mode]::Queue,
 	 "auto",
-	 "Installation package\Develop software",
-	 "https://www.python.org/ftp/python/3.9.2/python-3.9.2.exe",
-	 "https://www.python.org/ftp/python/3.9.2/python-3.9.2-amd64.exe",
+	 "Installation package\Develop",
+	 "https://www.python.org/ftp/python/3.9.4/python-3.9.4.exe",
+	 "https://www.python.org/ftp/python/3.9.4/python-3.9.4-amd64.exe",
 	 "",
 	 "python-*",
 	 "/quiet InstallAllUsers=1 PrependPath=1 Include_test=0",
@@ -157,7 +175,7 @@ $app = @(
 	 [Action]::Install,
 	 [Mode]::Queue,
 	 "auto",
-	 "Installation package\Music software",
+	 "Installation package\Music",
 	 "https://downmini.yun.kugou.com/web/kugou9229.exe",
 	 "",
 	 "",
@@ -169,26 +187,26 @@ $app = @(
 	 [Action]::Install,
 	 [Mode]::Queue,
 	 "auto",
-	 "Installation package\Music software",
+	 "Installation package\Music",
 	 "https://d1.music.126.net/dmusic/cloudmusicsetup2.7.6.198710.exe",
 	 "",
 	 "",
 	 "cloudmusicsetup*",
 	 "/S",
 	 ""),
-	("QQ music",
+	("QQ Music",
 	 [Status]::Disable,
 	 [Action]::Install,
 	 [Mode]::Queue,
 	 "auto",
-	 "Installation package\Music software",
+	 "Installation package\Music",
 	 "https://dldir1.qq.com/music/clntupate/QQMusic_YQQWinPCDL.exe",
 	 "",
 	 "",
 	 "QQMusicSetup",
 	 "",
 	 ""),
-	("Thunder 11",
+	("XunLei 11",
 	 [Status]::Disable,
 	 [Action]::Install,
 	 [Mode]::Queue,
@@ -212,7 +230,7 @@ $app = @(
 	 "PCQQ2021",
 	 "/S",
 	 ""),
-	("WeChat",
+	("Weixin",
 	 [Status]::Enable,
 	 [Action]::Install,
 	 [Mode]::Queue,
@@ -229,7 +247,7 @@ $app = @(
 	 [Action]::Install,
 	 [Mode]::Queue,
 	 "auto",
-	 "Installation package\Online TV",
+	 "Installation package\Video",
 	 "https://dldir1.qq.com/qqtv/TencentVideo11.17.7063.0.exe",
 	 "",
 	 "",
@@ -241,7 +259,7 @@ $app = @(
 	 [Action]::Install,
 	 [Mode]::Queue,
 	 "auto",
-	 "Installation package\Online TV",
+	 "Installation package\Video",
 	 "https://dl-static.iqiyi.com/hz/IQIYIsetup_z40.exe",
 	 "",
 	 "",
@@ -249,39 +267,49 @@ $app = @(
 	 "/S",
 	 "")
 )
-# Finally, please don't put , at the end, otherwise you will understand.
+# Finally, please don't use the, sign at the end, otherwise you will understand.
 
+# Status
 Enum Status
 {
 	Enable
 	Disable
 }
 
+# Operating mode
 Enum Mode
 {
 	Wait    # Wait for completion
-	Fast    # Run directly
+	Fast    # Fast running
 	Queue   # Queue
 }
 
+# Run action
 Enum Action
 {
 	Install # installation
-	NoInst  # Do not install after download
+	NoInst  # Do not install after downloading
 	To      # Download the compressed package to the directory
 	Unzip   # Only unzip after downloading
 }
 
-function GetArchitecture
+<#
+	.System structure
+#>
+# Get system architecture
+Function GetArchitecture
 {
+	# Obtain from the registry: user-specified system architecture
 	if (Get-ItemProperty -Path "HKCU:\SOFTWARE\$($Global:UniqueID)\Install" -Name "Architecture" -ErrorAction SilentlyContinue) {
 		$Global:InstlArchitecture = Get-ItemPropertyValue -Path "HKCU:\SOFTWARE\$($Global:UniqueID)\Install" -Name "Architecture"
 		return
 	}
 
+	# Initialization: system architecture
 	SetArchitecture -Type $env:PROCESSOR_ARCHITECTURE
 }
 
+# Set up the system architecture
 Function SetArchitecture
 {
 	param
@@ -299,28 +327,55 @@ Function SetArchitecture
 	$Global:InstlArchitecture = $Type
 }
 
-function SetFreeDisk
+<#
+	.Automatically select disk
+#>
+# Get automatic disk selection
+Function SetFreeDiskTo
 {
+	<#
+		.Obtain from the registry: select the disk and judge, if the disk is forcibly set, skip checking the remaining disk space, continue
+	#>
 	if (Get-ItemProperty -Path "HKCU:\SOFTWARE\$($Global:UniqueID)\Install" -Name "DiskTo" -ErrorAction SilentlyContinue) {
 		$GetDiskTo = Get-ItemPropertyValue -Path "HKCU:\SOFTWARE\$($Global:UniqueID)\Install" -Name "DiskTo"
-		if (TestAvailableDisk -Path $GetDiskTo)	{
+		if (TestAvailableDisk -Path $GetDiskTo) {
 			$Global:FreeDiskTo = $GetDiskTo
 			return
 		}
 	}
 
+	# Search disk conditions, exclude system disks
 	$drives = Get-PSDrive -PSProvider FileSystem | Where-Object { -not ((JoinMainFolder -Path $env:SystemDrive) -eq $_.Root) } | Select-Object -ExpandProperty 'Root'
+
+	# Get from the registry whether to check the disk free space
+	$GetDiskStatus = Get-ItemPropertyValue -Path "HKCU:\SOFTWARE\$($Global:UniqueID)\Install" -Name "DiskStatus"
+
+	# Get the selected disk from the registry
+	$GetDiskMinSize = Get-ItemPropertyValue -Path "HKCU:\SOFTWARE\$($Global:UniqueID)\Install" -Name "DiskMinSize"
+
+	# Search disk conditions, exclude system disks
 	foreach ($drive in $drives) {
-		if (TestAvailableDisk -Path $drive)	{
-			SetNewFreeDisk -Disk $drive
-			return
+		if (TestAvailableDisk -Path $drive) {
+			switch ($GetDiskStatus) {
+				1 {
+					if (VerifyAvailableSize -Disk $drive -Size $GetDiskMinSize) {
+						SetNewFreeDiskTo -Disk $drive
+						return
+					}
+				}
+				Default {
+					SetNewFreeDiskTo -Disk $drive
+					return
+				}
+			}
 		}
 	}
 
-	SetNewFreeDisk -Disk (JoinMainFolder -Path $env:SystemDrive)
+	# No available disk found, initialization: current system disk
+	SetNewFreeDiskTo -Disk (JoinMainFolder -Path $env:SystemDrive)
 }
 
-Function SetNewFreeDisk
+Function SetNewFreeDiskTo
 {
 	param
 	(
@@ -337,41 +392,204 @@ Function SetNewFreeDisk
 	$Global:FreeDiskTo = $Disk
 }
 
+Function SetFreeDiskSize
+{
+	<#
+		.Obtain the selected disk from the registry and judge. If the disk is forcibly set, skip checking the remaining disk space and continue
+	#>
+	if (Get-ItemProperty -Path "HKCU:\SOFTWARE\$($Global:UniqueID)\Install" -Name "DiskMinSize" -ErrorAction SilentlyContinue) {
+		$GetDiskMinSize = Get-ItemPropertyValue -Path "HKCU:\SOFTWARE\$($Global:UniqueID)\Install" -Name "DiskMinSize"
+
+		if ([string]::IsNullOrEmpty($GetDiskMinSize)) {
+			SetNewFreeDiskSize -Size $Global:DiskMinSize
+		}
+
+		if (-not ($GetDiskMinSize -ge $Global:DiskMinSize)) {
+			SetNewFreeDiskSize -Size $Global:DiskMinSize
+		}
+	} else {
+		SetNewFreeDiskSize -Size $Global:DiskMinSize
+	}
+}
+
+Function SetNewFreeDiskSize
+{
+	param
+	(
+		[string]$Size
+	)
+
+	$FullPath = "HKCU:\SOFTWARE\$($Global:UniqueID)\Install"
+
+	if (-not (Test-Path $FullPath)) {
+		New-Item -Path $FullPath -Force -ErrorAction SilentlyContinue | Out-Null
+	}
+	New-ItemProperty -LiteralPath $FullPath -Name "DiskMinSize" -Value $Size -PropertyType String -Force -ea SilentlyContinue | Out-Null
+}
+
+Function SetFreeDiskAvailable
+{
+	<#
+		.Get from the registry whether to check the disk free space
+	#>
+	if (Get-ItemProperty -Path "HKCU:\SOFTWARE\$($Global:UniqueID)\Install" -Name "DiskStatus" -ErrorAction SilentlyContinue) {
+		$GetDiskStatus = Get-ItemPropertyValue -Path "HKCU:\SOFTWARE\$($Global:UniqueID)\Install" -Name "DiskStatus"
+
+		if ([string]::IsNullOrEmpty($GetDiskStatus)) {
+			SetNewFreeDiskAvailable -Status 1
+		} else {
+			$Global:FreeDiskStatus = $GetDiskStatus
+		}
+	} else {
+		SetNewFreeDiskAvailable -Status 1
+	}
+}
+
+Function SetNewFreeDiskAvailable
+{
+	param
+	(
+		[string]$Status
+	)
+
+	$FullPath = "HKCU:\SOFTWARE\$($Global:UniqueID)\Install"
+
+	if (-not (Test-Path $FullPath)) {
+		New-Item -Path $FullPath -Force -ErrorAction SilentlyContinue | Out-Null
+	}
+	New-ItemProperty -LiteralPath $FullPath -Name "DiskStatus" -Value $Status -PropertyType String -Force -ea SilentlyContinue | Out-Null
+
+	$Global:FreeDiskStatus = $Status
+}
+
+<#
+	.Verify the available disk size
+#>
+Function VerifyAvailableSize
+{
+	param
+	(
+		[string]$Disk,
+		[int]$Size
+	)
+
+	$TempCheckVerify = $false
+
+	Get-PSDrive -PSProvider FileSystem -ErrorAction SilentlyContinue | Where-Object { ((JoinMainFolder -Path $Disk) -eq $_.Root) } | ForEach-Object {
+		if (($_.Free - $_.Used) -gt (ConvertSize -From GB -To Bytes $Size)) {
+			$TempCheckVerify = $True
+		} else {
+			$TempCheckVerify = $false
+		}
+	}
+
+	return $TempCheckVerify
+}
+
+Function ConvertSize {
+	param (
+		[validateset("Bytes","KB","MB","GB","TB")]
+		[string]$From,
+		[validateset("Bytes","KB","MB","GB","TB")]
+		[string]$To,
+		[Parameter(Mandatory=$true)]
+		[double]$Value,
+		[int]$Precision = 4
+	)
+	switch($From) {
+		"Bytes" { $value = $Value }
+		"KB" { $value = $Value * 1024 }
+		"MB" { $value = $Value * 1024 * 1024 }
+		"GB" { $value = $Value * 1024 * 1024 * 1024 }
+		"TB" { $value = $Value * 1024 * 1024 * 1024 * 1024 }
+	}
+	switch ($To) {
+		"Bytes" {return $value}
+		"KB" { $Value = $Value/1KB }
+		"MB" { $Value = $Value/1MB }
+		"GB" { $Value = $Value/1GB }
+		"TB" { $Value = $Value/1TB }
+	}
+
+	return [Math]::Round($value,$Precision,[MidPointRounding]::AwayFromZero)
+}
+
 Function SetupGUI
 {
 	GetArchitecture
-	SetFreeDisk
+	SetFreeDiskSize
+	SetFreeDiskAvailable
+	SetFreeDiskTo
 
 	Add-Type -AssemblyName System.Windows.Forms
 	Add-Type -AssemblyName System.Drawing
 	[System.Windows.Forms.Application]::EnableVisualStyles()
 
+	Function GetDiskAvailable {
+		$GetSaveDiskAvailable = Get-ItemPropertyValue -Path "HKCU:\SOFTWARE\$($Global:UniqueID)\Install" -Name "DiskStatus"
+		$SelectLowSize.Text = Get-ItemPropertyValue -Path "HKCU:\SOFTWARE\$($Global:UniqueID)\Install" -Name "DiskMinSize"
+		switch ($GetSaveDiskAvailable) {
+			1 {
+				$FormSelectDiSKLowSize.Checked = $True
+				$SelectLowSize.Enabled = $True
+			}
+			Default {
+				$FormSelectDiSKLowSize.Checked = $False
+				$SelectLowSize.Enabled = $False
+			}
+		}
+	}
+	$GetDiskAvailable_Click = {
+		if ($FormSelectDiSKLowSize.Checked) {
+			$SelectLowSize.Enabled = $True
+		} else {
+			$SelectLowSize.Enabled = $False
+		}
+	}
 	$Canel_Click = {
 		$FormSelectDiSK.Close()
 	}
 	$OK_ArchitectureARM64_Click = {
-		$SoftwareTipsErrorMsg.Text = "Prefer arm64 download address, select in order: x64, x86."
+		$SoftwareTipsErrorMsg.Text = "Preferred arm64 download address, select in order: x64, x86."
 	}
 	$OK_ArchitectureX64_Click = {
-		$SoftwareTipsErrorMsg.Text = "Prefer the x64 download address, and select in order: x86."
+		$SoftwareTipsErrorMsg.Text = "Preferred x64 download address, and select in order: x86."
 	}
 	$OK_ArchitectureX86_Click = {
 		$SoftwareTipsErrorMsg.Text = "Only select the x86 download address."
 	}
 	$OK_Click = {
-		$FormSelectDiSK.Hide()
 		if ($ArchitectureARM64.Checked) { SetArchitecture -Type "ARM64" }
 		if ($ArchitectureX64.Checked) { SetArchitecture -Type "AMD64" }
 		if ($ArchitectureX86.Checked) { SetArchitecture -Type "x86" }
 
+		if ($FormSelectDiSKLowSize.Checked) {
+			SetNewFreeDiskAvailable -Status 1
+		} else {
+			SetNewFreeDiskAvailable -Status 2
+		}
+
 		$FormSelectDiSKPane1.Controls | ForEach-Object {
 			if ($_ -is [System.Windows.Forms.RadioButton]) {
 				if ($_.Checked) {
-					SetNewFreeDisk -Disk $_.Text
+					if ($FormSelectDiSKLowSize.Checked) {
+						if (VerifyAvailableSize -Disk $_.Text -Size $SelectLowSize.Text) {
+							SetNewFreeDiskSize -Size $($SelectLowSize.Text)
+							SetNewFreeDiskTo -Disk $_.Text
+							$FormSelectDiSK.Close()
+						} else {
+							$ErrorMsg.Text = "Error: Insufficient free space on selected disk."
+						}
+					} else {
+						SetNewFreeDiskSize -Size $($SelectLowSize.Text)
+						SetNewFreeDiskTo -Disk $_.Text
+						$FormSelectDiSK.Close()
+					}
 				}
+			} else {
+				$ErrorMsg.Text = "Error: No disk selected by default"
 			}
 		}
-		$FormSelectDiSK.Close()
 	}
 	$FormSelectDiSK    = New-Object system.Windows.Forms.Form -Property @{
 		autoScaleMode  = 2
@@ -420,8 +638,8 @@ Function SetupGUI
 		add_Click      = $OK_ArchitectureX86_Click
 	}
 	$SoftwareTips      = New-Object system.Windows.Forms.FlowLayoutPanel -Property @{
-		Height         = 50
-		Width          = 392
+		Height         = 40
+		Width          = 386
 		BorderStyle    = 0
 		autoSizeMode   = 0
 		autoScroll     = $False
@@ -433,21 +651,56 @@ Function SetupGUI
 		AutoSize       = 1
 		Text           = ""
 	}
-	$FormSelectDiSKTitle = New-Object System.Windows.Forms.Label -Property @{
+	$FormSelectDiSKSize = New-Object System.Windows.Forms.Label -Property @{
+		Height         = 22
+		Width          = 395
+		Text           = "When automatically selecting available disks"
+		Location       = '10,115'
+	}
+	$FormSelectDiSKLowSize = New-Object System.Windows.Forms.CheckBox -Property @{
 		Height         = 22
 		Width          = 360
-		Text           = "Select auto download drive letter"
-		Location       = '10,130'
+		Text           = "Check the minimum free remaining space"
+		Location       = '26,140'
+		add_Click      = $GetDiskAvailable_Click
+	}
+	$SelectLowSize     = New-Object System.Windows.Forms.NumericUpDown -Property @{
+		Height         = 22
+		Width          = 60
+		Location       = "45,165"
+		Value          = 1
+		Minimum        = 1
+		Maximum        = 999999
+		TextAlign      = 1
+		add_Click      = $RefresISOLabelNEW_Click
+	}
+	$SelectLowUnit     = New-Object System.Windows.Forms.Label -Property @{
+		Height         = 22
+		Width          = 80
+		Text           = "GB"
+		Location       = "115,168"
+	}
+	$FormSelectDiSKTitle = New-Object System.Windows.Forms.Label -Property @{
+		Height         = 22
+		Width          = 380
+		Text           = "Disk is used by default:"
+		Location       = '24,205'
 	}
 	$FormSelectDiSKPane1 = New-Object system.Windows.Forms.FlowLayoutPanel -Property @{
-		Height         = 300
-		Width          = 400
+		Height         = 210
+		Width          = 380
 		BorderStyle    = 0
 		autoSizeMode   = 0
 		autoScroll     = $true
-		Padding        = 4
+		Padding        = 0
 		Dock           = 0
-		Location       = '10,150'
+		Location       = '24,228'
+	}
+	$ErrorMsg          = New-Object system.Windows.Forms.Label -Property @{
+		Location       = "10,455"
+		Height         = 26
+		Width          = 408
+		Text           = ""
 	}
 	$Start             = New-Object system.Windows.Forms.Button -Property @{
 		UseVisualStyleBackColor = $True
@@ -463,14 +716,19 @@ Function SetupGUI
 		Height         = 36
 		Width          = 202
 		add_Click      = $Canel_Click
-		Text           = "Cancel"
+		Text           = "Canel"
 	}
 	$FormSelectDiSK.controls.AddRange((
 		$ArchitectureTitle,
 		$GroupArchitecture,
 		$SoftwareTips,
+		$FormSelectDiSKSize,
+		$FormSelectDiSKLowSize,
+		$SelectLowSize,
+		$SelectLowUnit,
 		$FormSelectDiSKTitle,
 		$FormSelectDiSKPane1,
+		$ErrorMsg,
 		$Start,
 		$Canel
 	))
@@ -502,7 +760,7 @@ Function SetupGUI
 			} else {
 				$ArchitectureARM64.Enabled = $False
 			}
-			
+
 			if ($env:PROCESSOR_ARCHITECTURE -eq "AMD64") {
 				$ArchitectureX64.Enabled = $True
 			} else {
@@ -513,13 +771,12 @@ Function SetupGUI
 		}
 	}
 
-	$drives = Get-PSDrive -PSProvider FileSystem | Select-Object -ExpandProperty 'Root'
-	foreach ($drive in $drives) {
-		if (TestAvailableDisk -Path $drive)	{
-			$RadioButton   = New-Object System.Windows.Forms.RadioButton -Property @{
-				Height = 26
-				Width  = 390
-				Text   = $drive
+	Get-PSDrive -PSProvider FileSystem | ForEach-Object {
+		if (TestAvailableDisk -Path $_.Root) {
+			$RadioButton = New-Object System.Windows.Forms.RadioButton -Property @{
+				Height = 20
+				Width  = 370
+				Text   = $_.Root
 			}
 
 			$FormSelectDiSKPane1.controls.AddRange($RadioButton)
@@ -527,7 +784,7 @@ Function SetupGUI
 	}
 
 	$GetDiskTo = Get-ItemPropertyValue -Path "HKCU:\SOFTWARE\$($Global:UniqueID)\Install" -Name "DiskTo"
-	if (TestAvailableDisk -Path $GetDiskTo)	{
+	if (TestAvailableDisk -Path $GetDiskTo) {
 		$FormSelectDiSKPane1.Controls | ForEach-Object {
 			if ($_ -is [System.Windows.Forms.RadioButton]) {
 				if ($_.Text -eq $GetDiskTo) {
@@ -545,11 +802,13 @@ Function SetupGUI
 		}
 	}
 
+	GetDiskAvailable	
+
 	$FormSelectDiSK.FormBorderStyle = 'Fixed3D'
 	$FormSelectDiSK.ShowDialog() | Out-Null
 }
 
-function TestAvailableDisk
+Function TestAvailableDisk
 {
 	param
 	(
@@ -576,7 +835,7 @@ function TestAvailableDisk
 	}
 }
 
-function TestURI
+Function TestURI
 {
 	Param
 	(
@@ -607,9 +866,7 @@ function TestURI
 			} else {
 				if ($test.statuscode -ne 200) { $False } else { $True }
 			}
-		}
-		Catch
-		{
+		} Catch {
 			write-verbose -message $_.exception
 			if ($Detail) {
 				$objProp = [ordered]@{
@@ -625,7 +882,7 @@ function TestURI
 	}
 }
 
-function CheckCatalog
+Function CheckCatalog
 {
 	Param
 	(
@@ -642,7 +899,7 @@ function CheckCatalog
 	}
 }
 
-function JoinUrl
+Function JoinUrl
 {
 	param
 	(
@@ -675,7 +932,7 @@ Function JoinMainFolder
 	}
 }
 
-function StartInstallSoftware
+Function StartInstallSoftware
 {
 	param
 	(
@@ -694,7 +951,9 @@ function StartInstallSoftware
 	)
 
 	GetArchitecture
-	SetFreeDisk
+	SetFreeDiskSize
+	SetFreeDiskAvailable
+	SetFreeDiskTo
 
 	Switch ($status)
 	{
@@ -763,21 +1022,21 @@ function StartInstallSoftware
 	{
 		auto
 		{
-			$drives = Get-PSDrive -PSProvider FileSystem | Select-Object -ExpandProperty 'Root'
-			foreach ($drive in $drives) {			
-				$tempoutputfoldoer = Join-Path -Path $($drive) -ChildPath "$($structure)"
-				Get-ChildItem -Path $tempoutputfoldoer -File -Filter "*$($filename)*$((Get-Culture).Name)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
-					$OutTo = Join-Path -Path "$($drive)" -ChildPath "$($structure)"
+			Get-PSDrive -PSProvider FileSystem | ForEach-Object {
+				$TempRootPath = $_.Root
+				$tempoutputfoldoer = Join-Path -Path $($TempRootPath) -ChildPath "$($structure)"
+				Get-ChildItem -Path $tempoutputfoldoer -Filter "*$($filename)*$((Get-Culture).Name)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
+					$OutTo = Join-Path -Path "$($TempRootPath)" -ChildPath "$($structure)"
 					$OutAny = $($_.fullname)
 					break
 				}
-				Get-ChildItem -Path $tempoutputfoldoer -File -Filter "*$($filename)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
-					$OutTo = Join-Path -Path "$($drive)" -ChildPath "$($structure)"
+				Get-ChildItem -Path $tempoutputfoldoer -Filter "*$($filename)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
+					$OutTo = Join-Path -Path "$($TempRootPath)" -ChildPath "$($structure)"
 					$OutAny = $($_.fullname)
 					break
 				}
-				Get-ChildItem -Path $tempoutputfoldoer -File -Filter "*$($packer)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
-					$OutTo = Join-Path -Path "$($drive)" -ChildPath "$($structure)"
+				Get-ChildItem -Path $tempoutputfoldoer -Filter "*$($packer)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
+					$OutTo = Join-Path -Path "$($TempRootPath)" -ChildPath "$($structure)"
 					$OutAny = $($_.fullname)
 					break
 				}
@@ -789,15 +1048,15 @@ function StartInstallSoftware
 		{
 			$OutTo = Join-Path -Path $($todisk) -ChildPath "$($structure)"
 			$OutAny = Join-Path -Path $($todisk) -ChildPath "$($structure)\$SaveToName"
-			Get-ChildItem -Path $OutTo -File -Filter "*$($filename)*$((Get-Culture).Name)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
+			Get-ChildItem -Path $OutTo -Filter "*$($filename)*$((Get-Culture).Name)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
 				$OutAny = $($_.fullname)
 				break
 			}
-			Get-ChildItem -Path $OutTo -File -Filter "*$($filename)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
+			Get-ChildItem -Path $OutTo -Filter "*$($filename)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
 				$OutAny = $($_.fullname)
 				break
 			}
-			Get-ChildItem -Path $OutTo -File -Filter "*$($packer)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
+			Get-ChildItem -Path $OutTo -Filter "*$($packer)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
 				$OutAny = $($_.fullname)
 				break
 			}
@@ -812,17 +1071,17 @@ function StartInstallSoftware
 			{
 				Install
 				{
-					Get-ChildItem -Path $OutTo -File -Filter "*$($filename)*$((Get-Culture).Name)*.exe" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
+					Get-ChildItem -Path $OutTo -Filter "*$($filename)*$((Get-Culture).Name)*.exe" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
 						Write-Host "    - Locally exist: $($_.fullname)"
 						OpenApp -filename $($_.fullname) -param $param -mode $mode -method $method
 						break
 					}
-					Get-ChildItem -Path $OutTo -File -Filter "*$($filename)*.exe" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
+					Get-ChildItem -Path $OutTo -Filter "*$($filename)*.exe" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
 						Write-Host "    - Locally exist: $($_.fullname)"
 						OpenApp -filename $($_.fullname) -param $param -mode $mode -method $method
 						break
 					}
-					Get-ChildItem -Path $OutTo -File -Filter "*$($packer)*.exe" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
+					Get-ChildItem -Path $OutTo -Filter "*$($packer)*.exe" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
 						Write-Host "   - $($lang.LocallyExist)`n     $($_.fullname)"
 						OpenApp -filename $($_.fullname) -param $param -mode $mode -method $method
 						break
@@ -851,17 +1110,17 @@ function StartInstallSoftware
 					} else {
 						Write-Host "      - An error occurred during the download`n" -ForegroundColor Red
 					}
-					Get-ChildItem -Path $OutTo -File -Filter "*$($filename)*$((Get-Culture).Name)*.exe" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
+					Get-ChildItem -Path $OutTo -Filter "*$($filename)*$((Get-Culture).Name)*.exe" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
 						Write-Host "    - Locally exist: $($_.fullname)"
 						OpenApp -filename $($_.fullname) -param $param -mode $mode -method $method
 						break
 					}
-					Get-ChildItem -Path $OutTo -File -Filter "*$($filename)*.exe" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
+					Get-ChildItem -Path $OutTo -Filter "*$($filename)*.exe" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
 						Write-Host "    - Locally exist: $($_.fullname)"
 						OpenApp -filename $($_.fullname) -param $param -mode $mode -method $method
 						break
 					}
-					Get-ChildItem -Path $OutTo -File -Filter "*$($packer)*.exe" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
+					Get-ChildItem -Path $OutTo -Filter "*$($packer)*.exe" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
 						Write-Host "   - $($lang.LocallyExist)`n     $($_.fullname)"
 						OpenApp -filename $($_.fullname) -param $param -mode $mode -method $method
 						break
@@ -967,7 +1226,7 @@ function StartInstallSoftware
 	}
 }
 
-function Archive
+Function Archive
 {
 	param
 	(
@@ -985,7 +1244,7 @@ function Archive
 	}
 }
 
-function Compressing
+Function Compressing
 {
 	if (Test-Path "$env:ProgramFiles\7-Zip\7z.exe") {
 		$script:Zip = "$env:ProgramFiles\7-Zip\7z.exe"
@@ -997,27 +1256,27 @@ function Compressing
 		return $true
 	}
 
-	if (Test-Path "$env:SystemDrive\$($Global:UniqueID)\$($Global:UniqueID)\AIO\7z.exe") {
-		$script:Zip = "$env:SystemDrive\$($Global:UniqueID)\$($Global:UniqueID)\AIO\7z.exe"
+	if (Test-Path "$env:SystemDrive\$($Global:UniqueID)\$($Global:UniqueID)\7zPacker\7z.exe") {
+		$script:Zip = "$env:SystemDrive\$($Global:UniqueID)\$($Global:UniqueID)\7zPacker\7z.exe"
 		return $true
 	}
 	return $false
 }
 
-function WaitEnd
+Function WaitEnd
 {
 	Write-Host "`n   Waiting for the queue" -ForegroundColor Green
 	for ($i=0; $i -lt $Global:AppQueue.Count; $i++) {
-		Write-Host "    * PID: $($Global:AppQueue[$i]['ID'])".PadRight(22) -NoNewline
+		Write-Host "    * PID: $($Global:AppQueue[$i]['ID'])".PadRight(16) -NoNewline
 		if ((Get-Process -ID $($Global:AppQueue[$i]['ID']) -ErrorAction SilentlyContinue).Path -eq $Global:AppQueue[$i]['PATH']) {
 			Wait-Process -id $($Global:AppQueue[$i]['ID']) -ErrorAction SilentlyContinue
 		}
-		Write-Host "    - Completed"
+		Write-Host "    - Completed" -ForegroundColor Yellow
 	}
 	$Global:AppQueue = @()
 }
 
-function OpenApp
+Function OpenApp
 {
 	param
 	(
@@ -1105,7 +1364,7 @@ function OpenApp
 	}
 }
 
-function ToMainpage
+Function ToMainpage
 {
 	param
 	(
@@ -1116,16 +1375,15 @@ function ToMainpage
 	exit
 }
 
-function ObtainAndInstall
+Function ObtainAndInstall
 {
-	Write-Host "`n   INSTALLING SOFTWARE"
-	Write-Host "   ---------------------------------------------------"
+	Write-Host "`n   INSTALLING SOFTWARE`n   ---------------------------------------------------"
 	for ($i=0; $i -lt $app.Count; $i++) {
 		StartInstallSoftware -appname $app[$i][0] -status $app[$i][1] -act $app[$i][2] -mode $app[$i][3] -todisk $app[$i][4] -structure $app[$i][5] -url $app[$i][6] -urlx64 $app[$i][7] -urlarm64 $app[$i][8] -filename $app[$i][9] -param $app[$i][10] -method $app[$i][11]
 	}
 }
 
-function InstallGUI
+Function InstallGUI
 {
 	Add-Type -AssemblyName System.Windows.Forms
 	Add-Type -AssemblyName System.Drawing
@@ -1240,7 +1498,7 @@ function InstallGUI
 	$Install.ShowDialog() | Out-Null
 }
 
-function ShowList
+Function ShowList
 {
 	for ($i=0; $i -lt $app.Count; $i++)
 	{
@@ -1258,16 +1516,15 @@ function ShowList
 	}
 }
 
-function Mainpage
+Function Mainpage
 {
 	Clear-Host
 	Write-Host "`n   Author: $($Global:UniqueID) ( $($Global:AuthorURL) )
 
    From: $($Global:UniqueID)'s Solutions
-   buildstring: 6.1.0.5.bs_release.210226-1208
+   buildstring: 7.0.0.1.bs_release.210226-1208
 
-   INSTALLED SOFTWARE LIST ( total $($app.Count) items )
-   ---------------------------------------------------"
+   INSTALLED SOFTWARE LIST ( total $($app.Count) items )`n   ---------------------------------------------------"
 }
 
 $GroupCleanRun = @(
@@ -1279,14 +1536,14 @@ $GroupCleanRun = @(
 	"Thunder"
 )
 
-function CleanRun {
+Function CleanRun {
 	Write-Host "   - Delete startup items"
 	foreach ($nsf in $GroupCleanRun) {
 		Remove-ItemProperty -Name $nsf -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" -ErrorAction SilentlyContinue | Out-Null
 	}
 }
 
-function ProcessOther
+Function ProcessOther
 {
 	Write-Host "`n   Processing other:" -ForegroundColor Green
 
@@ -1304,7 +1561,7 @@ function ProcessOther
 	#Rename-Item-NewName "Google Chrome.lnk"  -Path ".\New Google Chrome.lnk" -ErrorAction SilentlyContinue | Out-Null
 }
 
-function initialization
+Function initialization
 {
 }
 
