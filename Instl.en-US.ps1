@@ -188,7 +188,7 @@ $app = @(
 	 [Mode]::Queue,
 	 "auto",
 	 "Installation package\Music",
-	 "https://d1.music.126.net/dmusic/cloudmusicsetup2.7.6.198710.exe",
+	 "https://d1.music.126.net/dmusic/cloudmusicsetup2.8.0.198822.exe",
 	 "",
 	 "",
 	 "cloudmusicsetup*",
@@ -212,7 +212,7 @@ $app = @(
 	 [Mode]::Queue,
 	 "auto",
 	 "Installation package\Download tool",
-	 "https://down.sandai.net/thunder11/XunLeiWebSetup11.1.10.1598gw.exe",
+	 "https://down.sandai.net/thunder11/XunLeiWebSetup11.1.12.1692gw.exe",
 	 "",
 	 "",
 	 "XunLeiWebSetup11*",
@@ -248,7 +248,7 @@ $app = @(
 	 [Mode]::Queue,
 	 "auto",
 	 "Installation package\Video",
-	 "https://dldir1.qq.com/qqtv/TencentVideo11.17.7063.0.exe",
+	 "https://dldir1.qq.com/qqtv/TencentVideo11.19.3049.0.exe",
 	 "",
 	 "",
 	 "TencentVideo*",
@@ -504,7 +504,7 @@ Function ConvertSize {
 		"TB" { $value = $Value * 1024 * 1024 * 1024 * 1024 }
 	}
 	switch ($To) {
-		"Bytes" {return $value}
+		"Bytes" { return $value }
 		"KB" { $Value = $Value/1KB }
 		"MB" { $Value = $Value/1MB }
 		"GB" { $Value = $Value/1GB }
@@ -569,6 +569,7 @@ Function SetupGUI
 			SetNewFreeDiskAvailable -Status 2
 		}
 
+		$VerifyAvailableSelect = 0
 		$FormSelectDiSKPane1.Controls | ForEach-Object {
 			if ($_ -is [System.Windows.Forms.RadioButton]) {
 				if ($_.Checked) {
@@ -578,7 +579,7 @@ Function SetupGUI
 							SetNewFreeDiskTo -Disk $_.Text
 							$FormSelectDiSK.Close()
 						} else {
-							$ErrorMsg.Text = "Error: Insufficient free space on selected disk."
+							$VerifyAvailableSelect = 1
 						}
 					} else {
 						SetNewFreeDiskSize -Size $($SelectLowSize.Text)
@@ -586,9 +587,11 @@ Function SetupGUI
 						$FormSelectDiSK.Close()
 					}
 				}
-			} else {
-				$ErrorMsg.Text = "Error: No disk selected by default"
 			}
+		}
+		switch ($VerifyAvailableSelect) {
+			0 { $ErrorMsg.Text = "Error: No disk selected by default" }
+			1 { $ErrorMsg.Text = "Error: Insufficient free space on selected disk" }
 		}
 	}
 	$FormSelectDiSK    = New-Object system.Windows.Forms.Form -Property @{
