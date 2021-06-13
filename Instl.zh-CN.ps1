@@ -476,7 +476,7 @@ Function VerifyAvailableSize
 	$TempCheckVerify = $false
 
 	Get-PSDrive -PSProvider FileSystem -ErrorAction SilentlyContinue | Where-Object { ((JoinMainFolder -Path $Disk) -eq $_.Root) } | ForEach-Object {
-		if (($_.Free - $_.Used) -gt (ConvertSize -From GB -To Bytes $Size)) {
+		if ($_.Free -gt (ConvertSize -From GB -To Bytes $Size)) {
 			$TempCheckVerify = $True
 		} else {
 			$TempCheckVerify = $false
