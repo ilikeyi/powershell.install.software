@@ -25,7 +25,6 @@
 
   . 连接
   	- https://github.com/ilikeyi/powershell.install.software
-  	- https://gitee.com/ilikeyi/powershell.install.software
 
 
   软件包配置教程
@@ -44,7 +43,7 @@
  "dfControl*",                                            文件名模糊查找 (*)
  "/D",                                                    运行参数
  "",                                                      运行前
- "1:dfControl:ini")                                       运行后：选择方案 1；dfControl = 配置文件名；ini = 类型，前往 Function OpenApp {} 处更改该模块
+ "")                                                      运行后：选择方案 1；dfControl = 配置文件名；ini = 类型，前往 Function OpenApp {} 处更改该模块
 
  .制作配置文件
 
@@ -95,7 +94,7 @@ $app = @(
 	 "auto",
 	 "安装包\主题包",
 	 "",
-	 "$($Global:AuthorURL)/$($Global:UniqueID).deskthemepack",
+	 "https://fengyi.tel/Yi.deskthemepack",
 	 "",
 	 "",
 	 "$($Global:UniqueID)*",
@@ -109,27 +108,41 @@ $app = @(
 	 "auto",
 	 "安装包\主题包",
 	 "",
-	 "$($Global:AuthorURL)/$($Global:UniqueID).Light.deskthemepack",
+	 "https://fengyi.tel/Yi.Light.deskthemepack",
 	 "",
 	 "",
 	 "$($Global:UniqueID)*Light*",
 	 "",
 	 "",
 	 ""),
-	("Nvidia GEFORCE GAME READY DRIVER",
+	("Google Chrome",
 	 [Status]::Disable,
 	 [Action]::Install,
-	 [Mode]::Queue,
-	 "auto",
-	 "安装包\驱动程序\显卡",
+	 [Mode]::Fast,
+	 "Installation package\Browser",
 	 "",
 	 "",
-	 "https://us.download.nvidia.cn/Windows/466.27/466.27-desktop-win10-64bit-international-dch-whql.exe",
+	 "https://dl.google.com/chrome/install/latest/chrome_installer.exe",
 	 "",
-	 "*-desktop-win10-*-international-dch-whql",
-	 "-s -clean -noreboot -noeula",
 	 "",
-	 ""),
+	 "Chrome*",
+	 "/silent /install",
+	 "",
+	 "Chrome"),
+	("Mozilla Firefox",
+	  [Status]::Disable,
+	  [Action]::Install,
+	  [Mode]::Fast,
+	  "Installation package\Browser",
+	  "",
+	  "",
+	  "http://ftp.mozilla.org/pub/firefox/releases/98.0/win32/zh-CN/Firefox%20Setup%2098.0.exe",
+	  "http://ftp.mozilla.org/pub/firefox/releases/98.0/win64/zh-CN/Firefox%20Setup%2098.0.exe",
+	  "",
+	  "",
+	  "Firefox*",
+	  "",
+	  ""),
 	("Sysinternals Suite",
 	 [Status]::Disable,
 	 [Action]::To,
@@ -151,7 +164,7 @@ $app = @(
 	 "auto",
 	 "安装包\AIO",
 	 "",
-	 "https://github.com/abbodi1406/vcredist/releases/download/v0.54.0/VisualCppRedist_AIO_x86_x64_54.zip",
+	 "https://github.com/abbodi1406/vcredist/releases/download/v0.58.0/VisualCppRedist_AIO_x86_x64_58.zip",
 	 "",
 	 "",
 	 "VisualCppRedist*",
@@ -179,11 +192,25 @@ $app = @(
 	 "auto",
 	 "安装包\开发软件",
 	 "",
-	 "https://www.python.org/ftp/python/3.9.4/python-3.9.4.exe",
-	 "https://www.python.org/ftp/python/3.9.4/python-3.9.4-amd64.exe",
-	 "",
+	 "https://www.python.org/ftp/python/3.10.2/python-3.10.2.exe",
+	 "https://www.python.org/ftp/python/3.10.2/python-3.10.2-amd64.exe",
+	 "https://www.python.org/ftp/python/3.10.2/python-3.10.2-embed-arm64.zip",
 	 "python-*",
 	 "/quiet InstallAllUsers=1 PrependPath=1 Include_test=0",
+	 "",
+	 ""),
+	("WPS Office",
+	 [Status]::Disable,
+	 [Action]::Install,
+	 [Mode]::Queue,
+	 "auto",
+	 "安装包\办公软件",
+	 "",
+	 "https://official-package.wpscdn.cn/wps/download/W.P.S.11365.12012.2019.exe",
+	 "",
+	 "",
+	 "W.P.S*",
+	 "",
 	 "",
 	 ""),
 	("酷狗音乐",
@@ -193,7 +220,7 @@ $app = @(
 	 "auto",
 	 "安装包\音乐软件",
 	 "",
-	 "https://downmini.yun.kugou.com/web/kugou9229.exe",
+	 "https://downmini.yun.kugou.com/web/kugou10021.exe",
 	 "",
 	 "",
 	 "kugou*",
@@ -207,7 +234,7 @@ $app = @(
 	 "auto",
 	 "安装包\音乐软件",
 	 "",
-	 "https://d1.music.126.net/dmusic/cloudmusicsetup2.8.0.198822.exe",
+	 "https://d1.music.126.net/dmusic/cloudmusicsetup2.9.7.199711.exe",
 	 "",
 	 "",
 	 "cloudmusicsetup*",
@@ -235,7 +262,7 @@ $app = @(
 	 "auto",
 	 "安装包\下载工具",
 	 "",
-	 "https://down.sandai.net/thunder11/XunLeiWebSetup11.1.12.1692gw.exe",
+	 "https://down.sandai.net/thunder11/XunLeiWebSetup11.3.7.1880gw.exe",
 	 "",
 	 "",
 	 "XunLeiWebSetup11*",
@@ -249,10 +276,10 @@ $app = @(
 	 "auto",
 	 "安装包\社交软件",
 	 "",
-	 "https://down.qq.com/qqweb/PCQQ/PCQQ_EXE/PCQQ2021.exe",
+	 "https://dldir1.qq.com/qqfile/qq/PCQQ9.5.8/QQ9.5.8.28186.exe",
 	 "",
 	 "",
-	 "PCQQ2021",
+	 "QQ*",
 	 "/S",
 	 "",
 	 ""),
@@ -266,7 +293,7 @@ $app = @(
 	 "https://dldir1.qq.com/weixin/Windows/WeChatSetup.exe",
 	 "",
 	 "",
-	 "WeChatSetup",
+	 "WeChat*",
 	 "/S",
 	 "",
 	 ""),
@@ -277,7 +304,7 @@ $app = @(
 	 "auto",
 	 "安装包\网络电视",
 	 "",
-	 "https://dldir1.qq.com/qqtv/TencentVideo11.19.3049.0.exe",
+	 "https://dldir1.qq.com/qqtv/TencentVideo11.38.9715.0.exe",
 	 "",
 	 "",
 	 "TencentVideo*",
@@ -291,7 +318,7 @@ $app = @(
 	 "auto",
 	 "安装包\网络电视",
 	 "",
-	 "https://dl-static.iqiyi.com/hz/IQIYIsetup_z40.exe",
+	 "https://dl-static.iqiyi.com/hz/IQIYIsetup_z43.exe",
 	 "",
 	 "",
 	 "IQIYIsetup*",
@@ -647,14 +674,14 @@ Function SetupGUI
 	}
 	$FormSelectDiSK    = New-Object system.Windows.Forms.Form -Property @{
 		autoScaleMode  = 2
-		Height         = 780
+		Height         = 720
 		Width          = 550
 		Text           = "设置"
-		TopMost        = $True
 		MaximizeBox    = $False
 		StartPosition  = "CenterScreen"
 		MinimizeBox    = $false
 		BackColor      = "#ffffff"
+		Font           = New-Object System.Drawing.Font("Microsoft YaHei", 9, [System.Drawing.FontStyle]::Regular)
 	}
 	$ArchitectureTitle = New-Object System.Windows.Forms.Label -Property @{
 		Height         = 22
@@ -699,7 +726,7 @@ Function SetupGUI
 		autoScroll     = $False
 		Padding        = "8,0,8,0"
 		Dock           = 0
-		Location       = '24,65'
+		Location       = '23,65'
 	}
 	$SoftwareTipsErrorMsg = New-Object system.Windows.Forms.Label -Property @{
 		AutoSize       = 1
@@ -745,7 +772,7 @@ Function SetupGUI
 		add_Click      = { RefreshInitialDisk }
 	}
 	$FormSelectDiSKPane1 = New-Object system.Windows.Forms.FlowLayoutPanel -Property @{
-		Height         = 380
+		Height         = 330
 		Width          = 490
 		BorderStyle    = 0
 		autoSizeMode   = 0
@@ -755,14 +782,14 @@ Function SetupGUI
 		Location       = '24,228'
 	}
 	$ErrorMsg          = New-Object system.Windows.Forms.Label -Property @{
-		Location       = "8,625"
-		Height         = 28
-		Width          = 408
+		Location       = "8,570"
+		Height         = 22
+		Width          = 512
 		Text           = ""
 	}
 	$Start             = New-Object system.Windows.Forms.Button -Property @{
 		UseVisualStyleBackColor = $True
-		Location       = "8,655"
+		Location       = "8,595"
 		Height         = 36
 		Width          = 515
 		add_Click      = $OK_Click
@@ -770,7 +797,7 @@ Function SetupGUI
 	}
 	$Canel             = New-Object system.Windows.Forms.Button -Property @{
 		UseVisualStyleBackColor = $True
-		Location       = "8,695"
+		Location       = "8,635"
 		Height         = 36
 		Width          = 515
 		add_Click      = $Canel_Click
@@ -865,22 +892,22 @@ Function TestAvailableDisk
 		[string]$Path
 	)
 
-	$RandomGuid = [guid]::NewGuid()
-	$test_tmp_filename = "writetest-$($RandomGuid)"
-	$test_filename = Join-Path -Path "$($Path)" -ChildPath "$($test_tmp_filename)" -ErrorAction SilentlyContinue
+	try {
+		New-Item -Path $Path -ItemType Directory -ErrorAction SilentlyContinue | Out-Null
 
-	try
-	{
+		$RandomGuid = [guid]::NewGuid()
+		$test_tmp_filename = "writetest-$($RandomGuid)"
+		$test_filename = Join-Path -Path "$($Path)" -ChildPath "$($test_tmp_filename)" -ErrorAction SilentlyContinue
+
 		[io.file]::OpenWrite($test_filename).close()
 
-		if (Test-Path $test_filename) {
+		if (Test-Path $test_filename -PathType Leaf)
+		{
 			Remove-Item $test_filename -ErrorAction SilentlyContinue
 			return $true
 		}
 		$false
-	}
-	catch
-	{
+	} catch {
 		return $false
 	}
 }
@@ -1478,10 +1505,9 @@ Function InstallGUI
 	}
 	$Install           = New-Object system.Windows.Forms.Form -Property @{
 		autoScaleMode  = 2
-		Height         = 780
+		Height         = 720
 		Width          = 550
 		Text           = "安装软件列表 ( 共 $($app.Count) 款 )"
-		TopMost        = $True
 		MaximizeBox    = $False
 		StartPosition  = "CenterScreen"
 		MinimizeBox    = $false
@@ -1489,7 +1515,7 @@ Function InstallGUI
 		Font           = New-Object System.Drawing.Font("Microsoft YaHei", 9, [System.Drawing.FontStyle]::Regular)
 	}
 	$Pane1             = New-Object system.Windows.Forms.FlowLayoutPanel -Property @{
-		Height         = 675
+		Height         = 625
 		Width          = 490
 		BorderStyle    = 0
 		autoSizeMode   = 0
@@ -1499,7 +1525,7 @@ Function InstallGUI
 	}
 	$Setting           = New-Object system.Windows.Forms.Button -Property @{
 		UseVisualStyleBackColor = $True
-		Location       = "10,695"
+		Location       = "10,635"
 		Height         = 36
 		Width          = 133
 		add_Click      = { SetupGUI }
@@ -1507,7 +1533,7 @@ Function InstallGUI
 	}
 	$Start             = New-Object system.Windows.Forms.Button -Property @{
 		UseVisualStyleBackColor = $True
-		Location       = "148,695"
+		Location       = "148,635"
 		Height         = 36
 		Width          = 184
 		add_Click      = $OK_Click
@@ -1515,7 +1541,7 @@ Function InstallGUI
 	}
 	$Canel             = New-Object system.Windows.Forms.Button -Property @{
 		UseVisualStyleBackColor = $True
-		Location       = "337,695"
+		Location       = "337,635"
 		Height         = 36
 		Width          = 184
 		add_Click      = $Canel_Click
@@ -1581,7 +1607,7 @@ Function Mainpage
 	Write-Host "`n   Author: $($Global:UniqueID) ( $($Global:AuthorURL) )
 
    From: $($Global:UniqueID)'s Solutions
-   buildstring: 8.0.0.0.bs_release.210814-1208
+   buildstring: 8.0.0.2.bs_release.220201-1208
 
    安装软件列表 ( 共 $($app.Count) 款 )`n   ---------------------------------------------------"
 }
