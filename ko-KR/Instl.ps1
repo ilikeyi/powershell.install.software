@@ -164,7 +164,7 @@ $app = @(
 	 "auto",
 	 "설치 패키지\AIO",
 	 "",
-	 "https://github.com/abbodi1406/vcredist/releases/download/v0.58.0/VisualCppRedist_AIO_x86_x64_58.zip",
+	 "https://github.com/abbodi1406/vcredist/releases/download/v0.59.0/VisualCppRedist_AIO_x86_x64_59.zip",
 	 "",
 	 "",
 	 "VisualCppRedist*",
@@ -1181,9 +1181,8 @@ Function InstallProcess
 						}
 					}
 					if (Test-Path $OutAny) {
-						Write-Host "    - 포장 풀기"
+						Write-Host "    - 포장 풀기".PadRight(28) -NoNewline
 						Archive -Password $pwd -filename $OutAny -to $OutTo
-						Write-Host "    - 감압 완료"
 						Remove-Item -path $OutAny -force -ErrorAction SilentlyContinue
 					} else {
 						Write-Host "      - 다운로드 중 오류가 발생했습니다`n" -ForegroundColor Red
@@ -1242,9 +1241,8 @@ Function InstallProcess
 						}
 					}
 					if (Test-Path $OutAny) {
-						Write-Host "    - 압축만 풀기"
+						Write-Host "    - 압축만 풀기".PadRight(28) -NoNewline
 						Archive -Password $pwd -filename $OutAny -to $newoutputfoldoer
-						Write-Host "    - 감압 완료`n"
 						Remove-Item -path $OutAny -force -ErrorAction SilentlyContinue
 					} else {
 						Write-Host "      - 다운로드 중 오류가 발생했습니다`n" -ForegroundColor Red
@@ -1269,9 +1267,8 @@ Function InstallProcess
 						}
 					}
 					if (Test-Path $OutAny) {
-						Write-Host "    - 압축만 풀기`n"
+						Write-Host "    - 압축만 풀기".PadRight(28) -NoNewline
 						Archive -Password $pwd -filename $OutAny -to $OutTo
-						Write-Host "    - 감압 완료`n"
 						Remove-Item -path $OutAny -force -ErrorAction SilentlyContinue
 					} else {
 						Write-Host "      - 다운로드 중 오류가 발생했습니다`n" -ForegroundColor Red
@@ -1315,16 +1312,16 @@ Function Archive
 	Convert-Path $filename -ErrorAction SilentlyContinue | Out-Null
 
 	if (Compressing) {
-		Write-host "    - 사용 $Global:Zip 소프트웨어 압축 풀기"
-		if ([string]::IsNullOrEmpty($Password)) {
+		if (([string]::IsNullOrEmpty($Password))) {
 			$arguments = "x ""-r"" ""-tzip"" ""$filename"" ""-o$to"" ""-y"""
 		} else {
 			$arguments = "x ""-p$Password"" ""-r"" ""-tzip"" ""$filename"" ""-o$to"" ""-y"""
 		}
 		Start-Process $Global:Zip "$arguments" -Wait -WindowStyle Minimized
+		Write-Host "     마치다`n" -ForegroundColor Green
 	} else {
-		Write-host "    - 시스템과 함께 제공되는 압축 해제 소프트웨어 사용"
 		Expand-Archive -LiteralPath $filename -DestinationPath $to -force
+		Write-Host "     마치다`n" -ForegroundColor Green
 	}
 }
 

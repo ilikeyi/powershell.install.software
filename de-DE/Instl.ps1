@@ -164,7 +164,7 @@ $app = @(
 	 "auto",
 	 "Installationspaket\AIO",
 	 "",
-	 "https://github.com/abbodi1406/vcredist/releases/download/v0.58.0/VisualCppRedist_AIO_x86_x64_58.zip",
+	 "https://github.com/abbodi1406/vcredist/releases/download/v0.59.0/VisualCppRedist_AIO_x86_x64_59.zip",
 	 "",
 	 "",
 	 "VisualCppRedist*",
@@ -1181,9 +1181,8 @@ Function InstallProcess
 						}
 					}
 					if (Test-Path $OutAny) {
-						Write-Host "    - Auspacken"
+						Write-Host "    - Auspacken".PadRight(28) -NoNewline
 						Archive -Password $pwd -filename $OutAny -to $OutTo
-						Write-Host "    - Dekompression ist abgeschlossen"
 						Remove-Item -path $OutAny -force -ErrorAction SilentlyContinue
 					} else {
 						Write-Host "      - Beim Download ist ein Fehler aufgetreten`n" -ForegroundColor Red
@@ -1242,9 +1241,8 @@ Function InstallProcess
 						}
 					}
 					if (Test-Path $OutAny) {
-						Write-Host "    - Nur entpacken"
+						Write-Host "    - Nur entpacken".PadRight(28) -NoNewline
 						Archive -Password $pwd -filename $OutAny -to $newoutputfoldoer
-						Write-Host "    - Dekompression ist abgeschlossen`n"
 						Remove-Item -path $OutAny -force -ErrorAction SilentlyContinue
 					} else {
 						Write-Host "      - Beim Download ist ein Fehler aufgetreten`n" -ForegroundColor Red
@@ -1269,9 +1267,8 @@ Function InstallProcess
 						}
 					}
 					if (Test-Path $OutAny) {
-						Write-Host "    - Nur entpacken`n"
+						Write-Host "    - Nur entpacken".PadRight(28) -NoNewline
 						Archive -Password $pwd -filename $OutAny -to $OutTo
-						Write-Host "    - Dekompression ist abgeschlossen`n"
 						Remove-Item -path $OutAny -force -ErrorAction SilentlyContinue
 					} else {
 						Write-Host "      - Beim Download ist ein Fehler aufgetreten`n" -ForegroundColor Red
@@ -1315,16 +1312,16 @@ Function Archive
 	Convert-Path $filename -ErrorAction SilentlyContinue | Out-Null
 
 	if (Compressing) {
-		Write-host "    - benutzen $Global:Zip Software entpacken"
-		if ([string]::IsNullOrEmpty($Password)) {
+		if (([string]::IsNullOrEmpty($Password))) {
 			$arguments = "x ""-r"" ""-tzip"" ""$filename"" ""-o$to"" ""-y"""
 		} else {
 			$arguments = "x ""-p$Password"" ""-r"" ""-tzip"" ""$filename"" ""-o$to"" ""-y"""
 		}
 		Start-Process $Global:Zip "$arguments" -Wait -WindowStyle Minimized
+		Write-Host "     Ziel`n" -ForegroundColor Green
 	} else {
-		Write-host "    - Verwenden Sie die mit dem System gelieferte Dekompressionssoftware"
 		Expand-Archive -LiteralPath $filename -DestinationPath $to -force
+		Write-Host "     Ziel`n" -ForegroundColor Green
 	}
 }
 

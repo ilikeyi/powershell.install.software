@@ -164,7 +164,7 @@ $app = @(
 	 "auto",
 	 "安装包\AIO",
 	 "",
-	 "https://github.com/abbodi1406/vcredist/releases/download/v0.58.0/VisualCppRedist_AIO_x86_x64_58.zip",
+	 "https://github.com/abbodi1406/vcredist/releases/download/v0.59.0/VisualCppRedist_AIO_x86_x64_59.zip",
 	 "",
 	 "",
 	 "VisualCppRedist*",
@@ -1182,9 +1182,8 @@ Function InstallProcess
 						}
 					}
 					if (Test-Path $OutAny) {
-						Write-Host "    - 解压中"
+						Write-Host "    - 解压中".PadRight(28) -NoNewline
 						Archive -Password $pwd -filename $OutAny -to $OutTo
-						Write-Host "    - 解压完成"
 						Remove-Item -path $OutAny -force -ErrorAction SilentlyContinue
 					} else {
 						Write-Host "      - 下载过程中出现错误`n" -ForegroundColor Red
@@ -1243,9 +1242,8 @@ Function InstallProcess
 						}
 					}
 					if (Test-Path $OutAny) {
-						Write-Host "    - 仅解压`n"
+						Write-Host "    - 仅解压".PadRight(28) -NoNewline
 						Archive -Password $pwd -filename $OutAny -to $newoutputfoldoer
-						Write-Host "    - 解压完成`n"
 						Remove-Item -path $OutAny -force -ErrorAction SilentlyContinue
 					} else {
 						Write-Host "      - 下载过程中出现错误`n" -ForegroundColor Red
@@ -1270,9 +1268,8 @@ Function InstallProcess
 						}
 					}
 					if (Test-Path $OutAny) {
-						Write-Host "    - 仅解压`n"
+						Write-Host "    - 仅解压".PadRight(28) -NoNewline
 						Archive -Password $pwd -filename $OutAny -to $OutTo
-						Write-Host "    - 解压完成`n"
 						Remove-Item -path $OutAny -force -ErrorAction SilentlyContinue
 					} else {
 						Write-Host "      - 下载过程中出现错误`n" -ForegroundColor Red
@@ -1316,16 +1313,16 @@ Function Archive
 	Convert-Path $filename -ErrorAction SilentlyContinue | Out-Null
 
 	if (Compressing) {
-		Write-host "    - 使用 $Global:Zip 解压软件"
-		if ([string]::IsNullOrEmpty($Password)) {
+		if (([string]::IsNullOrEmpty($Password))) {
 			$arguments = "x ""-r"" ""-tzip"" ""$filename"" ""-o$to"" ""-y"""
 		} else {
 			$arguments = "x ""-p$Password"" ""-r"" ""-tzip"" ""$filename"" ""-o$to"" ""-y"""
 		}
 		Start-Process $Global:Zip "$arguments" -Wait -WindowStyle Minimized
+		Write-Host "     完成`n" -ForegroundColor Green
 	} else {
-		Write-host "    - 使用系统自带的解压软件"
 		Expand-Archive -LiteralPath $filename -DestinationPath $to -force
+		Write-Host "     完成`n" -ForegroundColor Green
 	}
 }
 

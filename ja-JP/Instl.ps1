@@ -164,7 +164,7 @@ $app = @(
 	 "auto",
 	 "インストールパッケージ\AIO",
 	 "",
-	 "https://github.com/abbodi1406/vcredist/releases/download/v0.58.0/VisualCppRedist_AIO_x86_x64_58.zip",
+	 "https://github.com/abbodi1406/vcredist/releases/download/v0.59.0/VisualCppRedist_AIO_x86_x64_59.zip",
 	 "",
 	 "",
 	 "VisualCppRedist*",
@@ -1181,9 +1181,8 @@ Function InstallProcess
 						}
 					}
 					if (Test-Path $OutAny) {
-						Write-Host "    - 開梱"
+						Write-Host "    - 開梱".PadRight(28) -NoNewline
 						Archive -Password $pwd -filename $OutAny -to $OutTo
-						Write-Host "    - 解凍が完了しました"
 						Remove-Item -path $OutAny -force -ErrorAction SilentlyContinue
 					} else {
 						Write-Host "      - ダウンロード中にエラーが発生しました`n" -ForegroundColor Red
@@ -1242,9 +1241,8 @@ Function InstallProcess
 						}
 					}
 					if (Test-Path $OutAny) {
-						Write-Host "    - 解凍のみ"
+						Write-Host "    - 解凍のみ".PadRight(28) -NoNewline
 						Archive -Password $pwd -filename $OutAny -to $newoutputfoldoer
-						Write-Host "    - 解凍が完了しました`n"
 						Remove-Item -path $OutAny -force -ErrorAction SilentlyContinue
 					} else {
 						Write-Host "      - ダウンロード中にエラーが発生しました`n" -ForegroundColor Red
@@ -1269,9 +1267,8 @@ Function InstallProcess
 						}
 					}
 					if (Test-Path $OutAny) {
-						Write-Host "    - 解凍のみ`n"
+						Write-Host "    - 解凍のみ".PadRight(28) -NoNewline
 						Archive -Password $pwd -filename $OutAny -to $OutTo
-						Write-Host "    - 解凍が完了しました`n"
 						Remove-Item -path $OutAny -force -ErrorAction SilentlyContinue
 					} else {
 						Write-Host "      - ダウンロード中にエラーが発生しました`n" -ForegroundColor Red
@@ -1315,16 +1312,16 @@ Function Archive
 	Convert-Path $filename -ErrorAction SilentlyContinue | Out-Null
 
 	if (Compressing) {
-		Write-host "    - 使用する $Global:Zip ソフトウェアを解凍します"
-		if ([string]::IsNullOrEmpty($Password)) {
+		if (([string]::IsNullOrEmpty($Password))) {
 			$arguments = "x ""-r"" ""-tzip"" ""$filename"" ""-o$to"" ""-y"""
 		} else {
 			$arguments = "x ""-p$Password"" ""-r"" ""-tzip"" ""$filename"" ""-o$to"" ""-y"""
 		}
 		Start-Process $Global:Zip "$arguments" -Wait -WindowStyle Minimized
+		Write-Host "     終了`n" -ForegroundColor Green
 	} else {
-		Write-host "    - システムに付属の減圧ソフトウェアを使用する"
 		Expand-Archive -LiteralPath $filename -DestinationPath $to -force
+		Write-Host "     終了`n" -ForegroundColor Green
 	}
 }
 
