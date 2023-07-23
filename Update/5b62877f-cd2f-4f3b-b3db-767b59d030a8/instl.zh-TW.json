@@ -10,12 +10,12 @@
 	},
 	"App": [
 		{
-			"Group": "Theme pack",
-			"Structure": "Installation package\\Theme pack",
+			"Group": "主題包",
+			"Structure": "安裝包\\主題包",
 			"App": [
 				{
 					"GUID":      "7404a4fc-e59d-4bf0-86a5-33e3e8e1b3b1",
-					"Name":      "Yi's Dark Personality Theme Pack",
+					"Name":      "Yi's 深色個性主題包",
 					"Action":    "Install",
 					"Manner":    "Fast",
 					"DLetter":   "auto",
@@ -30,7 +30,7 @@
 				},
 				{
 					"GUID":      "bf3d7282-a23d-4e28-818e-005d7fcbeb22",
-					"Name":      "Yi's Light Personality Theme Pack",
+					"Name":      "Yi's 淺色個性主題包",
 					"Action":    "Install",
 					"Manner":    "Fast",
 					"DLetter":   "auto",
@@ -46,8 +46,8 @@
 			]
 	    },
 		{
-			"Group": "Social application",
-			"Structure": "Installation package\\Social application",
+			"Group": "社交軟件",
+			"Structure": "安裝包\\社交軟件",
 			"App": [
 				{
 					"GUID":      "5512e164-3969-488f-a48e-1dd24145c633",
@@ -66,7 +66,7 @@
 				},
 				{
 					"GUID":      "1da42d07-876c-4134-9b22-c2608634e8d8",
-					"Name":      "Weixin",
+					"Name":      "微信",
 					"Action":    "Install",
 					"Manner":    "Queue",
 					"DLetter":   "auto",
@@ -82,8 +82,8 @@
 			]
 		},
 		{
-			"Group": "Office Software",
-			"Structure": "Installation package\\Office Software",
+			"Group": "辦公軟件",
+			"Structure": "安裝包\\辦公軟件",
 			"App": [
 				{
 					"GUID":      "a19f3dc1-e77c-4001-903b-00fe4624d757",
@@ -133,8 +133,8 @@
 			]
 	    },
 	    {
-			"Group": "Browser",
-			"Structure": "Installation package\\Browser",
+			"Group": "瀏覽器",
+			"Structure": "安裝包\\瀏覽器",
 			"App": [
 				{
 					"GUID":      "45bf2c42-ec67-440a-8403-0ad31864f47a",
@@ -154,12 +154,12 @@
 			]
 		},
 		{
-			"Group": "Media software",
-			"Structure": "Installation package\\Media software",
+			"Group": "媒體軟件",
+			"Structure": "安裝包\\媒體軟件",
 			"App": [
 				{
 					"GUID":      "1c871e39-4a3a-4478-a583-a9fa6e03bfb3",
-					"Name":      "QQ music",
+					"Name":      "QQ 音樂",
 					"Action":    "Install",
 					"Manner":    "Queue",
 					"DLetter":   "auto",
@@ -174,7 +174,7 @@
 				},
 				{
 					"GUID":      "a356e629-30b6-4e9a-bc9d-a4fa50cb0bfd",
-					"Name":      "Kugou music",
+					"Name":      "酷狗音樂",
 					"Action":    "Install",
 					"Manner":    "Queue",
 					"DLetter":   "auto",
@@ -189,7 +189,7 @@
 				},
 				{
 					"GUID":      "79da884e-a8a2-4738-bc9d-3719134119f9",
-					"Name":      "NetEase Cloud Music",
+					"Name":      "網易云音樂",
 					"Action":    "Install",
 					"Manner":    "Queue",
 					"DLetter":   "auto",
@@ -205,12 +205,12 @@
 			]
 		},
 		{
-			"Group": "Video software",
-			"Structure": "Installation package\\Video software",
+			"Group": "視頻軟件",
+			"Structure": "安裝包\\視頻軟件",
 			"App": [
 				{
 					"GUID":      "7ae9149d-c7af-4c11-aaae-3c6190fcb23a",
-					"Name":      "Tencent Video",
+					"Name":      "騰訊視頻",
 					"Action":    "Install",
 					"Manner":    "Queue",
 					"DLetter":   "auto",
@@ -225,7 +225,7 @@
 				},
 				{
 					"GUID":      "1d83e689-0cf9-4389-a751-f9ae2fd884a9",
-					"Name":      "iQiyi video",
+					"Name":      "愛奇藝視頻",
 					"Action":    "Install",
 					"Manner":    "Queue",
 					"DLetter":   "auto",
@@ -271,8 +271,8 @@
 			]
 		},
 		{
-			"Group": "Develop software",
-			"Structure": "Installation package\\Develop software",
+			"Group": "開發軟件",
+			"Structure": "安裝包\\開發軟件",
 			"App": [
 				{
 					"GUID":      "60830361-902c-4c73-9fcc-ce6e4c3d8e0d",
@@ -307,12 +307,12 @@
 			]
 		},
 		{
-			"Group": "Download tool",
-			"Structure": "Installation package\\Download tool",
+			"Group": "下載工具",
+			"Structure": "安裝包\\下載工具",
 			"App": [
 				{
 					"GUID":      "db1a6219-c7ef-4b80-83a0-7f642da78763",
-					"Name":      "Xunlei 11",
+					"Name":      "迅雷 11",
 					"Action":    "Install",
 					"Manner":    "Queue",
 					"DLetter":   "auto",
@@ -328,8 +328,8 @@
 			]
 		},
 		{
-			"Group": "Runtime library",
-			"Structure": "Installation package\\Runtime library",
+			"Group": "運行庫",
+			"Structure": "安裝包\\運行庫",
 			"App": [
 				{
 					"GUID":      "2d4983a1-3568-4a23-8824-ffbd33a88dcc",
@@ -349,8 +349,8 @@
 			]
 		},
 		{
-			"Group": "Other",
-			"Structure": "Installation package\\Other",
+			"Group": "其它",
+			"Structure": "安裝包\\其它",
 			"App": [
 				{
 					"GUID":      "73854748-e3a1-45b3-aa6f-13c2d3a12722",
