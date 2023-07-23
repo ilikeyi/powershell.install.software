@@ -10,15 +10,15 @@
 	},
 	"App": [
 		{
-			"Group": "主题包",
+			"Group": "テーマパック",
 			"App": [
 				{
 					"GUID":      "7404a4fc-e59d-4bf0-86a5-33e3e8e1b3b1",
-					"Name":      "Yi's 深色个性主题包",
+					"Name":      "Yi's ダークパーソナリティテーマパック",
 					"Action":    "Install",
 					"Manner":    "Fast",
 					"DLetter":   "auto",
-					"Structure": "安装包\\主题包",
+					"Structure": "インストールパッケージ\\テーマパック",
 					"Unpwd":     "",
 					"Url": {
 						"arm64": "",
@@ -30,11 +30,11 @@
 				},
 				{
 					"GUID":      "bf3d7282-a23d-4e28-818e-005d7fcbeb22",
-					"Name":      "Yi's 浅色个性主题包",
+					"Name":      "Yi's ライトカラーのパーソナライズされたテーマパッケージ",
 					"Action":    "Install",
 					"Manner":    "Fast",
 					"DLetter":   "auto",
-					"Structure": "安装包\\主题包",
+					"Structure": "インストールパッケージ\\テーマパック",
 					"Unpwd":     "",
 					"Url": {
 						"arm64": "",
@@ -47,7 +47,7 @@
 			]
 	    },
 		{
-			"Group": "社交软件",
+			"Group": "ソーシャルアプリケーション",
 			"App": [
 				{
 					"GUID":      "5512e164-3969-488f-a48e-1dd24145c633",
@@ -55,7 +55,7 @@
 					"Action":    "Install",
 					"Manner":    "Queue",
 					"DLetter":   "auto",
-					"Structure": "安装包\\社交软件",
+					"Structure": "インストールパッケージ\\ソーシャルアプリケーション",
 					"Unpwd":     "",
 					"Url": {
 						"arm64": "",
@@ -67,11 +67,11 @@
 				},
 				{
 					"GUID":      "1da42d07-876c-4134-9b22-c2608634e8d8",
-					"Name":      "微信",
+					"Name":      "WeChat",
 					"Action":    "Install",
 					"Manner":    "Queue",
 					"DLetter":   "auto",
-					"Structure": "安装包\\社交软件",
+					"Structure": "インストールパッケージ\\ソーシャルアプリケーション",
 					"Unpwd":     "",
 					"Url": {
 						"arm64": "",
@@ -84,7 +84,7 @@
 			]
 		},
 		{
-			"Group": "办公软件",
+			"Group": "オフィスソフトウェア",
 			"App": [
 				{
 					"GUID":      "a19f3dc1-e77c-4001-903b-00fe4624d757",
@@ -92,7 +92,7 @@
 					"Action":    "Install",
 					"Manner":    "Queue",
 					"DLetter":   "auto",
-					"Structure": "安装包\\办公软件",
+					"Structure": "インストールパッケージ\\オフィスソフトウェア",
 					"Unpwd":     "",
 					"Url": {
 						"arm64": "",
@@ -108,7 +108,7 @@
 					"Action":    "Install",
 					"Manner":    "Queue",
 					"DLetter":   "auto",
-					"Structure": "安装包\\办公软件",
+					"Structure": "インストールパッケージ\\オフィスソフトウェア",
 					"Unpwd":     "",
 					"Url": {
 						"arm64": "",
@@ -124,7 +124,7 @@
 					"Action":    "Install",
 					"Manner":    "Queue",
 					"DLetter":   "auto",
-					"Structure": "安装包\\办公软件",
+					"Structure": "インストールパッケージ\\オフィスソフトウェア",
 					"Unpwd":     "",
 					"Url": {
 						"arm64": "",
@@ -137,7 +137,7 @@
 			]
 	    },
 	    {
-			"Group": "浏览器",
+			"Group": "ブラウザ",
 			"App": [
 				{
 					"GUID":      "45bf2c42-ec67-440a-8403-0ad31864f47a",
@@ -145,7 +145,7 @@
 					"Action":    "Install",
 					"Manner":    "Queue",
 					"DLetter":   "auto",
-					"Structure": "安装包\\浏览器",
+					"Structure": "インストールパッケージ\\ブラウザ",
 					"Unpwd":     "",
 					"Url": {
 						"arm64": "",
@@ -158,15 +158,15 @@
 			]
 		},
 		{
-			"Group": "媒体软件",
+			"Group": "メディアソフトウェア",
 			"App": [
 				{
 					"GUID":      "1c871e39-4a3a-4478-a583-a9fa6e03bfb3",
-					"Name":      "QQ 音乐",
+					"Name":      "QQ 音楽",
 					"Action":    "Install",
 					"Manner":    "Queue",
 					"DLetter":   "auto",
-					"Structure": "安装包\\媒体软件",
+					"Structure": "インストールパッケージ\\メディアソフトウェア",
 					"Unpwd":     "",
 					"Url": {
 						"arm64": "",
@@ -178,11 +178,11 @@
 				},
 				{
 					"GUID":      "a356e629-30b6-4e9a-bc9d-a4fa50cb0bfd",
-					"Name":      "酷狗音乐",
+					"Name":      "クゴウミュージック",
 					"Action":    "Install",
 					"Manner":    "Queue",
 					"DLetter":   "auto",
-					"Structure": "安装包\\媒体软件",
+					"Structure": "インストールパッケージ\\メディアソフトウェア",
 					"Unpwd":     "",
 					"Url": {
 						"arm64": "",
@@ -194,11 +194,11 @@
 				},
 				{
 					"GUID":      "79da884e-a8a2-4738-bc9d-3719134119f9",
-					"Name":      "网易云音乐",
+					"Name":      "NetEase クラウド ミュージック",
 					"Action":    "Install",
 					"Manner":    "Queue",
 					"DLetter":   "auto",
-					"Structure": "安装包\\媒体软件",
+					"Structure": "インストールパッケージ\\メディアソフトウェア",
 					"Unpwd":     "",
 					"Url": {
 						"arm64": "",
@@ -211,15 +211,15 @@
 			]
 		},
 		{
-			"Group": "视频软件",
+			"Group": "ビデオソフトウェア",
 			"App": [
 				{
 					"GUID":      "7ae9149d-c7af-4c11-aaae-3c6190fcb23a",
-					"Name":      "腾讯视频",
+					"Name":      "テンセントビデオ",
 					"Action":    "Install",
 					"Manner":    "Queue",
 					"DLetter":   "auto",
-					"Structure": "安装包\\视频软件",
+					"Structure": "インストールパッケージ\\ビデオソフトウェア",
 					"Unpwd":     "",
 					"Url": {
 						"arm64": "",
@@ -231,11 +231,11 @@
 				},
 				{
 					"GUID":      "1d83e689-0cf9-4389-a751-f9ae2fd884a9",
-					"Name":      "爱奇艺视频",
+					"Name":      "イキイービデオ",
 					"Action":    "Install",
 					"Manner":    "Queue",
 					"DLetter":   "auto",
-					"Structure": "安装包\\视频软件",
+					"Structure": "インストールパッケージ\\ビデオソフトウェア",
 					"Unpwd":     "",
 					"Url": {
 						"arm64": "",
@@ -251,7 +251,7 @@
 					"Action":    "Install",
 					"Manner":    "Queue",
 					"DLetter":   "auto",
-					"Structure": "安装包\\视频软件",
+					"Structure": "インストールパッケージ\\ビデオソフトウェア",
 					"Unpwd":     "",
 					"Url": {
 						"arm64": "https://artifacts.videolan.org/vlc/nightly-win64-arm-llvm/20230723-0423/vlc-4.0.0-dev-win64-68140314.exe",
@@ -267,7 +267,7 @@
 					"Action":    "Install",
 					"Manner":    "Queue",
 					"DLetter":   "auto",
-					"Structure": "安装包\\视频软件",
+					"Structure": "インストールパッケージ\\ビデオソフトウェア",
 					"Unpwd":     "",
 					"Url": {
 						"arm64": "",
@@ -280,7 +280,7 @@
 			]
 		},
 		{
-			"Group": "开发软件",
+			"Group": "ソフトウェアを開発する",
 			"App": [
 				{
 					"GUID":      "60830361-902c-4c73-9fcc-ce6e4c3d8e0d",
@@ -288,7 +288,7 @@
 					"Action":    "Install",
 					"Manner":    "Queue",
 					"DLetter":   "auto",
-					"Structure": "安装包\\开发软件",
+					"Structure": "インストールパッケージ\\ソフトウェアを開発する",
 					"Unpwd":     "",
 					"Url": {
 						"arm64": "https://az764295.vo.msecnd.net/stable/74f6148eb9ea00507ec113ec51c489d6ffb4b771/VSCodeUserSetup-arm64-1.80.1.exe",
@@ -304,7 +304,7 @@
 					"Action":    "Install",
 					"Manner":    "Queue",
 					"DLetter":   "auto",
-					"Structure": "安装包\\开发软件",
+					"Structure": "インストールパッケージ\\ソフトウェアを開発する",
 					"Unpwd":     "",
 					"Url": {
 						"arm64": "https://www.python.org/ftp/python/3.11.3/python-3.11.3-arm64.exe",
@@ -317,7 +317,7 @@
 			]
 		},
 		{
-			"Group": "下载工具",
+			"Group": "ダウンロードツール",
 			"App": [
 				{
 					"GUID":      "db1a6219-c7ef-4b80-83a0-7f642da78763",
@@ -325,7 +325,7 @@
 					"Action":    "Install",
 					"Manner":    "Queue",
 					"DLetter":   "auto",
-					"Structure": "安装包\\下载工具",
+					"Structure": "インストールパッケージ\\ダウンロードツール",
 					"Unpwd":     "",
 					"Url": {
 						"arm64": "",
@@ -338,7 +338,7 @@
 			]
 		},
 		{
-			"Group": "运行库",
+			"Group": "ランタイムライブラリ",
 			"App": [
 				{
 					"GUID":      "2d4983a1-3568-4a23-8824-ffbd33a88dcc",
@@ -346,7 +346,7 @@
 					"Action":    "Install",
 					"Manner":    "Queue",
 					"DLetter":   "auto",
-					"Structure": "安装包\\运行库",
+					"Structure": "インストールパッケージ\\ランタイムライブラリ",
 					"Unpwd":     "",
 					"Url": {
 						"arm64": "",
@@ -359,7 +359,7 @@
 			]
 		},
 		{
-			"Group": "其它",
+			"Group": "他の",
 			"App": [
 				{
 					"GUID":      "73854748-e3a1-45b3-aa6f-13c2d3a12722",
@@ -367,7 +367,7 @@
 					"Action":    "Install",
 					"Manner":    "Queue",
 					"DLetter":   "auto",
-					"Structure": "安装包\\其它",
+					"Structure": "インストールパッケージ\\他の",
 					"Unpwd":     "",
 					"Url": {
 						"arm64": "",

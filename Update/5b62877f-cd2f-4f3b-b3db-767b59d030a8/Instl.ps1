@@ -61,14 +61,19 @@ $ServerTest     = $false
        Only one URL address must be added in front of the, number, multiple addresses do not need to be added, example:
        只有一个 URL 地址必须在前面添加 , 号，多地址不用添加，示例：
 
-	$PreServerList = @(
-		,("$($Global:AuthorURL)",
-		  "/download/solutions/update/Yi.Optimiz.Private/latest.json")
+	$Script:PreServerList = @(
+		@{
+			Region = "en-US"
+			Link   = @(
+				"https://fengyi.tel/download/solutions/update/Instl/5b62877f-cd2f-4f3b-b3db-767b59d030a8/instl.json",
+				"https://github.com/ilikeyi/powershell.install.software/raw/main/Update/5b62877f-cd2f-4f3b-b3db-767b59d030a8/instl.json"
+			)
+		}
 	)
 #>
 $Script:ServerList = @()
 $Script:ServerListSelect = @()
-$PreServerList = @(
+$Script:PreServerList = @(
 	@{
 		Region = "en-US"
 		Link   = @(
@@ -1240,7 +1245,7 @@ Function Update_Setting_UI
 
 Function Refresh_Server_List
 {
-	ForEach ($item in $PreServerList) {
+	ForEach ($item in $Script:PreServerList) {
 		if ($Global:IsLang -eq $item.Region) {
 			ForEach ($itemLink in $item.Link) {
 				$Script:ServerListSelect += $itemLink
