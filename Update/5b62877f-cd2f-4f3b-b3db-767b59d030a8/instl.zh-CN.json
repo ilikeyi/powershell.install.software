@@ -11,7 +11,6 @@
 	"App": [
 		{
 			"Group": "主题包",
-			"Structure": "安装包\\主题包",
 			"App": [
 				{
 					"GUID":      "7404a4fc-e59d-4bf0-86a5-33e3e8e1b3b1",
@@ -19,6 +18,7 @@
 					"Action":    "Install",
 					"Manner":    "Fast",
 					"DLetter":   "auto",
+					"Structure": "安装包\\主题包",
 					"Unpwd":     "",
 					"Url": {
 						"arm64": "",
@@ -34,6 +34,7 @@
 					"Action":    "Install",
 					"Manner":    "Fast",
 					"DLetter":   "auto",
+					"Structure": "安装包\\主题包",
 					"Unpwd":     "",
 					"Url": {
 						"arm64": "",
@@ -47,7 +48,6 @@
 	    },
 		{
 			"Group": "社交软件",
-			"Structure": "安装包\\社交软件",
 			"App": [
 				{
 					"GUID":      "5512e164-3969-488f-a48e-1dd24145c633",
@@ -55,6 +55,7 @@
 					"Action":    "Install",
 					"Manner":    "Queue",
 					"DLetter":   "auto",
+					"Structure": "安装包\\社交软件",
 					"Unpwd":     "",
 					"Url": {
 						"arm64": "",
@@ -70,6 +71,7 @@
 					"Action":    "Install",
 					"Manner":    "Queue",
 					"DLetter":   "auto",
+					"Structure": "安装包\\社交软件",
 					"Unpwd":     "",
 					"Url": {
 						"arm64": "",
@@ -83,7 +85,6 @@
 		},
 		{
 			"Group": "办公软件",
-			"Structure": "安装包\\办公软件",
 			"App": [
 				{
 					"GUID":      "a19f3dc1-e77c-4001-903b-00fe4624d757",
@@ -91,6 +92,7 @@
 					"Action":    "Install",
 					"Manner":    "Queue",
 					"DLetter":   "auto",
+					"Structure": "安装包\\办公软件",
 					"Unpwd":     "",
 					"Url": {
 						"arm64": "",
@@ -106,6 +108,7 @@
 					"Action":    "Install",
 					"Manner":    "Queue",
 					"DLetter":   "auto",
+					"Structure": "安装包\\办公软件",
 					"Unpwd":     "",
 					"Url": {
 						"arm64": "",
@@ -121,6 +124,7 @@
 					"Action":    "Install",
 					"Manner":    "Queue",
 					"DLetter":   "auto",
+					"Structure": "安装包\\办公软件",
 					"Unpwd":     "",
 					"Url": {
 						"arm64": "",
@@ -134,7 +138,6 @@
 	    },
 	    {
 			"Group": "浏览器",
-			"Structure": "安装包\\浏览器",
 			"App": [
 				{
 					"GUID":      "45bf2c42-ec67-440a-8403-0ad31864f47a",
@@ -142,6 +145,7 @@
 					"Action":    "Install",
 					"Manner":    "Queue",
 					"DLetter":   "auto",
+					"Structure": "安装包\\浏览器",
 					"Unpwd":     "",
 					"Url": {
 						"arm64": "",
@@ -155,7 +159,6 @@
 		},
 		{
 			"Group": "媒体软件",
-			"Structure": "安装包\\媒体软件",
 			"App": [
 				{
 					"GUID":      "1c871e39-4a3a-4478-a583-a9fa6e03bfb3",
@@ -163,6 +166,7 @@
 					"Action":    "Install",
 					"Manner":    "Queue",
 					"DLetter":   "auto",
+					"Structure": "安装包\\媒体软件",
 					"Unpwd":     "",
 					"Url": {
 						"arm64": "",
@@ -178,6 +182,7 @@
 					"Action":    "Install",
 					"Manner":    "Queue",
 					"DLetter":   "auto",
+					"Structure": "安装包\\媒体软件",
 					"Unpwd":     "",
 					"Url": {
 						"arm64": "",
@@ -193,6 +198,7 @@
 					"Action":    "Install",
 					"Manner":    "Queue",
 					"DLetter":   "auto",
+					"Structure": "安装包\\媒体软件",
 					"Unpwd":     "",
 					"Url": {
 						"arm64": "",
@@ -206,7 +212,6 @@
 		},
 		{
 			"Group": "视频软件",
-			"Structure": "安装包\\视频软件",
 			"App": [
 				{
 					"GUID":      "7ae9149d-c7af-4c11-aaae-3c6190fcb23a",
@@ -214,6 +219,7 @@
 					"Action":    "Install",
 					"Manner":    "Queue",
 					"DLetter":   "auto",
+					"Structure": "安装包\\视频软件",
 					"Unpwd":     "",
 					"Url": {
 						"arm64": "",
@@ -229,6 +235,7 @@
 					"Action":    "Install",
 					"Manner":    "Queue",
 					"DLetter":   "auto",
+					"Structure": "安装包\\视频软件",
 					"Unpwd":     "",
 					"Url": {
 						"arm64": "",
@@ -244,6 +251,7 @@
 					"Action":    "Install",
 					"Manner":    "Queue",
 					"DLetter":   "auto",
+					"Structure": "安装包\\视频软件",
 					"Unpwd":     "",
 					"Url": {
 						"arm64": "https://artifacts.videolan.org/vlc/nightly-win64-arm-llvm/20230723-0423/vlc-4.0.0-dev-win64-68140314.exe",
@@ -259,6 +267,7 @@
 					"Action":    "Install",
 					"Manner":    "Queue",
 					"DLetter":   "auto",
+					"Structure": "安装包\\视频软件",
 					"Unpwd":     "",
 					"Url": {
 						"arm64": "",
@@ -272,7 +281,6 @@
 		},
 		{
 			"Group": "开发软件",
-			"Structure": "安装包\\开发软件",
 			"App": [
 				{
 					"GUID":      "60830361-902c-4c73-9fcc-ce6e4c3d8e0d",
@@ -280,6 +288,7 @@
 					"Action":    "Install",
 					"Manner":    "Queue",
 					"DLetter":   "auto",
+					"Structure": "安装包\\开发软件",
 					"Unpwd":     "",
 					"Url": {
 						"arm64": "https://az764295.vo.msecnd.net/stable/74f6148eb9ea00507ec113ec51c489d6ffb4b771/VSCodeUserSetup-arm64-1.80.1.exe",
@@ -295,6 +304,7 @@
 					"Action":    "Install",
 					"Manner":    "Queue",
 					"DLetter":   "auto",
+					"Structure": "安装包\\开发软件",
 					"Unpwd":     "",
 					"Url": {
 						"arm64": "https://www.python.org/ftp/python/3.11.3/python-3.11.3-arm64.exe",
@@ -308,7 +318,6 @@
 		},
 		{
 			"Group": "下载工具",
-			"Structure": "安装包\\下载工具",
 			"App": [
 				{
 					"GUID":      "db1a6219-c7ef-4b80-83a0-7f642da78763",
@@ -316,6 +325,7 @@
 					"Action":    "Install",
 					"Manner":    "Queue",
 					"DLetter":   "auto",
+					"Structure": "安装包\\下载工具",
 					"Unpwd":     "",
 					"Url": {
 						"arm64": "",
@@ -329,7 +339,6 @@
 		},
 		{
 			"Group": "运行库",
-			"Structure": "安装包\\运行库",
 			"App": [
 				{
 					"GUID":      "2d4983a1-3568-4a23-8824-ffbd33a88dcc",
@@ -337,6 +346,7 @@
 					"Action":    "Install",
 					"Manner":    "Queue",
 					"DLetter":   "auto",
+					"Structure": "安装包\\运行库",
 					"Unpwd":     "",
 					"Url": {
 						"arm64": "",
@@ -350,7 +360,6 @@
 		},
 		{
 			"Group": "其它",
-			"Structure": "安装包\\其它",
 			"App": [
 				{
 					"GUID":      "73854748-e3a1-45b3-aa6f-13c2d3a12722",
@@ -358,6 +367,7 @@
 					"Action":    "Install",
 					"Manner":    "Queue",
 					"DLetter":   "auto",
+					"Structure": "安装包\\其它",
 					"Unpwd":     "",
 					"Url": {
 						"arm64": "",

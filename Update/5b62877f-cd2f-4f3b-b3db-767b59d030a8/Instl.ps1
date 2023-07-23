@@ -737,6 +737,23 @@ Function Install_Process
 				$OutAny = Join-Path -Path $Global:FreeDiskTo -ChildPath "$($structure)\$SaveToName"
 			}
 		}
+		PSScriptRoot
+		{
+			$OutTo = Join-Path -Path $($PSScriptRoot) -ChildPath "$($structure)"
+			$OutAny = Join-Path -Path $($PSScriptRoot) -ChildPath "$($structure)\$SaveToName"
+			Get-ChildItem -Path $OutTo -Filter "*$($filename)*$((Get-Culture).Name)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
+				$OutAny = $($_.fullname)
+				break
+			}
+			Get-ChildItem -Path $OutTo -Filter "*$($filename)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
+				$OutAny = $($_.fullname)
+				break
+			}
+			Get-ChildItem -Path $OutTo -Filter "*$($packer)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
+				$OutAny = $($_.fullname)
+				break
+			}
+		}
 		default
 		{
 			$OutTo = Join-Path -Path $($todisk) -ChildPath "$($structure)"
@@ -1254,7 +1271,7 @@ Function Update_Process
 	#>
 	Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main" -Name "DisableFirstRunCustomize" -Value 2 -ErrorAction SilentlyContinue
 
-	Write-Host "   $($lang.UpdateCheckServerStatus -f $($Script:ServerList.Count))`n   $('-' * 80)"
+	Write-Host "`n   $($lang.UpdateCheckServerStatus -f $($Script:ServerList.Count))`n   $('-' * 80)"
 
 	ForEach ($item in $Script:ServerList) {
 		Write-Host "   * $($lang.UpdateServerAddress)"
@@ -1373,8 +1390,8 @@ Function Install_UI
 		$Script:Install_App = @()
 		$Custom_Config = Get-Content -Path $Script:Init_Config | ConvertFrom-JSON
 		foreach ($item in $Custom_Config) {
-		    if ($item.app.Count -gt 0) {
-		        foreach ($itemApp in $item.app) {
+		    if ($item.App.app.Count -gt 0) {
+		        foreach ($itemApp in $item.App.app) {
 					if (($Match_Wait_App -Contains $itemApp.Name) -or
 						($Match_Wait_App -Contains $itemApp.GUID))
 					{
@@ -1384,7 +1401,7 @@ Function Install_UI
 							Action    = $itemApp.Action;
 							Manner    = $itemApp.Manner;
 							DLetter   = $itemApp.DLetter;
-							Structure = $item.Structure;
+							Structure = $itemApp.Structure;
 							Unpwd     = $itemApp.Unpwd;
 							Url       = $itemApp.url;
 							FindFile  = $itemApp.FindFile;
@@ -1988,8 +2005,8 @@ Function Refresh_Match
 
 	$Custom_Config = Get-Content -Path $Script:Init_Config | ConvertFrom-JSON
 	foreach ($item in $Custom_Config) {
-	    if ($item.app.Count -gt 0) {
-	        foreach ($itemApp in $item.app) {
+	    if ($item.App.App.Count -gt 0) {
+	        foreach ($itemApp in $item.App.app) {
 				if (($MatchApp -Contains $itemApp.Name) -or
 					($MatchApp -Contains $itemApp.GUID))
 				{
@@ -1999,7 +2016,7 @@ Function Refresh_Match
 						Action    = $itemApp.Action;
 						Manner    = $itemApp.Manner;
 						DLetter   = $itemApp.DLetter;
-						Structure = $item.Structure;
+						Structure = $itemApp.Structure;
 						Unpwd     = $itemApp.Unpwd;
 						Url       = $itemApp.url;
 						FindFile  = $itemApp.FindFile;
@@ -2046,6 +2063,17 @@ if ($App) {
 		<#
 			.未指定配置文件，优先读取本地 Instl.json，如果没有就激活自动下载功能
 		#>
+		if (-not (Test-Path -Path $Script:Init_Config -PathType leaf)) {
+			ForEach ($item in $Script:ServerListSelect | Sort-Object { Get-Random } ) {
+				$Script:ServerList += $item
+			}
+
+			Update_Process
+		}
+
+		<#
+			.未指定配置文件，优先读取本地 Instl.json，如果没有就激活自动下载功能
+		#>
 		if (Test-Path -Path $Script:Init_Config -PathType leaf) {
 			Write-host "`n   $($lang.ConfigNot)`n   $('-' * 80)"
 			Write-host "   $($Script:Init_Config)" -ForegroundColor Green
@@ -2059,14 +2087,32 @@ if ($App) {
 	Refresh_Match -MatchApp $App
 	Install_Start_Process
 } else {
-	$OutputNew = "$($PSScriptRoot)\instl.json"
+	if ($Config) {
+		Write-host "`n   $($lang.ConfigNot)`n   $('-' * 80)"
+		Write-host "   $($config)" -ForegroundColor Green
 
-	if (-not (Test-Path -Path $OutputNew -PathType leaf)) {
-		ForEach ($item in $Script:ServerListSelect | Sort-Object { Get-Random } ) {
-			$Script:ServerList += $item
+		if (Test-Path -Path $config -PathType leaf) {
+			$Script:Init_Config = $Config
+			Write-host "   $($lang.SetDefault)"
+		} else {
+			Write-host "   $($lang.NoInstallImage)"
+			return
 		}
+	} else {
+		<#
+			.未指定配置文件，优先读取本地 Instl.json，如果没有就激活自动下载功能
+		#>
+		if (Test-Path -Path $Script:Init_Config -PathType leaf) {
+			Write-host "`n   $($lang.ConfigNot)`n   $('-' * 80)"
+			Write-host "   $($Script:Init_Config)" -ForegroundColor Green
+			Write-host "   $($lang.SetDefault)"
+		} else {
+			ForEach ($item in $Script:ServerListSelect | Sort-Object { Get-Random } ) {
+				$Script:ServerList += $item
+			}
 
-		Update_Process
+			Update_Process
+		}
 	}
 
 	Install_UI
