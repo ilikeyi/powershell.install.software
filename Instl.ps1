@@ -210,7 +210,7 @@ Function Language
 			Installing              = "正在安装"
 			Done                    = "完成"
 			ExistingPacker          = "已有安装包"
-			QucikRun                = "快速運行："
+			QucikRun                = "快速运行："
 			WaitDone                = "等待完成："
 			WaitQueue               = "正在等待队列"
 			AddQueue                = "添加队列："
@@ -1447,7 +1447,7 @@ Function Install_UI
 		Dock           = 3
 	}
 	$Select_Group_Value = New-Object system.Windows.Forms.Label -Property @{
-		Height         = 30
+		Height         = 35
 		Width          = 435
 		Padding        = 8
 		Text           = $lang.ChoseClass
@@ -1461,7 +1461,7 @@ Function Install_UI
 		margin         = "28,0,0,15"
 	}
 	$Select_App_Value  = New-Object system.Windows.Forms.Label -Property @{
-		Height         = 30
+		Height         = 35
 		Width          = 435
 		Padding        = 8
 		Text           = $lang.ChoseInstall
@@ -1812,7 +1812,7 @@ Function Install_UI
 					autoSize = 1
 					Text     = $item.Group
 					Checked  = $True
-					margin   = "0,0,20,10"
+					margin   = "0,0,25,15"
 					add_Click = { Refresh_Select_Group }
 				}
 				$Select_Group.controls.AddRange($CheckBox)
@@ -1843,7 +1843,7 @@ Function Install_UI
 			Refresh_Select_Item
 		} else {
 			$UI_Main_Pre_Rule_Not_Find = New-Object system.Windows.Forms.Label -Property @{
-				Height   = 30
+				Height   = 35
 				Width    = 470
 				Text     = $lang.ChoseClassNo
 			}
@@ -1859,7 +1859,7 @@ Function Install_UI
 		foreach ($item in $Script:Custom_Config.App) {
 			if (($Script:Init_Select_Value) -Contains $item.Group) {
 				$Temp_Main_Save_Expand_Name = New-Object system.Windows.Forms.Label -Property @{
-					Height         = 25
+					Height         = 30
 					Width          = 470
 					Text           = $item.Group
 				}
@@ -1886,7 +1886,7 @@ Function Install_UI
 						}
 
 						$UI_Expand_Wrap = New-Object system.Windows.Forms.Label -Property @{
-							Height         = 22
+							Height         = 30
 							Width          = 470
 						}
 						$Select_App.controls.AddRange($UI_Expand_Wrap)
@@ -1908,7 +1908,7 @@ Function Install_UI
 					}
 
 					$UI_Expand_Wrap = New-Object system.Windows.Forms.Label -Property @{
-						Height         = 22
+						Height         = 30
 						Width          = 465
 					}
 					$Select_App.controls.AddRange((
