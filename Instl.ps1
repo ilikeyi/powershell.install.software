@@ -1546,7 +1546,7 @@ Function Update_Process
 	$RandomGuid = [guid]::NewGuid()
 	$output = "$($PSScriptRoot)\$($RandomGuid).json"
 
-	New-Item -Path "$($PSScriptRoot)\Config\$($Global:IsLang)" -ItemType Directory -ErrorAction SilentlyContinue | Out-Null
+	New-Item -Path "$($PSScriptRoot)\$($Global:IsLang)" -ItemType Directory -ErrorAction SilentlyContinue | Out-Null
 
 	$start_time = Get-Date
 	remove-item -path $output -force -ErrorAction SilentlyContinue
@@ -2288,7 +2288,7 @@ Language
 <#
 	.初始化默认配置文件
 #>
-$Script:Init_Config = "$($PSScriptRoot)\Config\$($Global:IsLang)\Instl.json"
+$Script:Init_Config = "$($PSScriptRoot)\$($Global:IsLang)\Instl.json"
 
 Get_Architecture
 Setting_Init_Disk_Free
