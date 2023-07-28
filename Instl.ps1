@@ -29,6 +29,12 @@
   . 连接
   	- https://github.com/ilikeyi/powershell.install.software
 
+  .用法
+   -Config "d:\instl.json"     | 指定配置文件
+   -App "Gpg4win", "Python"    | 从指定配置文件 instl.json 里获取应用程序，如果没有指定则自动从网站上下载配置文件
+                                 可指定应用程序名、GUID 唯一识别符
+   -Lang "en-US"               | 指定语言
+
 #>
 
 #Requires -version 5.1
@@ -37,6 +43,7 @@
 [CmdletBinding()]
 param
 (
+	$Lang,
 	$Config,
 	[string[]]$App
 )
@@ -126,10 +133,10 @@ $Script:Install_App = @()
 	.Language
 	.语言
 #>
-Function Language
-{
-	$AvailableLanguages = @{
-		"en-US" = @{
+$AvailableLanguages = @(
+	@{
+		Tag      = "en-US"
+		Language = @{
 			Instl                   = "Software Installation"
 			Setting                 = "Set up"
 			Refresh                 = "Refresh"
@@ -191,7 +198,10 @@ Function Language
 			UpdateFailedConfig      = "Download succeeded, but profile test failed, updated failed."
 			ConfigError             = "Configuration file error"
 		}
-		"de-DE" = @{
+	}
+	@{
+		Tag      = "de-DE"
+		Language = @{
 			Instl                   = "Software Installation"
 			Setting                 = "aufstellen"
 			Refresh                 = "erneuern"
@@ -253,7 +263,10 @@ Function Language
 			UpdateFailedConfig      = "Der Download war erfolgreich, aber der Profiltest ist fehlgeschlagen, die Aktualisierung ist fehlgeschlagen."
 			ConfigError             = "Fehler in der Konfigurationsdatei"
 		}
-		"ja-JP" = @{
+	}
+	@{
+		Tag      = "ja-JP"
+		Language = @{
 			Instl                   = "ソフトウェアのインストール"
 			Setting                 = "設定"
 			Refresh                 = "リフレッシュする"
@@ -315,7 +328,10 @@ Function Language
 			UpdateFailedConfig      = "ダウンロードは成功しましたが、プロファイルのテストは失敗し、更新は失敗しました。"
 			ConfigError             = "設定ファイルエラー"
 		}
-		"ko-KR" = @{
+	}
+	@{
+		Tag      = "ko-KR"
+		Language = @{
 			Instl                   = "소프트웨어 설치"
 			Setting                 = "설정"
 			Refresh                 = "새로 고침"
@@ -377,7 +393,10 @@ Function Language
 			UpdateFailedConfig      = "다운로드에 성공했지만 프로필 테스트에 실패하고 업데이트에 실패했습니다."
 			ConfigError             = "구성 파일 오류"
 		}
-		"zh-CN" = @{
+	}
+	@{
+		Tag      = "zh-CN"
+		Language = @{
 			Instl                   = "软件安装"
 			Setting                 = "设置"
 			Refresh                 = "刷新"
@@ -439,7 +458,10 @@ Function Language
 			UpdateFailedConfig      = "下载成功，但配置文件测试失败，已更新失败。"
 			ConfigError             = "配置文件错误"
 		}
-		"zh-TW" = @{
+	}
+	@{
+		Tag      = "zh-TW"
+		Language = @{
 			Instl                   = "軟件安裝"
 			Setting                 = "設置"
 			Refresh                 = "刷新"
@@ -502,29 +524,36 @@ Function Language
 			ConfigError             = "配置文件錯誤"
 		}
 	}
+)
 
+Function Language
+{
 	<#
 		.重置语言，获取当前主语言
 	#>
-	$Global:Lang = @()
-	$Global:IsLang = ""
+	$Script:lang = @()
+	$Script:IsLang = ""
 	$PrimaryLnguage = (Get-Culture).Name
 
 	ForEach ($item in $AvailableLanguages) {
-		$NewItem = $item.Name + $PrimaryLnguage
-
-		if ($NewItem -eq $PrimaryLnguage) {
-			$Global:Lang = $item.$PrimaryLnguage
-			$Global:IsLang = $PrimaryLnguage
+		if ($item.Tag -eq $PrimaryLnguage) {
+			$Script:lang = $item.Language
+			$Script:IsLang = $item.Tag
 			return
 		}
 	}
 
-	<#
-		.未发现可用的语言包
-	#>
-	$Global:Lang = $AvailableLanguages."en-US"
-	$Global:IsLang = "en-US"
+	ForEach ($item in $AvailableLanguages) {
+		if ($item.Tag -eq "en-US") {
+			$Script:lang = $item.Language
+			$Script:IsLang = $item.Tag
+			return
+		}
+	}
+
+	Write-Host "No language packs found, please try again." -ForegroundColor Red
+	Start-Sleep -s 2
+	exit
 }
 
 <#
@@ -849,7 +878,7 @@ Function Check_Folder
 	{
 		New-Item -Path $chkpath -ItemType Directory -ErrorAction SilentlyContinue | Out-Null
 		if (-not (Test-Path $chkpath -PathType Container)) {
-			Write-Host "   $($lang.FailedCreateFolder)$($chkpath)`n" -ForegroundColor Red
+			Write-Host "   $($Script:lang.FailedCreateFolder)$($chkpath)`n" -ForegroundColor Red
 			return
 		}
 	}
@@ -905,7 +934,7 @@ Function Install_Process
 		$param
 	)
 
-	Write-Host "   $($lang.Installing) - $($appname)" -ForegroundColor Green
+	Write-Host "   $($Script:lang.Installing) - $($appname)" -ForegroundColor Green
 
 	switch ($Global:InstlArchitecture) {
 		"arm64" {
@@ -1028,55 +1057,55 @@ Function Install_Process
 				Install
 				{
 					Get-ChildItem -Path $OutTo -Filter "*$($filename)*$((Get-Culture).Name)*.exe" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
-						Write-Host "    - $($lang.LocallyExist)$($_.fullname)"
+						Write-Host "    - $($Script:lang.LocallyExist)$($_.fullname)"
 						Open_Apps -filename $($_.fullname) -param $param -mode $mode
 						break
 					}
 					Get-ChildItem -Path $OutTo -Filter "*$($filename)*.exe" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
-						Write-Host "    - $($lang.LocallyExist)$($_.fullname)"
+						Write-Host "    - $($Script:lang.LocallyExist)$($_.fullname)"
 						Open_Apps -filename $($_.fullname) -param $param -mode $mode
 						break
 					}
 					Get-ChildItem -Path $OutTo -Filter "*$($packer)*.exe" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
-						Write-Host "   - $($lang.LocallyExist)`n     $($_.fullname)"
+						Write-Host "   - $($Script:lang.LocallyExist)`n     $($_.fullname)"
 						Open_Apps -filename $($_.fullname) -param $param -mode $mode
 						break
 					}
 					if (Test-Path $OutAny) {
-						Write-Host "    - $($lang.ExistingPacker)"
+						Write-Host "    - $($Script:lang.ExistingPacker)"
 					} else {
-						Write-Host "    * $($lang.StartDown)"
+						Write-Host "    * $($Script:lang.StartDown)"
 						if ([string]::IsNullOrEmpty($url)) {
-							Write-Host "    - $($lang.DownloadLinkError)" -ForegroundColor Red
+							Write-Host "    - $($Script:lang.DownloadLinkError)" -ForegroundColor Red
 						} else {
 							if (Test_URI $url) {
-								Write-Host "      > $($lang.ConnectTo)`n        $url`n      + $($lang.SaveTo)`n        $OutAny"
+								Write-Host "      > $($Script:lang.ConnectTo)`n        $url`n      + $($Script:lang.SaveTo)`n        $OutAny"
 								Check_Folder -chkpath $OutTo
 								Invoke-WebRequest -Uri $url -OutFile "$($OutAny)" -ErrorAction SilentlyContinue | Out-Null
 							} else {
-								Write-Host "      - $($lang.NotAvailable)" -ForegroundColor Red
+								Write-Host "      - $($Script:lang.NotAvailable)" -ForegroundColor Red
 							}
 						}
 					}
 					if (Test-Path $OutAny) {
-						Write-Host "    - $($lang.Unpacking)".PadRight(28) -NoNewline
+						Write-Host "    - $($Script:lang.Unpacking)".PadRight(28) -NoNewline
 						Archive -Password $pwd -filename $OutAny -to $OutTo
 						Remove-Item -path $OutAny -force -ErrorAction SilentlyContinue
 					} else {
-						Write-Host "      - $($lang.ErrorDown)`n" -ForegroundColor Red
+						Write-Host "      - $($Script:lang.ErrorDown)`n" -ForegroundColor Red
 					}
 					Get-ChildItem -Path $OutTo -Filter "*$($filename)*$((Get-Culture).Name)*.exe" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
-						Write-Host "    - $($lang.LocallyExist)$($_.fullname)"
+						Write-Host "    - $($Script:lang.LocallyExist)$($_.fullname)"
 						Open_Apps -filename $($_.fullname) -param $param -mode $mode
 						break
 					}
 					Get-ChildItem -Path $OutTo -Filter "*$($filename)*.exe" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
-						Write-Host "    - $($lang.LocallyExist)$($_.fullname)"
+						Write-Host "    - $($Script:lang.LocallyExist)$($_.fullname)"
 						Open_Apps -filename $($_.fullname) -param $param -mode $mode
 						break
 					}
 					Get-ChildItem -Path $OutTo -Filter "*$($packer)*.exe" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
-						Write-Host "   - $($lang.LocallyExist)`n     $($_.fullname)"
+						Write-Host "   - $($Script:lang.LocallyExist)`n     $($_.fullname)"
 						Open_Apps -filename $($_.fullname) -param $param -mode $mode
 						break
 					}
@@ -1084,18 +1113,18 @@ Function Install_Process
 				NoInst
 				{
 					if (Test-Path $OutAny) {
-						Write-Host "    - $($lang.ItInstalled)`n"
+						Write-Host "    - $($Script:lang.ItInstalled)`n"
 					} else {
-						Write-Host "    * $($lang.StartDown)"
+						Write-Host "    * $($Script:lang.StartDown)"
 						if ([string]::IsNullOrEmpty($url)) {
-							Write-Host "      - $($lang.DownloadLinkError)" -ForegroundColor Red
+							Write-Host "      - $($Script:lang.DownloadLinkError)" -ForegroundColor Red
 						} else {
 							if (Test_URI $url) {
-								Write-Host "      > $($lang.ConnectTo)`n        $url`n      + $($lang.SaveTo)`n        $OutAny"
+								Write-Host "      > $($Script:lang.ConnectTo)`n        $url`n      + $($Script:lang.SaveTo)`n        $OutAny"
 								Check_Folder -chkpath $OutTo
 								Invoke-WebRequest -Uri $url -OutFile "$($OutAny)" -ErrorAction SilentlyContinue | Out-Null
 							} else {
-								Write-Host "      - $($lang.NotAvailable)`n" -ForegroundColor Red
+								Write-Host "      - $($Script:lang.NotAvailable)`n" -ForegroundColor Red
 							}
 						}
 					}
@@ -1104,52 +1133,52 @@ Function Install_Process
 				{
 					$newoutputfoldoer = "$($OutTo)\$($packer)"
 					if (Test-Path $newoutputfoldoer -PathType Container) {
-						Write-Host "    - $($lang.ItInstalled)`n"
+						Write-Host "    - $($Script:lang.ItInstalled)`n"
 						break
 					}
 					if (Test-Path $OutAny) {
-						Write-Host "    - $($lang.ExistingInstlPacker)"
+						Write-Host "    - $($Script:lang.ExistingInstlPacker)"
 					} else {
-						Write-Host "    * $($lang.StartDown)"
+						Write-Host "    * $($Script:lang.StartDown)"
 						if ([string]::IsNullOrEmpty($url)) {
-							Write-Host "      - $($lang.DownloadLinkError)" -ForegroundColor Red
+							Write-Host "      - $($Script:lang.DownloadLinkError)" -ForegroundColor Red
 						} else {
-							Write-Host "      > $($lang.ConnectTo)`n        $url`n      + $($lang.SaveTo)`n        $OutAny"
+							Write-Host "      > $($Script:lang.ConnectTo)`n        $url`n      + $($Script:lang.SaveTo)`n        $OutAny"
 							Invoke-WebRequest -Uri $url -OutFile $OutAny -ErrorAction SilentlyContinue | Out-Null
 						}
 					}
 					if (Test-Path $OutAny) {
-						Write-Host "    - $($lang.OnlyUnzip)".PadRight(28) -NoNewline
+						Write-Host "    - $($Script:lang.OnlyUnzip)".PadRight(28) -NoNewline
 						Archive -Password $pwd -filename $OutAny -to $newoutputfoldoer
 						Remove-Item -path $OutAny -force -ErrorAction SilentlyContinue
 					} else {
-						Write-Host "      - $($lang.ErrorDown)`n" -ForegroundColor Red
+						Write-Host "      - $($Script:lang.ErrorDown)`n" -ForegroundColor Red
 					}
 				}
 				Unzip
 				{
 					if (Test-Path $OutAny) {
-						Write-Host "    - $($lang.ExistingPacker)"
+						Write-Host "    - $($Script:lang.ExistingPacker)"
 					} else {
-						Write-Host "    * $($lang.StartDown)"
+						Write-Host "    * $($Script:lang.StartDown)"
 						if ([string]::IsNullOrEmpty($url)) {
-							Write-Host "      - $($lang.DownloadLinkError)" -ForegroundColor Red
+							Write-Host "      - $($Script:lang.DownloadLinkError)" -ForegroundColor Red
 						} else {
 							if (Test_URI $url) {
-								Write-Host "      > $($lang.ConnectTo)`n        $url`n      + $($lang.SaveTo)`n        $OutAny"
+								Write-Host "      > $($Script:lang.ConnectTo)`n        $url`n      + $($Script:lang.SaveTo)`n        $OutAny"
 								Check_Folder -chkpath $OutTo
 								Invoke-WebRequest -Uri $url -OutFile $OutAny -ErrorAction SilentlyContinue | Out-Null
 							} else {
-								Write-Host "      - $($lang.NotAvailable)`n" -ForegroundColor Red
+								Write-Host "      - $($Script:lang.NotAvailable)`n" -ForegroundColor Red
 							}
 						}
 					}
 					if (Test-Path $OutAny) {
-						Write-Host "    - $($lang.OnlyUnzip)".PadRight(28) -NoNewline
+						Write-Host "    - $($Script:lang.OnlyUnzip)".PadRight(28) -NoNewline
 						Archive -Password $pwd -filename $OutAny -to $OutTo
 						Remove-Item -path $OutAny -force -ErrorAction SilentlyContinue
 					} else {
-						Write-Host "      - $($lang.ErrorDown)`n" -ForegroundColor Red
+						Write-Host "      - $($Script:lang.ErrorDown)`n" -ForegroundColor Red
 					}
 				}
 			}
@@ -1159,18 +1188,18 @@ Function Install_Process
 			if (Test-Path $OutAny -PathType Leaf) {
 				Open_Apps -filename $OutAny -param $param -mode $mode
 			} else {
-				Write-Host "    * $($lang.StartDown)"
+				Write-Host "    * $($Script:lang.StartDown)"
 				if ([string]::IsNullOrEmpty($url)) {
-					Write-Host "      - $($lang.DownloadLinkError)`n" -ForegroundColor Red
+					Write-Host "      - $($Script:lang.DownloadLinkError)`n" -ForegroundColor Red
 				} else {
-					Write-Host "      > $($lang.ConnectTo)`n        $url"
+					Write-Host "      > $($Script:lang.ConnectTo)`n        $url"
 					if (Test_URI $url) {
-						Write-Host "      + $($lang.SaveTo)`n        $OutAny"
+						Write-Host "      + $($Script:lang.SaveTo)`n        $OutAny"
 						Check_Folder -chkpath $OutTo
 						Invoke-WebRequest -Uri $url -OutFile $OutAny -ErrorAction SilentlyContinue | Out-Null
 						Open_Apps -filename $OutAny -param $param -mode $mode
 					} else {
-						Write-Host "      - $($lang.NotAvailable)`n" -ForegroundColor Red
+						Write-Host "      - $($Script:lang.NotAvailable)`n" -ForegroundColor Red
 					}
 				}
 			}
@@ -1192,7 +1221,7 @@ Function Archive
 
 	Write-Host "   $($filename)"
 	Write-host "   $($to)"
-	Write-Host "   $($lang.Unpacking)".PadRight(28) -NoNewline
+	Write-Host "   $($Script:lang.Unpacking)".PadRight(28) -NoNewline
 	if (Compressing) {
 		if (([string]::IsNullOrEmpty($Password))) {
 			$arguments = "x ""-r"" ""-tzip"" ""$filename"" ""-o$to"" ""-y"""
@@ -1200,10 +1229,10 @@ Function Archive
 			$arguments = "x ""-p$Password"" ""-r"" ""-tzip"" ""$filename"" ""-o$to"" ""-y"""
 		}
 		Start-Process $Global:Zip "$arguments" -Wait -WindowStyle Minimized
-		Write-Host "     $($lang.Done)`n" -ForegroundColor Green
+		Write-Host "     $($Script:lang.Done)`n" -ForegroundColor Green
 	} else {
 		Expand-Archive -LiteralPath $filename -DestinationPath $to -force
-		Write-Host "     $($lang.Done)`n" -ForegroundColor Green
+		Write-Host "     $($Script:lang.Done)`n" -ForegroundColor Green
 	}
 }
 
@@ -1228,13 +1257,13 @@ Function Compressing
 
 Function Wait_Process_End
 {
-	Write-Host "`n   $($lang.WaitQueue)" -ForegroundColor Green
+	Write-Host "`n   $($Script:lang.WaitQueue)" -ForegroundColor Green
 	for ($i=0; $i -lt $Script:AppQueue.Count; $i++) {
 		Write-Host "    * PID: $($Script:AppQueue[$i]['ID'])".PadRight(22) -NoNewline
 		if ((Get-Process -ID $($Script:AppQueue[$i]['ID']) -ErrorAction SilentlyContinue).Path -eq $Script:AppQueue[$i]['PATH']) {
 			Wait-Process -id $($Script:AppQueue[$i]['ID']) -ErrorAction SilentlyContinue
 		}
-		Write-Host "    - $($lang.Done)" -ForegroundColor Yellow
+		Write-Host "    - $($Script:lang.Done)" -ForegroundColor Yellow
 	}
 	$Script:AppQueue = @()
 }
@@ -1254,25 +1283,25 @@ Function Open_Apps
 			Fast {
 				if ([string]::IsNullOrEmpty($param))
 				{
-					Write-Host "    - $($lang.QucikRun)`n      $filename`n"
+					Write-Host "    - $($Script:lang.QucikRun)`n      $filename`n"
 					Start-Process -FilePath $filename
 				} else {
-					Write-Host "    - $($lang.QucikRun)`n      $filename`n    - $($lang.Parameter)`n      $param`n"
+					Write-Host "    - $($Script:lang.QucikRun)`n      $filename`n    - $($Script:lang.Parameter)`n      $param`n"
 					Start-Process -FilePath $filename -ArgumentList $param
 				}
 			}
 			Wait {
 				if ([string]::IsNullOrEmpty($param))
 				{
-					Write-Host "    - $($lang.WaitDone)`n      $filename`n"
+					Write-Host "    - $($Script:lang.WaitDone)`n      $filename`n"
 					Start-Process -FilePath $filename -Wait
 				} else {
-					Write-Host "    - $($lang.WaitDone)`n      $filename`n    - $($lang.Parameter)`n      $param`n"
+					Write-Host "    - $($Script:lang.WaitDone)`n      $filename`n    - $($Script:lang.Parameter)`n      $param`n"
 					Start-Process -FilePath $filename -ArgumentList $param -Wait
 				}
 			}
 			Queue {
-				Write-Host "    - $($lang.QucikRun)`n      $filename"
+				Write-Host "    - $($Script:lang.QucikRun)`n      $filename"
 				if ([string]::IsNullOrEmpty($param))
 				{
 					$AppRunQueue = Start-Process -FilePath $filename -passthru
@@ -1280,20 +1309,20 @@ Function Open_Apps
 						ID   = "$($AppRunQueue.Id)";
 						PATH = "$($filename)"
 					}
-					Write-Host "    - $($lang.AddQueue)$($AppRunQueue.Id)`n"
+					Write-Host "    - $($Script:lang.AddQueue)$($AppRunQueue.Id)`n"
 				} else {
 					$AppRunQueue = Start-Process -FilePath $filename -ArgumentList $param -passthru
 					$Script:AppQueue += @{
 						ID   = "$($AppRunQueue.Id)";
 						PATH = "$($filename)"
 					}
-					Write-Host "    - $($lang.Parameter)`n      $param"
-					Write-Host "    - $($lang.AddQueue)$($AppRunQueue.Id)`n"
+					Write-Host "    - $($Script:lang.Parameter)`n      $param"
+					Write-Host "    - $($Script:lang.AddQueue)$($AppRunQueue.Id)`n"
 				}
 			}
 		}
 	} else {
-		Write-Host "    - $($lang.InstlNo)$filename`n" -ForegroundColor Red
+		Write-Host "    - $($Script:lang.InstlNo)$filename`n" -ForegroundColor Red
 	}
 }
 
@@ -1303,14 +1332,14 @@ Function ToMainpage
 	(
 		[int]$wait
 	)
-	Write-Host "   $($lang.ToQuit -f $wait)" -ForegroundColor Red
+	Write-Host "   $($Script:lang.ToQuit -f $wait)" -ForegroundColor Red
 	Start-Sleep -s $wait
 	exit
 }
 
 Function Install_Start_Process
 {
-	Write-Host "`n   $($lang.Instllsoftwareing) ( $($Script:Install_App.Count) )`n   $('-' * 80)"
+	Write-Host "`n   $($Script:lang.Instllsoftwareing) ( $($Script:Install_App.Count) )`n   $('-' * 80)"
 	if ($Script:Install_App.Count -gt 0) {
 		foreach ($item in $Script:Install_App) {
 			Install_Process -appname $item.Name -act $item.Action -mode $item.Manner -todisk $item.DLetter -structure $item.Structure -pwd $item.Unpwd -url $item.url.x86 -urlAMD64 $item.url.x64 -urlarm64 $item.url.arm64 -filename $item.FindFile -param $item.param
@@ -1318,7 +1347,7 @@ Function Install_Start_Process
 
 		Wait_Process_End
 	} else {
-		Write-host "   $($lang.InstllUnavailable)"
+		Write-host "   $($Script:lang.InstllUnavailable)"
 	}
 }
 
@@ -1359,7 +1388,7 @@ Function Update_Setting_UI
 				Update_Process
 				$GUIUpdate.Close()
 			} else {
-				$GUIUpdateErrorMsg.Text = "$($lang.UpdateServerNoSelect)"
+				$GUIUpdateErrorMsg.Text = "$($Script:lang.UpdateServerNoSelect)"
 			}
 		}
 	}
@@ -1367,7 +1396,7 @@ Function Update_Setting_UI
 		autoScaleMode  = 2
 		Height         = 720
 		Width          = 550
-		Text           = $lang.UpdateList
+		Text           = $Script:lang.UpdateList
 		StartPosition  = "CenterScreen"
 		MaximizeBox    = $False
 		MinimizeBox    = $False
@@ -1377,7 +1406,7 @@ Function Update_Setting_UI
 	$GUIUpdateAuto     = New-Object System.Windows.Forms.CheckBox -Property @{
 		Height         = 22
 		Width          = 505
-		Text           = $lang.UpdateServerSelect
+		Text           = $Script:lang.UpdateServerSelect
 		Location       = '10,6'
 		add_Click      = {
 			if ($GUIUpdateAuto.Checked) {
@@ -1411,7 +1440,7 @@ Function Update_Setting_UI
 		Height         = 36
 		Width          = 515
 		add_Click      = $GUIUpdateOKClick
-		Text           = $lang.OK
+		Text           = $Script:lang.OK
 	}
 	$GUIUpdateCanel    = New-Object system.Windows.Forms.Button -Property @{
 		UseVisualStyleBackColor = $True
@@ -1423,7 +1452,7 @@ Function Update_Setting_UI
 			$Script:ServerList = @()
 			$GUIUpdate.Close()
 		}
-		Text           = $lang.Cancel
+		Text           = $Script:lang.Cancel
 	}
 	$GUIUpdate.controls.AddRange((
 		$GUIUpdateAuto,
@@ -1451,7 +1480,7 @@ Function Update_Setting_UI
 		.添加右键菜单：全选、清除按钮
 	#>
 	$GUIUpdateMenu = New-Object System.Windows.Forms.ContextMenuStrip
-	$GUIUpdateMenu.Items.Add($lang.AllSel).add_Click({
+	$GUIUpdateMenu.Items.Add($Script:lang.AllSel).add_Click({
 		$GUIUpdatePanel.Controls | ForEach-Object {
 			if ($_ -is [System.Windows.Forms.CheckBox]) {
 				if ($_.Enabled) {
@@ -1460,7 +1489,7 @@ Function Update_Setting_UI
 			}
 		}
 	})
-	$GUIUpdateMenu.Items.Add($lang.AllClear).add_Click({
+	$GUIUpdateMenu.Items.Add($Script:lang.AllClear).add_Click({
 		$GUIUpdatePanel.Controls | ForEach-Object {
 			if ($_ -is [System.Windows.Forms.CheckBox]) {
 				if ($_.Enabled) {
@@ -1471,7 +1500,7 @@ Function Update_Setting_UI
 	})
 	$GUIUpdatePanel.ContextMenuStrip = $GUIUpdateMenu
 
-	switch ($Global:IsLang) {
+	switch ($Script:IsLang) {
 		"zh-CN" {
 			$GUIUpdate.Font = New-Object System.Drawing.Font("Microsoft YaHei", 9, [System.Drawing.FontStyle]::Regular)
 		}
@@ -1487,7 +1516,7 @@ Function Update_Setting_UI
 Function Refresh_Server_List
 {
 	ForEach ($item in $Script:PreServerList) {
-		if ($Global:IsLang -eq $item.Region) {
+		if ($Script:IsLang -eq $item.Region) {
 			ForEach ($itemLink in $item.Link) {
 				$Script:ServerListSelect += $itemLink
 			}
@@ -1495,7 +1524,7 @@ Function Refresh_Server_List
 			break
 		}
 
-		if ($Global:IsLang -eq "en-US") {
+		if ($Script:IsLang -eq "en-US") {
 			ForEach ($itemLink in $item.Link) {
 				$Script:ServerListSelect += $itemLink
 	        }
@@ -1517,44 +1546,44 @@ Function Update_Process
 	#>
 	Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main" -Name "DisableFirstRunCustomize" -Value 2 -ErrorAction SilentlyContinue
 
-	Write-Host "`n   $($lang.UpdateCheckServerStatus -f $($Script:ServerList.Count))`n   $('-' * 80)"
+	Write-Host "`n   $($Script:lang.UpdateCheckServerStatus -f $($Script:ServerList.Count))`n   $('-' * 80)"
 
 	ForEach ($item in $Script:ServerList) {
-		Write-Host "   * $($lang.UpdateServerAddress)"
+		Write-Host "   * $($Script:lang.UpdateServerAddress)"
 		Write-host "     $($item)" -ForegroundColor Green
 		if (Test_URI $item) {
 			$PreServerVersion = $item
 			$ServerTest = $true
 			$url = $item
-			Write-Host "     $($lang.UpdateServeravailable)" -ForegroundColor Green
+			Write-Host "     $($Script:lang.UpdateServeravailable)" -ForegroundColor Green
 			break
 		} else {
-			Write-Host "     $($lang.NotAvailable)`n" -ForegroundColor Red
+			Write-Host "     $($Script:lang.NotAvailable)`n" -ForegroundColor Red
 		}
 	}
 
 	if ($ServerTest) {
 		Write-Host "   $('-' * 80)"
-		Write-Host "     $($lang.UpdatePriority)" -ForegroundColor Green
+		Write-Host "     $($Script:lang.UpdatePriority)" -ForegroundColor Green
 	} else {
-		Write-Host "     $($lang.UpdateServerTestFailed)" -ForegroundColor Red
+		Write-Host "     $($Script:lang.UpdateServerTestFailed)" -ForegroundColor Red
 		Write-Host "   $('-' * 80)"
 		return
 	}
 
-	Write-host "`n   $($lang.UpdateQueryingUpdate)"
+	Write-host "`n   $($Script:lang.UpdateQueryingUpdate)"
 	$RandomGuid = [guid]::NewGuid()
 	$output = "$($PSScriptRoot)\$($RandomGuid).json"
 
-	New-Item -Path "$($PSScriptRoot)\$($Global:IsLang)" -ItemType Directory -ErrorAction SilentlyContinue | Out-Null
+	New-Item -Path "$($PSScriptRoot)\$($Script:IsLang)" -ItemType Directory -ErrorAction SilentlyContinue | Out-Null
 
 	$start_time = Get-Date
 	remove-item -path $output -force -ErrorAction SilentlyContinue
 	Invoke-WebRequest -Uri $url -OutFile $output -TimeoutSec 30 -DisableKeepAlive -ErrorAction SilentlyContinue | Out-Null
-	Write-Host "`n   $($lang.UpdateTimeUsed)$((Get-Date).Subtract($start_time).Seconds) (s)`n"
+	Write-Host "`n   $($Script:lang.UpdateTimeUsed)$((Get-Date).Subtract($start_time).Seconds) (s)`n"
 
 	if (Test-Path -Path $output -PathType Leaf) {
-		Write-host "   $($lang.VerifyConfig)"
+		Write-host "   $($Script:lang.VerifyConfig)"
 
 		try {
 			$Custom_Config = Get-Content -Path $output | ConvertFrom-JSON
@@ -1562,15 +1591,15 @@ Function Update_Process
 			Move-Item $output $Script:Init_Config -Force -ErrorAction SilentlyContinue
 
 			if (Test-Path -Path $Script:Init_Config -PathType Leaf) {
-				Write-host "   $($lang.Done)" -ForegroundColor Green
+				Write-host "   $($Script:lang.Done)" -ForegroundColor Green
 			} else {
-				Write-host "   $($lang.UpdateFailedConfig)" -ForegroundColor Red
+				Write-host "   $($Script:lang.UpdateFailedConfig)" -ForegroundColor Red
 			}
 		} catch {
-			Write-host "   $($lang.ConfigError)" -ForegroundColor Red
+			Write-host "   $($Script:lang.ConfigError)" -ForegroundColor Red
 		}
 	} else {
-		Write-host "   $($lang.DownloadFailed)" -ForegroundColor Red
+		Write-host "   $($Script:lang.DownloadFailed)" -ForegroundColor Red
 	}
 }
 
@@ -1627,7 +1656,7 @@ Function Install_UI
 
 		if ($Match_Wait_App.Count -gt 0) {
 		} else {
-			$UI_Main_Error.Text = $lang.ChoseSoftwareNot
+			$UI_Main_Error.Text = $Script:lang.ChoseSoftwareNot
 			return
 		}
 
@@ -1664,7 +1693,7 @@ Function Install_UI
 			Install_Start_Process
 			$Install.Close()
 		} else {
-			$UI_Main_Error.Text = $lang.InstllUnavailable
+			$UI_Main_Error.Text = $Script:lang.InstllUnavailable
 			return
 		}
 	}
@@ -1672,7 +1701,7 @@ Function Install_UI
 		autoScaleMode  = 2
 		Height         = 720
 		Width          = 825
-		Text           = $lang.Instl
+		Text           = $Script:lang.Instl
 		MaximizeBox    = $False
 		StartPosition  = "CenterScreen"
 		MinimizeBox    = $false
@@ -1691,7 +1720,7 @@ Function Install_UI
 		Height         = 35
 		Width          = 435
 		Padding        = 8
-		Text           = $lang.ChoseClass
+		Text           = $Script:lang.ChoseClass
 	}
 	$Select_Group      = New-Object system.Windows.Forms.FlowLayoutPanel -Property @{
 		AutoSize       = 1
@@ -1705,7 +1734,7 @@ Function Install_UI
 		Height         = 35
 		Width          = 435
 		Padding        = 8
-		Text           = $lang.ChoseInstall
+		Text           = $Script:lang.ChoseInstall
 	}
 	$Select_App        = New-Object system.Windows.Forms.FlowLayoutPanel -Property @{
 		AutoSize       = 1
@@ -1720,7 +1749,7 @@ Function Install_UI
 		Location       = "575,10"
 		Height         = 36
 		Width          = 220
-		Text           = $lang.Setting
+		Text           = $Script:lang.Setting
 		add_Click      = {
 			$UIUnzipPanel.visible = $True
 		}
@@ -1730,7 +1759,7 @@ Function Install_UI
 		Location       = "575,50"
 		Height         = 36
 		Width          = 220
-		Text           = $lang.UpdateList
+		Text           = $Script:lang.UpdateList
 		add_Click      = {
 			$Install.Hide()
 			Update_Setting_UI
@@ -1745,7 +1774,7 @@ Function Install_UI
 		Height         = 36
 		Width          = 220
 		add_Click      = { Refresh_Select_Group }
-		Text           = $lang.Refresh
+		Text           = $Script:lang.Refresh
 	}
 
 	<#
@@ -1776,7 +1805,7 @@ Function Install_UI
 	$ArchitectureTitle = New-Object System.Windows.Forms.Label -Property @{
 		Height         = 22
 		Width          = 470
-		Text           = $lang.PreDownLink
+		Text           = $Script:lang.PreDownLink
 	}
 	$GroupArchitecture = New-Object system.Windows.Forms.FlowLayoutPanel -Property @{
 		BorderStyle    = 0
@@ -1791,7 +1820,7 @@ Function Install_UI
 		margin         = "0,0,20,0"
 		Text           = "arm64"
 		add_Click      = {
-			$SoftwareTipsUIUnzipPanelErrorMsg.Text = $lang.SolutionsTipsArm64
+			$SoftwareTipsUIUnzipPanelErrorMsg.Text = $Script:lang.SolutionsTipsArm64
 		}
 	}
 	$ArchitectureAMD64 = New-Object System.Windows.Forms.RadioButton -Property @{
@@ -1800,7 +1829,7 @@ Function Install_UI
 		margin         = "0,0,20,0"
 		Text           = "x64"
 		add_Click      = {
-			$SoftwareTipsUIUnzipPanelErrorMsg.Text = $lang.SolutionsTipsAMD64
+			$SoftwareTipsUIUnzipPanelErrorMsg.Text = $Script:lang.SolutionsTipsAMD64
 		}
 	}
 	$ArchitectureX86   = New-Object System.Windows.Forms.RadioButton -Property @{
@@ -1809,7 +1838,7 @@ Function Install_UI
 		margin         = "0,0,20,0"
 		Text           = "x86"
 		add_Click      = {
-			$SoftwareTipsUIUnzipPanelErrorMsg.Text = $lang.SolutionsTipsX86
+			$SoftwareTipsUIUnzipPanelErrorMsg.Text = $Script:lang.SolutionsTipsX86
 		}
 	}
 	$SoftwareTips      = New-Object system.Windows.Forms.FlowLayoutPanel -Property @{
@@ -1827,13 +1856,13 @@ Function Install_UI
 	$FormSelectDiSKSize = New-Object System.Windows.Forms.Label -Property @{
 		Height         = 22
 		Width          = 470
-		Text           = $lang.SelectAutoAvailable
+		Text           = $Script:lang.SelectAutoAvailable
 		Location       = '10,115'
 	}
 	$FormSelectDiSKLowSize = New-Object System.Windows.Forms.CheckBox -Property @{
 		Height         = 25
 		Width          = 470
-		Text           = $lang.SelectCheckAvailable
+		Text           = $Script:lang.SelectCheckAvailable
 		Padding        = "26,0,0,0"
 		add_Click      = {
 			if ($FormSelectDiSKLowSize.Checked) {
@@ -1869,7 +1898,7 @@ Function Install_UI
 		Height         = 22
 		Width          = 470
 		margin         = "28,25,0,0"
-		Text           = $lang.SettingDiskNewPath
+		Text           = $Script:lang.SettingDiskNewPath
 		LinkColor      = "GREEN"
 		ActiveLinkColor = "RED"
 		LinkBehavior   = "NeverUnderline"
@@ -1898,7 +1927,7 @@ Function Install_UI
 		Location       = "575,595"
 		Height         = 36
 		Width          = 220
-		Text           = $lang.OK
+		Text           = $Script:lang.OK
 		add_Click      = {
 			if ($ArchitectureARM64.Checked) { Set_Architecture -Type "ARM64" }
 			if ($ArchitectureAMD64.Checked) { Set_Architecture -Type "AMD64" }
@@ -1916,7 +1945,7 @@ Function Install_UI
 			}
 
 			if ([string]::IsNullOrEmpty($init_Select_In)) {
-				$UIUnzipPanelErrorMsg.Text = $lang.SelectNoDisk
+				$UIUnzipPanelErrorMsg.Text = $Script:lang.SelectNoDisk
 			} else {
 				SetNewFreeDiskTo -Disk $init_Select_In
 				$UIUnzipPanel.visible = $False
@@ -1928,7 +1957,7 @@ Function Install_UI
 		Location       = "575,635"
 		Height         = 36
 		Width          = 220
-		Text           = $lang.Cancel
+		Text           = $Script:lang.Cancel
 		add_Click      = {
 			$UIUnzipPanel.visible = $False
 		}
@@ -1946,7 +1975,7 @@ Function Install_UI
 		Height         = 36
 		Width          = 220
 		add_Click      = $OK_Click
-		Text           = $lang.OK
+		Text           = $Script:lang.OK
 	}
 	$Canel             = New-Object system.Windows.Forms.Button -Property @{
 		UseVisualStyleBackColor = $True
@@ -1954,7 +1983,7 @@ Function Install_UI
 		Height         = 36
 		Width          = 220
 		add_Click      = $Canel_Click
-		Text           = $lang.Cancel
+		Text           = $Script:lang.Cancel
 	}
 	$Install.controls.AddRange((
 		$UIUnzipPanel,
@@ -2011,7 +2040,7 @@ Function Install_UI
 	switch ($Global:InstlArchitecture) {
 		"ARM64" {
 			$ArchitectureARM64.Checked = $True
-			$SoftwareTipsUIUnzipPanelErrorMsg.Text = $lang.SolutionsTipsArm64
+			$SoftwareTipsUIUnzipPanelErrorMsg.Text = $Script:lang.SolutionsTipsArm64
 		}
 		"AMD64" {
 			if ($env:PROCESSOR_ARCHITECTURE -eq "ARM64") {
@@ -2021,7 +2050,7 @@ Function Install_UI
 			}
 
 			$ArchitectureAMD64.Checked = $True
-			$SoftwareTipsUIUnzipPanelErrorMsg.Text = $lang.SolutionsTipsAMD64
+			$SoftwareTipsUIUnzipPanelErrorMsg.Text = $Script:lang.SolutionsTipsAMD64
 		}
 		Default {
 			if ($env:PROCESSOR_ARCHITECTURE -eq "ARM64") {
@@ -2037,7 +2066,7 @@ Function Install_UI
 			}
 
 			$ArchitectureX86.Checked = $True
-			$SoftwareTipsUIUnzipPanelErrorMsg.Text = $lang.SolutionsTipsX86
+			$SoftwareTipsUIUnzipPanelErrorMsg.Text = $Script:lang.SolutionsTipsX86
 		}
 	}
 
@@ -2061,7 +2090,7 @@ Function Install_UI
 
 			Refresh_Select_Group
 		} else {
-			$SoftwareTipsUIUnzipPanelErrorMsg.Text = $lang.NoInstallImage
+			$SoftwareTipsUIUnzipPanelErrorMsg.Text = $Script:lang.NoInstallImage
 		}
 	}
 
@@ -2086,7 +2115,7 @@ Function Install_UI
 			$UI_Main_Pre_Rule_Not_Find = New-Object system.Windows.Forms.Label -Property @{
 				Height   = 35
 				Width    = 470
-				Text     = $lang.ChoseClassNo
+				Text     = $Script:lang.ChoseClassNo
 			}
 			$Select_App.controls.AddRange($UI_Main_Pre_Rule_Not_Find)
 			return
@@ -2136,7 +2165,7 @@ Function Install_UI
 							Height   = 30
 							Width    = 470
 							Padding  = "20,0,0,0"
-							Text     = $lang.AppNo
+							Text     = $Script:lang.AppNo
 						}
 						$Select_App.controls.AddRange($UI_Main_Pre_Rule_Not_Find)
 					}
@@ -2145,7 +2174,7 @@ Function Install_UI
 						Height   = 30
 						Width    = 470
 						Padding  = "20,0,0,0"
-						Text     = $lang.AppNo
+						Text     = $Script:lang.AppNo
 					}
 
 					$UI_Expand_Wrap = New-Object system.Windows.Forms.Label -Property @{
@@ -2191,14 +2220,14 @@ Function Install_UI
 		.右键菜单：选择标签
 	#>
 	$SelectMenu = New-Object System.Windows.Forms.ContextMenuStrip
-	$SelectMenu.Items.Add($lang.AllSel).add_Click({
+	$SelectMenu.Items.Add($Script:lang.AllSel).add_Click({
 		$Select_Group.Controls | ForEach-Object {
 			if ($_ -is [System.Windows.Forms.CheckBox]){ $_.Checked = $true }
 		}
 
 		Refresh_Select_Group
 	})
-	$SelectMenu.Items.Add($lang.AllClear).add_Click({
+	$SelectMenu.Items.Add($Script:lang.AllClear).add_Click({
 		$Select_Group.Controls | ForEach-Object {
 			if ($_ -is [System.Windows.Forms.CheckBox]){ $_.Checked = $false }
 		}
@@ -2211,19 +2240,19 @@ Function Install_UI
 		.右键菜单：选择所有应用
 	#>
 	$SelectMenu = New-Object System.Windows.Forms.ContextMenuStrip
-	$SelectMenu.Items.Add($lang.AllSel).add_Click({
+	$SelectMenu.Items.Add($Script:lang.AllSel).add_Click({
 		$Select_App.Controls | ForEach-Object {
 			if ($_ -is [System.Windows.Forms.CheckBox]){ $_.Checked = $true }
 		}
 	})
-	$SelectMenu.Items.Add($lang.AllClear).add_Click({
+	$SelectMenu.Items.Add($Script:lang.AllClear).add_Click({
 		$Select_App.Controls | ForEach-Object {
 			if ($_ -is [System.Windows.Forms.CheckBox]){ $_.Checked = $false }
 		}
 	})
 	$Select_App.ContextMenuStrip = $SelectMenu
 
-	switch ($Global:IsLang) {
+	switch ($Script:IsLang) {
 		"zh-CN" {
 			$Install.Font = New-Object System.Drawing.Font("Microsoft YaHei", 9, [System.Drawing.FontStyle]::Regular)
 		}
@@ -2239,14 +2268,14 @@ Function Install_UI
 Function Mainpage
 {
 	Clear-Host
-	$Host.UI.RawUI.WindowTitle = $lang.Instl
+	$Host.UI.RawUI.WindowTitle = $Script:lang.Instl
 
 	Write-Host "`n   Author: $($Script:UniqueID) ( $($Script:AuthorURL) )
 
    From: $($Script:UniqueID)'s Solutions
    buildstring: 8.0.0.2.bs_release.230429-1208
 
-   $($lang.Instl)`n   $('-' * 80)"
+   $($Script:lang.Instl)`n   $('-' * 80)"
 }
 
 Function Refresh_Match
@@ -2283,12 +2312,22 @@ Function Refresh_Match
 	}
 }
 
-Language
+if ($lang) {
+	ForEach ($item in $AvailableLanguages) {
+		if ($item.Tag -eq $lang) {
+			$Script:lang = $item.Language
+			$Script:IsLang = $item.Tag
+			break
+		}
+	}
+} else {
+	Language
+}
 
 <#
 	.初始化默认配置文件
 #>
-$Script:Init_Config = "$($PSScriptRoot)\$($Global:IsLang)\Instl.json"
+$Script:Init_Config = "$($PSScriptRoot)\$($Script:IsLang)\Instl.json"
 
 Get_Architecture
 Setting_Init_Disk_Free
@@ -2310,14 +2349,14 @@ if ($App) {
 	}
 
 	if ($Config) {
-		Write-host "`n   $($lang.ConfigNot)`n   $('-' * 80)"
+		Write-host "`n   $($Script:lang.ConfigNot)`n   $('-' * 80)"
 		Write-host "   $($config)" -ForegroundColor Green
 
 		if (Test-Path -Path $config -PathType leaf) {
 			$Script:Init_Config = $Config
-			Write-host "   $($lang.SetDefault)"
+			Write-host "   $($Script:lang.SetDefault)"
 		} else {
-			Write-host "   $($lang.NoInstallImage)"
+			Write-host "   $($Script:lang.NoInstallImage)"
 			return
 		}
 	} else {
@@ -2336,11 +2375,11 @@ if ($App) {
 			.未指定配置文件，优先读取本地 Instl.json，如果没有就激活自动下载功能
 		#>
 		if (Test-Path -Path $Script:Init_Config -PathType leaf) {
-			Write-host "`n   $($lang.ConfigNot)`n   $('-' * 80)"
+			Write-host "`n   $($Script:lang.ConfigNot)`n   $('-' * 80)"
 			Write-host "   $($Script:Init_Config)" -ForegroundColor Green
-			Write-host "   $($lang.SetDefault)"
+			Write-host "   $($Script:lang.SetDefault)"
 		} else {
-			Write-host "`n   $($lang.NoInstallImage)"
+			Write-host "`n   $($Script:lang.NoInstallImage)"
 			return
 		}
 	}
@@ -2349,14 +2388,14 @@ if ($App) {
 	Install_Start_Process
 } else {
 	if ($Config) {
-		Write-host "`n   $($lang.ConfigNot)`n   $('-' * 80)"
+		Write-host "`n   $($Script:lang.ConfigNot)`n   $('-' * 80)"
 		Write-host "   $($config)" -ForegroundColor Green
 
 		if (Test-Path -Path $config -PathType leaf) {
 			$Script:Init_Config = $Config
-			Write-host "   $($lang.SetDefault)"
+			Write-host "   $($Script:lang.SetDefault)"
 		} else {
-			Write-host "   $($lang.NoInstallImage)"
+			Write-host "   $($Script:lang.NoInstallImage)"
 			return
 		}
 	} else {
@@ -2364,9 +2403,9 @@ if ($App) {
 			.未指定配置文件，优先读取本地 Instl.json，如果没有就激活自动下载功能
 		#>
 		if (Test-Path -Path $Script:Init_Config -PathType leaf) {
-			Write-host "`n   $($lang.ConfigNot)`n   $('-' * 80)"
+			Write-host "`n   $($Script:lang.ConfigNot)`n   $('-' * 80)"
 			Write-host "   $($Script:Init_Config)" -ForegroundColor Green
-			Write-host "   $($lang.SetDefault)"
+			Write-host "   $($Script:lang.SetDefault)"
 		} else {
 			ForEach ($item in $Script:ServerListSelect | Sort-Object { Get-Random } ) {
 				$Script:ServerList += $item
