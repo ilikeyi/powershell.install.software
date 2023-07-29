@@ -321,7 +321,7 @@
 			"App": [
 				{
 					"GUID":      "db1a6219-c7ef-4b80-83a0-7f642da78763",
-					"Name":      "迅雷 11",
+					"Name":      "Xunlei 12",
 					"Action":    "Install",
 					"Manner":    "Queue",
 					"DLetter":   "auto",
@@ -330,9 +330,9 @@
 					"Url": {
 						"arm64": "",
 						"x64":   "",
-						"x86":   "https://down.sandai.net/thunder11/XunLeiWebSetup11.4.8.2122xl11.exe"
+						"x86":   "https://down.sandai.net/thunder11/XunLeiSetup12.0.0.2140.exe"
 					},
-					"FindFile":  "XunLeiWebSetup11*",
+					"FindFile":  "XunLeiSetup12*",
 					"param":     "/S"
 				}
 			]
