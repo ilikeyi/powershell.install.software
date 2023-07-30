@@ -72,8 +72,8 @@ $ServerTest     = $false
 		@{
 			Region = "en-US"
 			Link   = @(
-				"https://fengyi.tel/download/solutions/update/Instl/5b62877f-cd2f-4f3b-b3db-767b59d030a8/instl.json",
-				"https://github.com/ilikeyi/powershell.install.software/raw/main/Update/5b62877f-cd2f-4f3b-b3db-767b59d030a8/instl.json"
+				"https://fengyi.tel/download/solutions/update/Instl/en-US/latest.json",
+				"https://github.com/ilikeyi/powershell.install.software/raw/main/Update/en-US/latest.json"
 			)
 		}
 	)
@@ -84,36 +84,36 @@ $Script:PreServerList = @(
 	@{
 		Region = "en-US"
 		Link   = @(
-			"https://fengyi.tel/download/solutions/update/Instl/5b62877f-cd2f-4f3b-b3db-767b59d030a8/instl.json",
-			"https://github.com/ilikeyi/powershell.install.software/raw/main/Update/5b62877f-cd2f-4f3b-b3db-767b59d030a8/instl.json"
+			"https://fengyi.tel/download/solutions/update/Instl/en-US/latest.json",
+			"https://github.com/ilikeyi/powershell.install.software/raw/main/Update/en-US/latest.json"
 		)
 	}
 	@{
 		Region = "zh-CN"
 		Link   = @(
-			"https://fengyi.tel/download/solutions/update/Instl/5b62877f-cd2f-4f3b-b3db-767b59d030a8/instl.zh-CN.json"
-			"https://github.com/ilikeyi/powershell.install.software/raw/main/Update/5b62877f-cd2f-4f3b-b3db-767b59d030a8/instl.zh-CN.json"
+			"https://fengyi.tel/download/solutions/update/Instl/zh-CN/latest.json"
+			"https://github.com/ilikeyi/powershell.install.software/raw/main/Update/zh-CN/latest.json"
 		)
 	}
 	@{
 		Region = "zh-TW"
 		Link   = @(
-			"https://fengyi.tel/download/solutions/update/Instl/5b62877f-cd2f-4f3b-b3db-767b59d030a8/instl.zh-TW.json"
-			"https://github.com/ilikeyi/powershell.install.software/raw/main/Update/5b62877f-cd2f-4f3b-b3db-767b59d030a8/instl.zh-TW.json"
+			"https://fengyi.tel/download/solutions/update/Instl/zh-TW/latest.json"
+			"https://github.com/ilikeyi/powershell.install.software/raw/main/Update/zh-TW/latest.json"
 		)
 	}
 	@{
 		Region = "ja-JP"
 		Link   = @(
-			"https://fengyi.tel/download/solutions/update/Instl/5b62877f-cd2f-4f3b-b3db-767b59d030a8/instl.ja-JP.json"
-			"https://github.com/ilikeyi/powershell.install.software/raw/main/Update/5b62877f-cd2f-4f3b-b3db-767b59d030a8/instl.ja-JP.json"
+			"https://fengyi.tel/download/solutions/update/Instl/ja-JP/latest.json"
+			"https://github.com/ilikeyi/powershell.install.software/raw/main/Update/ja-JP/latest.json"
 		)
 	}
 	@{
 		Region = "ko-KR"
 		Link   = @(
-			"https://fengyi.tel/download/solutions/update/Instl/5b62877f-cd2f-4f3b-b3db-767b59d030a8/instl.ko-KR.json"
-			"https://github.com/ilikeyi/powershell.install.software/raw/main/Update/5b62877f-cd2f-4f3b-b3db-767b59d030a8/instl.ko-KR.json"
+			"https://fengyi.tel/download/solutions/update/Instl/ko-KR/latest.json"
+			"https://github.com/ilikeyi/powershell.install.software/raw/main/Update/ko-KR/latest.json"
 		)
 	}
 )
@@ -186,6 +186,7 @@ $AvailableLanguages = @(
 			UpdateServerSelect      = "Automatic server selection or custom selection"
 			SetDefault              = "Set as default"
 			AppNo                   = "No software available"
+			NoWork                  = "No task"
 			NoInstallImage          = "Does not exist locally: "
 			ConfigNot               = "Configuration file:"
 			UpdateCheckServerStatus = "Check server status ( {0} optional )"
@@ -251,6 +252,7 @@ $AvailableLanguages = @(
 			UpdateServerSelect      = "Automatische Serverauswahl oder benutzerdefinierte Auswahl"
 			SetDefault              = "als Standard einstellen"
 			AppNo                   = "keine Software verfügbar"
+			NoWork                  = "Nicht fragen"
 			NoInstallImage          = "existiert lokal nicht: "
 			ConfigNot               = "Konfigurationsdatei: "
 			UpdateCheckServerStatus = "Serverstatus prüfen ( {0} optional )"
@@ -316,6 +318,7 @@ $AvailableLanguages = @(
 			UpdateServerSelect      = "自動サーバー選択またはカスタム選択"
 			SetDefault              = "デフォルトとして設定"
 			AppNo                   = "利用可能なソフトウェアがありません"
+			NoWork                  = "タスクがありません"
 			NoInstallImage          = "ローカルに存在しません: "
 			ConfigNot               = "設定ファイル: "
 			UpdateCheckServerStatus = "サーバーのステータスを確認する ( 合計 {0} 個はオプションです )"
@@ -381,6 +384,7 @@ $AvailableLanguages = @(
 			UpdateServerSelect      = "자동 서버 선택 또는 사용자 지정 선택"
 			SetDefault              = "기본값으로 설정"
 			AppNo                   = "사용 가능한 소프트웨어 없음"
+			NoWork                  = "묻지 않는다"
 			NoInstallImage          = "로컬에 존재하지 않음: "
 			ConfigNot               = "구성 파일: "
 			UpdateCheckServerStatus = "서버 상태 확인 ( {0} 선택 사항 )"
@@ -446,6 +450,7 @@ $AvailableLanguages = @(
 			UpdateServerSelect      = "自动选择服务器或自定义选择"
 			SetDefault              = "已设置为默认"
 			AppNo                   = "无可用软件"
+			NoWork                  = "无任务"
 			NoInstallImage          = "本地不存在："
 			ConfigNot               = "配置文件："
 			UpdateCheckServerStatus = "检查服务器状态 ( 共 {0} 个可选 )"
@@ -511,6 +516,7 @@ $AvailableLanguages = @(
 			UpdateServerSelect      = "自動選擇服務器或自定義選擇"
 			SetDefault              = "已設置為默認"
 			AppNo                   = "無可用軟件"
+			NoWork                  = "無任務"
 			NoInstallImage          = "本地不存在："
 			ConfigNot               = "配置文件："
 			UpdateCheckServerStatus = "檢查服務器狀態 ( 共 {0} 個可選 )"
@@ -1258,13 +1264,23 @@ Function Compressing
 Function Wait_Process_End
 {
 	Write-Host "`n   $($Script:lang.WaitQueue)" -ForegroundColor Green
-	for ($i=0; $i -lt $Script:AppQueue.Count; $i++) {
-		Write-Host "    * PID: $($Script:AppQueue[$i]['ID'])".PadRight(22) -NoNewline
-		if ((Get-Process -ID $($Script:AppQueue[$i]['ID']) -ErrorAction SilentlyContinue).Path -eq $Script:AppQueue[$i]['PATH']) {
-			Wait-Process -id $($Script:AppQueue[$i]['ID']) -ErrorAction SilentlyContinue
+	if ($Script:AppQueue.Count -gt 0) {
+		foreach ($item in $Script:AppQueue) {
+			Write-Host "    * PID: $($item.ID)".PadRight(22) -NoNewline
+
+			while ($true) {
+				if ((Get-Process -ID $item.ID -ErrorAction SilentlyContinue).Path -eq $item.Path) {
+					Start-Sleep -s 5
+				} else {
+					Write-Host "    - $($Script:lang.Done)" -ForegroundColor Yellow
+					break
+				}
+			}
 		}
-		Write-Host "    - $($Script:lang.Done)" -ForegroundColor Yellow
+	} else {
+		Write-host "   $($lang.NoWork)" -ForegroundColor Red
 	}
+
 	$Script:AppQueue = @()
 }
 
@@ -1306,15 +1322,15 @@ Function Open_Apps
 				{
 					$AppRunQueue = Start-Process -FilePath $filename -passthru
 					$Script:AppQueue += @{
-						ID   = "$($AppRunQueue.Id)";
-						PATH = "$($filename)"
+						ID   = $AppRunQueue.Id;
+						PATH = $filename
 					}
 					Write-Host "    - $($Script:lang.AddQueue)$($AppRunQueue.Id)`n"
 				} else {
 					$AppRunQueue = Start-Process -FilePath $filename -ArgumentList $param -passthru
 					$Script:AppQueue += @{
-						ID   = "$($AppRunQueue.Id)";
-						PATH = "$($filename)"
+						ID   = $AppRunQueue.Id;
+						PATH = $filename
 					}
 					Write-Host "    - $($Script:lang.Parameter)`n      $param"
 					Write-Host "    - $($Script:lang.AddQueue)$($AppRunQueue.Id)`n"
@@ -2327,7 +2343,7 @@ if ($lang) {
 <#
 	.初始化默认配置文件
 #>
-$Script:Init_Config = "$($PSScriptRoot)\$($Script:IsLang)\Instl.json"
+$Script:Init_Config = "$($PSScriptRoot)\$($Script:IsLang)\latest.json"
 
 Get_Architecture
 Setting_Init_Disk_Free
@@ -2341,7 +2357,7 @@ Mainpage
 	 -Config "Yi.json"
 	
 	.安装软件名
-	 -App "Google Chrome", "腾讯 QQ"
+	 -App "Google Chrome", "QQ"
 #>
 if ($App) {
 	ForEach ($item in $app) {
