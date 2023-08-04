@@ -45,7 +45,7 @@
 					"param":     ""
 				}
 			]
-	    },
+		},
 		{
 			"Group": "社交软件",
 			"App": [
@@ -59,8 +59,8 @@
 					"Unpwd":     "",
 					"Url": {
 						"arm64": "",
-						"x64":   "https://dldir1.qq.com/qqfile/qq/QQNT/bbabcfd7/QQ9.9.0.14569_x64.exe",
-						"x86":   "https://dldir1.qq.com/qqfile/qq/PCQQ9.7.11/QQ9.7.11.29088.exe"
+						"x64":   "https://dldir1.qq.com/qqfile/qq/QQNT/342b8a70/QQ9.9.1.15489_x64.exe",
+						"x86":   "https://dldir1.qq.com/qqfile/qq/QQNT/88d1900a/QQ9.9.1.15489_x86.exe"
 					},
 					"FindFile":  "QQ*",
 					"param":     "/S"
@@ -135,8 +135,8 @@
 					"param":     "/S"
 				}
 			]
-	    },
-	    {
+		},
+		{
 			"Group": "浏览器",
 			"App": [
 				{
