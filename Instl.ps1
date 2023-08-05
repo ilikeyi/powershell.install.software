@@ -56,7 +56,7 @@ $Script:AuthorURL = "https://fengyi.tel"
 	.Server test
 	.服务器测试
 #>
-$ServerTest     = $false
+$ServerTest = $false
 
 <#
 	.Available servers
@@ -1377,37 +1377,6 @@ Function Update_Setting_UI
 	Add-Type -AssemblyName System.Drawing
 	[System.Windows.Forms.Application]::EnableVisualStyles()
 
-	$GUIUpdateOKClick = {
-		$Script:ServerList = @()
-
-		if ($GUIUpdateAuto.Checked) {
-			$GUIUpdate.Hide()
-			ForEach ($item in $Script:ServerListSelect | Sort-Object { Get-Random } ) {
-				$Script:ServerList += $item
-			}
-
-			Update_Process
-			$GUIUpdate.Close()
-		} else {
-			$FlagsVerifyServerlist = $False
-			$GUIUpdatePanel.Controls | ForEach-Object {
-				if ($_ -is [System.Windows.Forms.CheckBox]) {
-					if ($_.Checked) {
-						$FlagsVerifyServerlist = $true
-						$Script:ServerList += $_.Tag
-					}
-				}
-			}
-
-			if ($FlagsVerifyServerlist) {
-				$GUIUpdate.Hide()
-				Update_Process
-				$GUIUpdate.Close()
-			} else {
-				$GUIUpdateErrorMsg.Text = "$($Script:lang.UpdateServerNoSelect)"
-			}
-		}
-	}
 	$GUIUpdate         = New-Object system.Windows.Forms.Form -Property @{
 		autoScaleMode  = 2
 		Height         = 720
@@ -1455,8 +1424,36 @@ Function Update_Setting_UI
 		Location       = "8,595"
 		Height         = 36
 		Width          = 515
-		add_Click      = $GUIUpdateOKClick
 		Text           = $Script:lang.OK
+		add_Click      = {
+			$Script:ServerList = @()
+
+			if ($GUIUpdateAuto.Checked) {
+				$GUIUpdate.Hide()
+				ForEach ($item in $Script:ServerListSelect | Sort-Object { Get-Random } ) {
+					$Script:ServerList += $item
+				}
+
+				Update_Process
+				$GUIUpdate.Close()
+			} else {
+				$GUIUpdatePanel.Controls | ForEach-Object {
+					if ($_ -is [System.Windows.Forms.CheckBox]) {
+						if ($_.Checked) {
+							$Script:ServerList += $_.Tag
+						}
+					}
+				}
+
+				if ($Script:ServerList.Count -gt 0) {
+					$GUIUpdate.Hide()
+					Update_Process
+					$GUIUpdate.Close()
+				} else {
+					$GUIUpdateErrorMsg.Text = "$($Script:lang.UpdateServerNoSelect)"
+				}
+			}
+		}
 	}
 	$GUIUpdateCanel    = New-Object system.Windows.Forms.Button -Property @{
 		UseVisualStyleBackColor = $True
@@ -1568,7 +1565,6 @@ Function Update_Process
 		Write-Host "   * $($Script:lang.UpdateServerAddress)"
 		Write-host "     $($item)" -ForegroundColor Green
 		if (Test_URI $item) {
-			$PreServerVersion = $item
 			$ServerTest = $true
 			$url = $item
 			Write-Host "     $($Script:lang.UpdateServeravailable)" -ForegroundColor Green
@@ -1581,41 +1577,70 @@ Function Update_Process
 	if ($ServerTest) {
 		Write-Host "   $('-' * 80)"
 		Write-Host "     $($Script:lang.UpdatePriority)" -ForegroundColor Green
+
+		Write-host "`n   $($Script:lang.UpdateQueryingUpdate)"
+
+		$RandomGuid = [guid]::NewGuid()
+		$output = "$($PSScriptRoot)\$($RandomGuid).json"
+
+		New-Item -Path "$($PSScriptRoot)\$($Script:IsLang)" -ItemType Directory -ErrorAction SilentlyContinue | Out-Null
+	
+		$start_time = Get-Date
+		remove-item -path $output -force -ErrorAction SilentlyContinue
+		Invoke-WebRequest -Uri $url -OutFile $output -TimeoutSec 30 -DisableKeepAlive -ErrorAction SilentlyContinue | Out-Null
+		Write-Host "`n   $($Script:lang.UpdateTimeUsed)$((Get-Date).Subtract($start_time).Seconds) (s)`n"
+		
+		if (Test-Path -Path $output -PathType Leaf) {
+			Write-host "   $($Script:lang.VerifyConfig)"
+
+			try {
+				$Custom_Config = Get-Content -Path $output | ConvertFrom-JSON
+				Remove-Item -Path $Script:Init_Config -ErrorAction SilentlyContinue
+				Move-Item $output $Script:Init_Config -Force -ErrorAction SilentlyContinue
+
+				if (Test-Path -Path $Script:Init_Config -PathType Leaf) {
+					Write-host "   $($Script:lang.Done)" -ForegroundColor Green
+				} else {
+					Write-host "   $($Script:lang.UpdateFailedConfig)" -ForegroundColor Red
+				}
+			} catch {
+				Write-host "   $($Script:lang.ConfigError)" -ForegroundColor Red
+			}
+		} else {
+			Write-host "   $($Script:lang.DownloadFailed)" -ForegroundColor Red
+		}
 	} else {
 		Write-Host "     $($Script:lang.UpdateServerTestFailed)" -ForegroundColor Red
 		Write-Host "   $('-' * 80)"
-		return
-	}
 
-	Write-host "`n   $($Script:lang.UpdateQueryingUpdate)"
-	$RandomGuid = [guid]::NewGuid()
-	$output = "$($PSScriptRoot)\$($RandomGuid).json"
+		$output = "$($PSScriptRoot)\Backup\$($Script:IsLang)\latest.json"
+		Write-host "`n   $($Script:lang.ConfigNot)`n   $('-' * 80)"
+		Write-host "   $($output)" -ForegroundColor Green
+		Write-host "   $($Script:lang.SetDefault)"
 
-	New-Item -Path "$($PSScriptRoot)\$($Script:IsLang)" -ItemType Directory -ErrorAction SilentlyContinue | Out-Null
+		if (Test-Path -Path $output -PathType Leaf) {
+			Write-host "`n   $($Script:lang.VerifyConfig)"
 
-	$start_time = Get-Date
-	remove-item -path $output -force -ErrorAction SilentlyContinue
-	Invoke-WebRequest -Uri $url -OutFile $output -TimeoutSec 30 -DisableKeepAlive -ErrorAction SilentlyContinue | Out-Null
-	Write-Host "`n   $($Script:lang.UpdateTimeUsed)$((Get-Date).Subtract($start_time).Seconds) (s)`n"
+			try {
+				$Custom_Config = Get-Content -Path $output | ConvertFrom-JSON
 
-	if (Test-Path -Path $output -PathType Leaf) {
-		Write-host "   $($Script:lang.VerifyConfig)"
+				$Script:Init_Config = $output
 
-		try {
-			$Custom_Config = Get-Content -Path $output | ConvertFrom-JSON
-			Remove-Item -Path $Script:Init_Config -ErrorAction SilentlyContinue
-			Move-Item $output $Script:Init_Config -Force -ErrorAction SilentlyContinue
-
-			if (Test-Path -Path $Script:Init_Config -PathType Leaf) {
-				Write-host "   $($Script:lang.Done)" -ForegroundColor Green
-			} else {
-				Write-host "   $($Script:lang.UpdateFailedConfig)" -ForegroundColor Red
+				if (Test-Path -Path $Script:Init_Config -PathType Leaf) {
+					Write-host "   $($Script:lang.Done)" -ForegroundColor Green
+				} else {
+					Write-host "   $($Script:lang.UpdateFailedConfig)" -ForegroundColor Red
+				}
+			} catch {
+				Write-host "   $($Script:lang.ConfigError)" -ForegroundColor Red
 			}
-		} catch {
-			Write-host "   $($Script:lang.ConfigError)" -ForegroundColor Red
+		} else {
+			Write-host "`n   $($Script:lang.ConfigNot)`n   $('-' * 80)"
+			Write-host "   $($output)" -ForegroundColor Green
+
+			Write-host "   $($Script:lang.NoInstallImage)"
+			return
 		}
-	} else {
-		Write-host "   $($Script:lang.DownloadFailed)" -ForegroundColor Red
 	}
 }
 
@@ -1652,67 +1677,7 @@ Function Install_UI
 			}
 		}
 	}
-	$Canel_Click = {
-		$Install.Hide()
-		$Install.Close()
-	}
-	$OK_Click = {
-		$Match_Wait_App = @()
 
-		<#
-			.获取用户是否选择了软件
-		#>
-		$Select_App.Controls | ForEach-Object {
-			if ($_ -is [System.Windows.Forms.CheckBox]) {
-				if ($_.Checked) {
-					$Match_Wait_App += $_.Tag
-				}
-			}
-		}
-
-		if ($Match_Wait_App.Count -gt 0) {
-		} else {
-			$UI_Main_Error.Text = $Script:lang.ChoseSoftwareNot
-			return
-		}
-
-		<#
-			.从配置文件里获取软件匹配
-		#>
-		$Script:Install_App = @()
-		$Custom_Config = Get-Content -Path $Script:Init_Config | ConvertFrom-JSON
-		foreach ($item in $Custom_Config) {
-		    if ($item.App.app.Count -gt 0) {
-		        foreach ($itemApp in $item.App.app) {
-					if (($Match_Wait_App -Contains $itemApp.Name) -or
-						($Match_Wait_App -Contains $itemApp.GUID))
-					{
-						$Script:Install_App += @{
-							GUID      = $itemApp.GUID;
-							Name      = $itemApp.name;
-							Action    = $itemApp.Action;
-							Manner    = $itemApp.Manner;
-							DLetter   = $itemApp.DLetter;
-							Structure = $itemApp.Structure;
-							Unpwd     = $itemApp.Unpwd;
-							Url       = $itemApp.url;
-							FindFile  = $itemApp.FindFile;
-							param     = $itemApp.param
-						}
-					}
-				}
-			}
-		}
-
-		if ($Script:Install_App.Count -gt 0) {
-			$Install.Hide()
-			Install_Start_Process
-			$Install.Close()
-		} else {
-			$UI_Main_Error.Text = $Script:lang.InstllUnavailable
-			return
-		}
-	}
 	$Install           = New-Object system.Windows.Forms.Form -Property @{
 		autoScaleMode  = 2
 		Height         = 720
@@ -1990,16 +1955,75 @@ Function Install_UI
 		Location       = "575,595"
 		Height         = 36
 		Width          = 220
-		add_Click      = $OK_Click
 		Text           = $Script:lang.OK
+		add_Click      = {
+			$Match_Wait_App = @()
+
+			<#
+				.获取用户是否选择了软件
+			#>
+			$Select_App.Controls | ForEach-Object {
+				if ($_ -is [System.Windows.Forms.CheckBox]) {
+					if ($_.Checked) {
+						$Match_Wait_App += $_.Tag
+					}
+				}
+			}
+
+			if ($Match_Wait_App.Count -gt 0) {
+			} else {
+				$UI_Main_Error.Text = $Script:lang.ChoseSoftwareNot
+				return
+			}
+
+			<#
+				.从配置文件里获取软件匹配
+			#>
+			$Script:Install_App = @()
+			$Custom_Config = Get-Content -Path $Script:Init_Config | ConvertFrom-JSON
+			foreach ($item in $Custom_Config) {
+			    if ($item.App.app.Count -gt 0) {
+			        foreach ($itemApp in $item.App.app) {
+						if (($Match_Wait_App -Contains $itemApp.Name) -or
+							($Match_Wait_App -Contains $itemApp.GUID))
+						{
+							$Script:Install_App += @{
+								GUID      = $itemApp.GUID;
+								Name      = $itemApp.name;
+								Action    = $itemApp.Action;
+								Manner    = $itemApp.Manner;
+								DLetter   = $itemApp.DLetter;
+								Structure = $itemApp.Structure;
+								Unpwd     = $itemApp.Unpwd;
+								Url       = $itemApp.url;
+								FindFile  = $itemApp.FindFile;
+								param     = $itemApp.param
+							}
+						}
+					}
+				}
+			}
+
+			if ($Script:Install_App.Count -gt 0) {
+				$Install.Hide()
+				Install_Start_Process
+				$Install.Close()
+			} else {
+				$UI_Main_Error.Text = $Script:lang.InstllUnavailable
+				return
+			}
+		}
 	}
 	$Canel             = New-Object system.Windows.Forms.Button -Property @{
 		UseVisualStyleBackColor = $True
 		Location       = "575,635"
 		Height         = 36
 		Width          = 220
-		add_Click      = $Canel_Click
 		Text           = $Script:lang.Cancel
+		add_Click      = {
+			$Install.Hide()
+			$Install.Close()
+		}
 	}
 	$Install.controls.AddRange((
 		$UIUnzipPanel,
