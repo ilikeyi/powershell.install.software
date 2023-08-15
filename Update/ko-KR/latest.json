@@ -45,7 +45,7 @@
 					"param":     ""
 				}
 			]
-		},
+	    },
 		{
 			"Group": "사회적응용",
 			"App": [
@@ -59,8 +59,8 @@
 					"Unpwd":     "",
 					"Url": {
 						"arm64": "",
-						"x64":   "https://dldir1.qq.com/qqfile/qq/QQNT/342b8a70/QQ9.9.1.15489_x64.exe",
-						"x86":   "https://dldir1.qq.com/qqfile/qq/QQNT/88d1900a/QQ9.9.1.15489_x86.exe"
+						"x64":   "https://dldir1.qq.com/qqfile/qq/QQNT/da0a635f/QQ9.9.1.15820_x64.exe",
+						"x86":   "https://dldir1.qq.com/qqfile/qq/QQNT/a90af3fd/QQ9.9.1.15820_x86.exe"
 					},
 					"FindFile":  "QQ*",
 					"param":     "/S"
@@ -135,8 +135,8 @@
 					"param":     "/S"
 				}
 			]
-		},
-		{
+	    },
+	    {
 			"Group": "브라우저",
 			"App": [
 				{
@@ -350,8 +350,8 @@
 					"Unpwd":     "",
 					"Url": {
 						"arm64": "",
-						"x64":   "",
-						"x86":   "https://github.com/abbodi1406/vcredist/releases/download/v0.73.0/VisualCppRedist_AIO_x86_x64.exe"
+						"x64":   "https://github.com/abbodi1406/vcredist/releases/download/v0.75.0/VisualCppRedist_AIO_x86_x64_75.zip",
+						"x86":   "https://github.com/abbodi1406/vcredist/releases/download/v0.75.0/VisualCppRedist_AIO_x86only.zip"
 					},
 					"FindFile":  "VisualCppRedist*",
 					"param":     "/y"
