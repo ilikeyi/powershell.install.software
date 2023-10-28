@@ -1,4 +1,4 @@
-﻿<#
+<#
 
   PowerShell 安装软件
 
@@ -811,7 +811,7 @@ Function Test_Available_Disk
 
 		$RandomGuid = [guid]::NewGuid()
 		$test_tmp_filename = "writetest-$($RandomGuid)"
-		$test_filename = Join-Path -Path "$($Path)" -ChildPath "$($test_tmp_filename)" -ErrorAction SilentlyContinue
+		$test_filename = Join-Path -Path $Path -ChildPath $test_tmp_filename -ErrorAction SilentlyContinue
 
 		[io.file]::OpenWrite($test_filename).close()
 
@@ -917,7 +917,7 @@ Function Join_MainFolder
 	)
 	if ($Path.EndsWith('\'))
 	{
-		return "$Path"
+		return $Path
 	} else {
 		return "$Path\"
 	}
@@ -998,30 +998,30 @@ Function Install_Process
 		{
 			Get-PSDrive -PSProvider FileSystem -ErrorAction SilentlyContinue | ForEach-Object {
 				$TempRootPath = $_.Root
-				$tempoutputfoldoer = Join-Path -Path $($TempRootPath) -ChildPath "$($structure)"
+				$tempoutputfoldoer = Join-Path -Path $TempRootPath -ChildPath $structure
 				Get-ChildItem -Path $tempoutputfoldoer -Filter "*$($filename)*$((Get-Culture).Name)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
-					$OutTo = Join-Path -Path "$($TempRootPath)" -ChildPath "$($structure)"
+					$OutTo = Join-Path -Path $TempRootPath -ChildPath $structure
 					$OutAny = $($_.fullname)
 					break
 				}
 				Get-ChildItem -Path $tempoutputfoldoer -Filter "*$($filename)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
-					$OutTo = Join-Path -Path "$($TempRootPath)" -ChildPath "$($structure)"
+					$OutTo = Join-Path -Path $TempRootPath -ChildPath $structure
 					$OutAny = $($_.fullname)
 					break
 				}
 				Get-ChildItem -Path $tempoutputfoldoer -Filter "*$($packer)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
-					$OutTo = Join-Path -Path "$($TempRootPath)" -ChildPath "$($structure)"
+					$OutTo = Join-Path -Path $TempRootPath -ChildPath $structure
 					$OutAny = $($_.fullname)
 					break
 				}
-				$OutTo = Join-Path -Path $Global:FreeDiskTo -ChildPath "$($structure)"
+				$OutTo = Join-Path -Path $Global:FreeDiskTo -ChildPath $structure
 				$OutAny = Join-Path -Path $Global:FreeDiskTo -ChildPath "$($structure)\$SaveToName"
 			}
 		}
 		PSScriptRoot
 		{
-			$OutTo = Join-Path -Path $($PSScriptRoot) -ChildPath "$($structure)"
-			$OutAny = Join-Path -Path $($PSScriptRoot) -ChildPath "$($structure)\$SaveToName"
+			$OutTo = Join-Path -Path $PSScriptRoot -ChildPath $structure
+			$OutAny = Join-Path -Path $PSScriptRoot -ChildPath "$($structure)\$SaveToName"
 			Get-ChildItem -Path $OutTo -Filter "*$($filename)*$((Get-Culture).Name)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
 				$OutAny = $($_.fullname)
 				break
@@ -1037,8 +1037,8 @@ Function Install_Process
 		}
 		default
 		{
-			$OutTo = Join-Path -Path $($todisk) -ChildPath "$($structure)"
-			$OutAny = Join-Path -Path $($todisk) -ChildPath "$($structure)\$SaveToName"
+			$OutTo = Join-Path -Path $todisk -ChildPath $structure
+			$OutAny = Join-Path -Path $todisk -ChildPath "$($structure)\$SaveToName"
 			Get-ChildItem -Path $OutTo -Filter "*$($filename)*$((Get-Culture).Name)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
 				$OutAny = $($_.fullname)
 				break
@@ -1213,6 +1213,28 @@ Function Install_Process
 	}
 }
 
+Function Get_Zip
+{
+	param
+	(
+		$Run
+	)
+
+	$Local_Zip_Path = @(
+		"${env:ProgramFiles}\7-Zip\$($Run)"
+		"${env:ProgramFiles(x86)}\7-Zip\$($Run)"
+		"$(Get_Arch_Path -Path "$($PSScriptRoot)\AIO\7zPacker")\$($Run)"
+	)
+
+	ForEach ($item in $Local_Zip_Path) {
+		if (Test-Path -Path $item -PathType leaf) {
+			return $item
+		}
+	}
+
+	return $False
+}
+
 Function Archive
 {
 	param
@@ -1227,38 +1249,22 @@ Function Archive
 
 	Write-Host "   $($filename)"
 	Write-host "   $($to)"
-	Write-Host "   $($Script:lang.Unpacking)".PadRight(28) -NoNewline
-	if (Compressing) {
+	Write-Host "   $($Script:lang.Unpacking)".PadRight(28) -NoNewlinee
+
+	$Verify_Install_Path = Get_Zip -Run "7z.exe"
+	if (Test-Path -Path $Verify_Install_Path -PathType leaf) {
 		if (([string]::IsNullOrEmpty($Password))) {
 			$arguments = "x ""-r"" ""-tzip"" ""$filename"" ""-o$to"" ""-y"""
 		} else {
 			$arguments = "x ""-p$Password"" ""-r"" ""-tzip"" ""$filename"" ""-o$to"" ""-y"""
 		}
-		Start-Process $Global:Zip "$arguments" -Wait -WindowStyle Minimized
+
+		Start-Process $Verify_Install_Path "$arguments" -Wait -WindowStyle Minimized
 		Write-Host "     $($Script:lang.Done)`n" -ForegroundColor Green
 	} else {
 		Expand-Archive -LiteralPath $filename -DestinationPath $to -force
 		Write-Host "     $($Script:lang.Done)`n" -ForegroundColor Green
 	}
-}
-
-Function Compressing
-{
-	if (Test-Path "${env:ProgramFiles}\7-Zip\7z.exe" -PathType Leaf) {
-		$Global:Zip = "${env:ProgramFiles}\7-Zip\7z.exe"
-		return $true
-	}
-
-	if (Test-Path "${env:ProgramFiles(x86)}\7-Zip\7z.exe" -PathType Leaf) {
-		$Global:Zip = "${env:ProgramFiles(x86)}\7-Zip\7z.exe"
-		return $true
-	}
-
-	if (Test-Path "$($env:SystemDrive)\$($Script:UniqueID)\$($Script:UniqueID)\7zPacker\7z.exe" -PathType Leaf) {
-		$Global:Zip = "$($env:SystemDrive)\$($Script:UniqueID)\$($Script:UniqueID)\7zPacker\7z.exe"
-		return $true
-	}
-	return $false
 }
 
 Function Wait_Process_End
@@ -1450,7 +1456,7 @@ Function Update_Setting_UI
 					Update_Process
 					$GUIUpdate.Close()
 				} else {
-					$GUIUpdateErrorMsg.Text = "$($Script:lang.UpdateServerNoSelect)"
+					$GUIUpdateErrorMsg.Text = $Script:lang.UpdateServerNoSelect
 				}
 			}
 		}
@@ -1791,7 +1797,7 @@ Function Install_UI
 	$GroupArchitecture = New-Object system.Windows.Forms.FlowLayoutPanel -Property @{
 		BorderStyle    = 0
 		autoSizeMode   = 1
-		Height         = 28
+		Height         = 30
 		Width          = 470
 		Padding        = "20,0,0,0"
 	}
