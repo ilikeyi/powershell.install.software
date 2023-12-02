@@ -338,6 +338,59 @@
 			]
 		},
 		{
+			"Group": "输入法",
+			"App": [
+				{
+					"GUID":      "05136153-3fd2-4a0a-899b-895202daa6a5",
+					"Name":      "搜狗输入法",
+					"Action":    "Install",
+					"Manner":    "Queue",
+					"DLetter":   "auto",
+					"Structure": "安装包\\输入法",
+					"Unpwd":     "",
+					"Url": {
+						"arm64": "",
+						"x64":   "",
+						"x86":   "https://ime-sec.gtimg.com/202312021716/128ea7c81f037c9d998416c5c4d62f39/pc/sogou_pinyin_guanwang_13.11a.exe"
+					},
+					"FindFile":  "sogou_pinyin*",
+					"param":     "/S"
+				},
+				{
+					"GUID":      "a8dca868-21eb-4527-a996-23fe731c3078",
+					"Name":      "百度输入法",
+					"Action":    "Install",
+					"Manner":    "Queue",
+					"DLetter":   "auto",
+					"Structure": "安装包\\输入法",
+					"Unpwd":     "",
+					"Url": {
+						"arm64": "",
+						"x64":   "",
+						"x86":   "https://imeres.baidu.com/imeres/imeres/ime-res/guanwang/dl/online/BaiduPinyinSetup_6.0.4.195.exe"
+					},
+					"FindFile":  "BaiduPinyinSetup*",
+					"param":     "/S"
+				},
+				{
+					"GUID":      "d9a93f04-4197-4ae8-9f81-9bb4a5f3dd69",
+					"Name":      "讯飞输入法",
+					"Action":    "Install",
+					"Manner":    "Queue",
+					"DLetter":   "auto",
+					"Structure": "安装包\\输入法",
+					"Unpwd":     "",
+					"Url": {
+						"arm64": "",
+						"x64":   "",
+						"x86":   "https://download.voicecloud.cn/200ime/iFlyIME_Setup_3.0.1734.exe"
+					},
+					"FindFile":  "iFlyIME*",
+					"param":     ""
+				}
+			]
+		},
+		{
 			"Group": "运行库",
 			"App": [
 				{
