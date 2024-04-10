@@ -1,4 +1,4 @@
-<#
+﻿<#
 
   PowerShell 安装软件
 
@@ -903,9 +903,9 @@ Function Join_Url
 	)
 	if ($Path.EndsWith('/'))
 	{
-		return "$Path"+"$ChildPath"
+		return "$($Path)"+"$($ChildPath)"
 	} else {
-		return "$Path/$ChildPath"
+		return "$($Path)/$($ChildPath)"
 	}
 }
 
@@ -1064,17 +1064,17 @@ Function Install_Process
 				{
 					Get-ChildItem -Path $OutTo -Filter "*$($filename)*$((Get-Culture).Name)*.exe" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
 						Write-Host "    - $($Script:lang.LocallyExist)$($_.fullname)"
-						Open_Apps -filename $($_.fullname) -param $param -mode $mode
+						Open_Apps -filename $_.fullname -param $param -mode $mode
 						break
 					}
 					Get-ChildItem -Path $OutTo -Filter "*$($filename)*.exe" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
 						Write-Host "    - $($Script:lang.LocallyExist)$($_.fullname)"
-						Open_Apps -filename $($_.fullname) -param $param -mode $mode
+						Open_Apps -filename $_.fullname -param $param -mode $mode
 						break
 					}
 					Get-ChildItem -Path $OutTo -Filter "*$($packer)*.exe" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
 						Write-Host "   - $($Script:lang.LocallyExist)`n     $($_.fullname)"
-						Open_Apps -filename $($_.fullname) -param $param -mode $mode
+						Open_Apps -filename $_.fullname -param $param -mode $mode
 						break
 					}
 					if (Test-Path $OutAny) {
@@ -1085,9 +1085,9 @@ Function Install_Process
 							Write-Host "    - $($Script:lang.DownloadLinkError)" -ForegroundColor Red
 						} else {
 							if (Test_URI $url) {
-								Write-Host "      > $($Script:lang.ConnectTo)`n        $url`n      + $($Script:lang.SaveTo)`n        $OutAny"
+								Write-Host "      > $($Script:lang.ConnectTo)`n        $($url)`n      + $($Script:lang.SaveTo)`n        $($OutAny)"
 								Check_Folder -chkpath $OutTo
-								Invoke-WebRequest -Uri $url -OutFile "$($OutAny)" -ErrorAction SilentlyContinue | Out-Null
+								Invoke-WebRequest -Uri $url -OutFile $OutAny -ErrorAction SilentlyContinue | Out-Null
 							} else {
 								Write-Host "      - $($Script:lang.NotAvailable)" -ForegroundColor Red
 							}
@@ -1102,17 +1102,17 @@ Function Install_Process
 					}
 					Get-ChildItem -Path $OutTo -Filter "*$($filename)*$((Get-Culture).Name)*.exe" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
 						Write-Host "    - $($Script:lang.LocallyExist)$($_.fullname)"
-						Open_Apps -filename $($_.fullname) -param $param -mode $mode
+						Open_Apps -filename $_.fullname -param $param -mode $mode
 						break
 					}
 					Get-ChildItem -Path $OutTo -Filter "*$($filename)*.exe" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
 						Write-Host "    - $($Script:lang.LocallyExist)$($_.fullname)"
-						Open_Apps -filename $($_.fullname) -param $param -mode $mode
+						Open_Apps -filename $_.fullname -param $param -mode $mode
 						break
 					}
 					Get-ChildItem -Path $OutTo -Filter "*$($packer)*.exe" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
 						Write-Host "   - $($Script:lang.LocallyExist)`n     $($_.fullname)"
-						Open_Apps -filename $($_.fullname) -param $param -mode $mode
+						Open_Apps -filename $_.fullname -param $param -mode $mode
 						break
 					}
 				}
@@ -1126,9 +1126,9 @@ Function Install_Process
 							Write-Host "      - $($Script:lang.DownloadLinkError)" -ForegroundColor Red
 						} else {
 							if (Test_URI $url) {
-								Write-Host "      > $($Script:lang.ConnectTo)`n        $url`n      + $($Script:lang.SaveTo)`n        $OutAny"
+								Write-Host "      > $($Script:lang.ConnectTo)`n        $($url)`n      + $($Script:lang.SaveTo)`n        $($OutAny)"
 								Check_Folder -chkpath $OutTo
-								Invoke-WebRequest -Uri $url -OutFile "$($OutAny)" -ErrorAction SilentlyContinue | Out-Null
+								Invoke-WebRequest -Uri $url -OutFile $OutAny -ErrorAction SilentlyContinue | Out-Null
 							} else {
 								Write-Host "      - $($Script:lang.NotAvailable)`n" -ForegroundColor Red
 							}
@@ -1149,7 +1149,7 @@ Function Install_Process
 						if ([string]::IsNullOrEmpty($url)) {
 							Write-Host "      - $($Script:lang.DownloadLinkError)" -ForegroundColor Red
 						} else {
-							Write-Host "      > $($Script:lang.ConnectTo)`n        $url`n      + $($Script:lang.SaveTo)`n        $OutAny"
+							Write-Host "      > $($Script:lang.ConnectTo)`n        $($url)`n      + $($Script:lang.SaveTo)`n        $($OutAny)"
 							Invoke-WebRequest -Uri $url -OutFile $OutAny -ErrorAction SilentlyContinue | Out-Null
 						}
 					}
@@ -1171,7 +1171,7 @@ Function Install_Process
 							Write-Host "      - $($Script:lang.DownloadLinkError)" -ForegroundColor Red
 						} else {
 							if (Test_URI $url) {
-								Write-Host "      > $($Script:lang.ConnectTo)`n        $url`n      + $($Script:lang.SaveTo)`n        $OutAny"
+								Write-Host "      > $($Script:lang.ConnectTo)`n        $($url)`n      + $($Script:lang.SaveTo)`n        $($OutAny)"
 								Check_Folder -chkpath $OutTo
 								Invoke-WebRequest -Uri $url -OutFile $OutAny -ErrorAction SilentlyContinue | Out-Null
 							} else {
@@ -1198,9 +1198,9 @@ Function Install_Process
 				if ([string]::IsNullOrEmpty($url)) {
 					Write-Host "      - $($Script:lang.DownloadLinkError)`n" -ForegroundColor Red
 				} else {
-					Write-Host "      > $($Script:lang.ConnectTo)`n        $url"
+					Write-Host "      > $($Script:lang.ConnectTo)`n        $($url)"
 					if (Test_URI $url) {
-						Write-Host "      + $($Script:lang.SaveTo)`n        $OutAny"
+						Write-Host "      + $($Script:lang.SaveTo)`n        $($OutAny)"
 						Check_Folder -chkpath $OutTo
 						Invoke-WebRequest -Uri $url -OutFile $OutAny -ErrorAction SilentlyContinue | Out-Null
 						Open_Apps -filename $OutAny -param $param -mode $mode
@@ -1213,6 +1213,34 @@ Function Install_Process
 	}
 }
 
+Function Get_Arch_Path
+{
+	param
+	(
+		[string]$Path
+	)
+
+	switch ($env:PROCESSOR_ARCHITECTURE) {
+		"arm64" {
+			if (Test-Path -Path "$($Path)\$($arm64)" -PathType Container) {
+				return Convert-Path -Path "$($Path)\$($arm64)" -ErrorAction SilentlyContinue
+			}
+		}
+		"AMD64" {
+			if (Test-Path -Path "$($Path)\$($AMD64)" -PathType Container) {
+				return Convert-Path -Path "$($Path)\$($AMD64)" -ErrorAction SilentlyContinue
+			}
+		}
+		"x86" {
+			if (Test-Path -Path "$($Path)\$($x86)" -PathType Container) {
+				return Convert-Path -Path "$($Path)\$($x86)" -ErrorAction SilentlyContinue
+			}
+		}
+	}
+
+	return $Path
+}
+
 Function Get_Zip
 {
 	param
@@ -1223,7 +1251,7 @@ Function Get_Zip
 	$Local_Zip_Path = @(
 		"${env:ProgramFiles}\7-Zip\$($Run)"
 		"${env:ProgramFiles(x86)}\7-Zip\$($Run)"
-		"$(Get_Arch_Path -Path "$($PSScriptRoot)\AIO\7zPacker")\$($Run)"
+		"$(Get_Arch_Path -Path "$($PSScriptRoot)\7zPacker")\$($Run)"
 	)
 
 	ForEach ($item in $Local_Zip_Path) {
@@ -1245,7 +1273,10 @@ Function Archive
 	)
 
 	$filename = Convert-Path $filename -ErrorAction SilentlyContinue
-	$to = Convert-Path $to -ErrorAction SilentlyContinue
+
+	if (Test-Path -Path $to -PathType leaf) {
+		$to = Convert-Path $to -ErrorAction SilentlyContinue
+	}
 
 	Write-Host "   $($filename)"
 	Write-host "   $($to)"
@@ -1254,12 +1285,30 @@ Function Archive
 	$Verify_Install_Path = Get_Zip -Run "7z.exe"
 	if (Test-Path -Path $Verify_Install_Path -PathType leaf) {
 		if (([string]::IsNullOrEmpty($Password))) {
-			$arguments = "x ""-r"" ""-tzip"" ""$filename"" ""-o$to"" ""-y"""
+			$arguments = @(
+				"x",
+				"-r",
+				"-tzip",
+				$filename,
+				"-o""$($to)""",
+				"-y";
+			)
+
+			Start-Process -FilePath $Verify_Install_Path -ArgumentList $Arguments -Wait -WindowStyle Minimized
 		} else {
-			$arguments = "x ""-p$Password"" ""-r"" ""-tzip"" ""$filename"" ""-o$to"" ""-y"""
+			$arguments = @(
+				"x",
+				"-p$($Password)"
+				"-r",
+				"-tzip",
+				$filename,
+				"-o""$($to)""",
+				"-y";
+			)
+
+			Start-Process -FilePath $Verify_Install_Path -ArgumentList $Arguments -Wait -WindowStyle Minimized
 		}
 
-		Start-Process $Verify_Install_Path "$arguments" -Wait -WindowStyle Minimized
 		Write-Host "     $($Script:lang.Done)`n" -ForegroundColor Green
 	} else {
 		Expand-Archive -LiteralPath $filename -DestinationPath $to -force
@@ -1393,6 +1442,7 @@ Function Update_Setting_UI
 		MinimizeBox    = $False
 		ControlBox     = $False
 		BackColor      = "#ffffff"
+		FormBorderStyle = "Fixed3D"
 	}
 	$GUIUpdateAuto     = New-Object System.Windows.Forms.CheckBox -Property @{
 		Height         = 22
@@ -1528,7 +1578,6 @@ Function Update_Setting_UI
 		}
 	}
 
-	$GUIUpdate.FormBorderStyle = 'Fixed3D'
 	$GUIUpdate.ShowDialog() | Out-Null
 }
 
@@ -1693,6 +1742,7 @@ Function Install_UI
 		StartPosition  = "CenterScreen"
 		MinimizeBox    = $false
 		BackColor      = "#ffffff"
+		FormBorderStyle = "Fixed3D"
 	}
 	$GroupPanel        = New-Object system.Windows.Forms.FlowLayoutPanel -Property @{
 		Height         = 625
@@ -2173,7 +2223,7 @@ Function Install_UI
 		$init_Select_Default_App = $Script:Custom_Config.Config.DefaultSelect
 
 		foreach ($item in $Script:Custom_Config.App) {
-			if (($Script:Init_Select_Value) -Contains $item.Group) {
+			if ($Script:Init_Select_Value -Contains $item.Group) {
 				$Temp_Main_Save_Expand_Name = New-Object system.Windows.Forms.Label -Property @{
 					Height         = 30
 					Width          = 470
@@ -2307,7 +2357,6 @@ Function Install_UI
 		}
 	}
 
-	$Install.FormBorderStyle = 'Fixed3D'
 	$Install.ShowDialog() | Out-Null
 }
 
@@ -2319,7 +2368,7 @@ Function Mainpage
 	Write-Host "`n   Author: $($Script:UniqueID) ( $($Script:AuthorURL) )
 
    From: $($Script:UniqueID)'s Solutions
-   buildstring: 8.0.0.2.bs_release.230429-1208
+   buildstring: 8.0.0.2.bs_release.2024.04.18
 
    $($Script:lang.Instl)`n   $('-' * 80)"
 }
