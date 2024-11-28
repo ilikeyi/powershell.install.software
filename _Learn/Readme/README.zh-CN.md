@@ -4,34 +4,31 @@ PowerShell 软件安装器
 
 <br>
 
-QUICK DOWNLOAD GUIDE
+快速下载指南
 -
 
-Open "Terminal" or "PowerShell ISE" as an administrator, paste the following command line into the "Terminal" dialog box, and press Enter to start running;
+以管理员身份打开“Terminal”或“PowerShell ISE”，将以下命令行粘贴到“Terminal”对话框，按回车键（Enter）后开始运行；
 
 <br>
 
-Open "Terminal" or "PowerShell ISE" as an administrator, set PowerShell execution policy: Bypass, PS command line:
+以管理员身份打开“Terminal”或“PowerShell ISE”，设置 PowerShell 执行策略：绕过，PS 命令行：
 ```
 Set-ExecutionPolicy -ExecutionPolicy Bypass -Force
 ```
 
 <br>
 
-a) Prioritize downloading from Github node
+a) 优先从 Yi 节点下载
 ```
 irm https://github.com/ilikeyi/Instl/raw/main/Instl.ps1 | iex
 ```
 
 <br>
 
-b) Prioritize downloading from Yi node
+b) 优先从 Github 节点下载
 ```
-irm https://fengyi.tel/instl | iex
+irm https://fengyi.tel/pi | iex
 ```
-
-<p>After running the installation script, users can customize the installation interface: specify the download link, specify the installation location, add routing functions, add context to obtain ownership, and go to: package scripts, create templates, create deployment engine upgrade packages, backup, etc.</p>
-<p>You can choose either: interactive experience installation and custom installation to suit different installation requirements.</p>
 
 <br>
 
