@@ -30,9 +30,6 @@ b) Prioritize downloading from Yi node
 irm https://fengyi.tel/pi | iex
 ```
 
-<p>After running the installation script, users can customize the installation interface: specify the download link, specify the installation location, add routing functions, add context to obtain ownership, and go to: package scripts, create templates, create deployment engine upgrade packages, backup, etc.</p>
-<p>You can choose either: interactive experience installation and custom installation to suit different installation requirements.</p>
-
 <br>
 
 Detailed introduction
