@@ -32,7 +32,7 @@ irm https://fengyi.tel/pi | iex
 
 <br>
 
-Detailed introduction
+可用语言
 -
 
  * <a href="https://github.com/ilikeyi/Instl">United States - English</a>
