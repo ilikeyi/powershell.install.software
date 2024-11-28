@@ -35,7 +35,7 @@ irm https://fengyi.tel/pi | iex
 Available languages
 -
 
- * <a href="https://github.com/ilikeyi/Instl/blob/main/_Learn/Readme/Readme.Detailed.zh-CN.pdf">简体中文 - 中国</a>
+ * <a href="https://github.com/ilikeyi/Instl/blob/main/_Learn/Readme/README.zh-CN.md">简体中文 - 中国</a>
 
 
 <br>
