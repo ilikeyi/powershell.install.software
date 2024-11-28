@@ -32,7 +32,7 @@ irm https://fengyi.tel/pi | iex
 
 <br>
 
-Detailed introduction
+Available languages
 -
 
  * <a href="https://github.com/ilikeyi/Instl/blob/main/_Learn/Readme/Readme.Detailed.zh-CN.pdf">简体中文 - 中国</a>
