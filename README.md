@@ -61,6 +61,8 @@ Detailed introduction
 	</dl>
 </ul>
 
+<br>
+
 <p>4.&nbsp;&nbsp;搜索文件名支持模糊查找，通配符 *；</p>
 <p>5.&nbsp;&nbsp;队列，运行安装程序后添加到队列，等待结束；</p>
 <p>6.&nbsp;&nbsp;依次按预先设置的结构搜索：</p>
@@ -74,6 +76,8 @@ Detailed introduction
 	</dl>
 </ul>
 
+<br>
+
 <p>7.&nbsp;&nbsp;动态功能：已添加运行前，运行后处理，前往 Function OpenApp {} 处更改该模块；</p>
 <p>8.&nbsp;&nbsp;支持解压包处理等。</p>
 
@@ -83,10 +87,13 @@ Detailed introduction
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+<br>
+
 ## License
 
 Distributed under the MIT License. See `LICENSE` for more information.
 
+<br>
 
 ## Contact
 
