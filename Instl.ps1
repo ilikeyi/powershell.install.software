@@ -134,6 +134,7 @@ $Global:IsLang = ""
 $AvailableLanguages = @(
 	@{
 		Tag      = "en-US"
+		Name     = "English (United States)"
 		Language = @{
 			Instl                   = "Software Installation"
 			Setting                 = "Set up"
@@ -201,6 +202,7 @@ $AvailableLanguages = @(
 	}
 	@{
 		Tag      = "de-DE"
+		Name     = "German (Germany)"
 		Language = @{
 			Instl                   = "Software Installation"
 			Setting                 = "aufstellen"
@@ -268,6 +270,7 @@ $AvailableLanguages = @(
 	}
 	@{
 		Tag      = "ja-JP"
+		Name     = "Japanese (Japan)"
 		Language = @{
 			Instl                   = "ソフトウェアのインストール"
 			Setting                 = "設定"
@@ -335,6 +338,7 @@ $AvailableLanguages = @(
 	}
 	@{
 		Tag      = "ko-KR"
+		Name     = "Korean (Korea)"
 		Language = @{
 			Instl                   = "소프트웨어 설치"
 			Setting                 = "설정"
@@ -402,6 +406,7 @@ $AvailableLanguages = @(
 	}
 	@{
 		Tag      = "zh-CN"
+		Name     = "Chinese (Simplified, China)"
 		Language = @{
 			Instl                   = "软件安装"
 			Setting                 = "设置"
@@ -469,6 +474,7 @@ $AvailableLanguages = @(
 	}
 	@{
 		Tag      = "zh-TW"
+		Name     = "Chinese (Traditional, Taiwan)"
 		Language = @{
 			Instl                   = "軟件安裝"
 			Setting                 = "設置"
@@ -782,6 +788,7 @@ Function Convert_Size
 		[double]$Value,
 		[int]$Precision = 4
 	)
+
 	switch($From) {
 		"Bytes" { $value = $Value }
 		"KB" { $value = $Value * 1024 }
@@ -789,6 +796,7 @@ Function Convert_Size
 		"GB" { $value = $Value * 1024 * 1024 * 1024 }
 		"TB" { $value = $Value * 1024 * 1024 * 1024 * 1024 }
 	}
+
 	switch ($To) {
 		"Bytes" { return $value }
 		"KB" { $Value = $Value/1KB }
@@ -812,7 +820,7 @@ Function Test_Available_Disk
 
 		$RandomGuid = [guid]::NewGuid()
 		$test_tmp_filename = "writetest-$($RandomGuid)"
-		$test_filename = Join-Path -Path $Path -ChildPath $test_tmp_filename -ErrorAction SilentlyContinue
+		$test_filename = Join-Path -Path $Path -ChildPath $test_tmp_filename
 
 		[io.file]::OpenWrite($test_filename).close()
 
@@ -826,6 +834,10 @@ Function Test_Available_Disk
 	}
 }
 
+<#
+	.Test if the URL address is available
+	.测试 URL 地址是否可用
+#>
 Function Test_URI
 {
 	Param
@@ -834,11 +846,14 @@ Function Test_URI
 		[ValidatePattern( "^(http|https)://" )]
 		[Alias("url")]
 		[string]$URI,
+
 		[Parameter(ParameterSetName="Detail")]
 		[Switch]$Detail,
+
 		[ValidateScript({$_ -ge 0})]
 		[int]$Timeout = 30
 	)
+
 	Process
 	{
 		Try
@@ -852,10 +867,20 @@ Function Test_URI
 				TimeoutSec = $Timeout
 			}
 			$test = Invoke-WebRequest @paramHash
+
 			if ($Detail) {
-				$test.BaseResponse | Select-Object ResponseURI,ContentLength,ContentType,LastModified, @{Name="Status";Expression={$Test.StatusCode}}
+				$test.BaseResponse | Select-Object ResponseURI, ContentLength, ContentType, LastModified, @{
+					Name = "Status";
+					Expression = {
+						$Test.StatusCode
+					}
+				}
 			} else {
-				if ($test.statuscode -ne 200) { $False } else { $True }
+				if ($test.statuscode -ne 200) {
+					$False
+				} else {
+					$True
+				}
 			}
 		} Catch {
 			write-verbose -message $_.exception
@@ -867,8 +892,11 @@ Function Test_URI
 					LastModified = $null
 					Status = 404
 				}
+
 				New-Object -TypeName psobject -Property $objProp
-			} else { $False }
+			} else {
+				$False
+			}
 		}
 	}
 }
@@ -984,41 +1012,43 @@ Function Install_Process
 		{
 			Get-PSDrive -PSProvider FileSystem -ErrorAction SilentlyContinue | ForEach-Object {
 				$TempRootPath = $_.Root
-				$tempoutputfoldoer = Join-Path -Path $TempRootPath -ChildPath $structure -ErrorAction SilentlyContinue
+				$tempoutputfoldoer = Join-Path -Path $TempRootPath -ChildPath $structure
 
 				Get-ChildItem -Path $tempoutputfoldoer -Filter "*$($filename)*$((Get-Culture).Name)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
-					$OutTo = Join-Path -Path $TempRootPath -ChildPath $structure -ErrorAction SilentlyContinue
+					$OutTo = Join-Path -Path $TempRootPath -ChildPath $structure
 					$OutAny = $_.fullname
 					break
 				}
 
 				Get-ChildItem -Path $tempoutputfoldoer -Filter "*$($filename)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
-					$OutTo = Join-Path -Path $TempRootPath -ChildPath $structure -ErrorAction SilentlyContinue
+					$OutTo = Join-Path -Path $TempRootPath -ChildPath $structure
 					$OutAny = $_.fullname
 					break
 				}
 
 				Get-ChildItem -Path $tempoutputfoldoer -Filter "*$($packer)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
-					$OutTo = Join-Path -Path $TempRootPath -ChildPath $structure -ErrorAction SilentlyContinue
+					$OutTo = Join-Path -Path $TempRootPath -ChildPath $structure
 					$OutAny = $_.fullname
 					break
 				}
-				$OutTo = Join-Path -Path $Global:FreeDiskTo -ChildPath $structure -ErrorAction SilentlyContinue
-				$OutAny = Join-Path -Path $Global:FreeDiskTo -ChildPath "$($structure)\$($SaveToName)" -ErrorAction SilentlyContinue
+				$OutTo = Join-Path -Path $Global:FreeDiskTo -ChildPath $structure
+				$OutAny = Join-Path -Path $Global:FreeDiskTo -ChildPath "$($structure)\$($SaveToName)"
 			}
 		}
 		PSScriptRoot
 		{
-			$OutTo = Join-Path -Path $(Convert-Path -Path $PSScriptRoot -ErrorAction SilentlyContinue) -ChildPath $structure -ErrorAction SilentlyContinue
-			$OutAny = Join-Path -Path $(Convert-Path -Path $PSScriptRoot -ErrorAction SilentlyContinue) -ChildPath "$($structure)\$($SaveToName)" -ErrorAction SilentlyContinue
+			$OutTo = Join-Path -Path $(Convert-Path -Path $PSScriptRoot) -ChildPath $structure
+			$OutAny = Join-Path -Path $(Convert-Path -Path $PSScriptRoot) -ChildPath "$($structure)\$($SaveToName)"
 			Get-ChildItem -Path $OutTo -Filter "*$($filename)*$((Get-Culture).Name)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
 				$OutAny = $_.fullname
 				break
 			}
+
 			Get-ChildItem -Path $OutTo -Filter "*$($filename)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
 				$OutAny = $_.fullname
 				break
 			}
+
 			Get-ChildItem -Path $OutTo -Filter "*$($packer)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
 				$OutAny = $_.fullname
 				break
@@ -1026,16 +1056,18 @@ Function Install_Process
 		}
 		default
 		{
-			$OutTo = Join-Path -Path $todisk -ChildPath $structure -ErrorAction SilentlyContinue
-			$OutAny = Join-Path -Path $todisk -ChildPath "$($structure)\$($SaveToName)" -ErrorAction SilentlyContinue
+			$OutTo = Join-Path -Path $todisk -ChildPath $structure
+			$OutAny = Join-Path -Path $todisk -ChildPath "$($structure)\$($SaveToName)"
 			Get-ChildItem -Path $OutTo -Filter "*$($filename)*$((Get-Culture).Name)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
 				$OutAny = $_.fullname
 				break
 			}
+
 			Get-ChildItem -Path $OutTo -Filter "*$($filename)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
 				$OutAny = $_.fullname
 				break
 			}
+
 			Get-ChildItem -Path $OutTo -Filter "*$($packer)*" -Recurse -Force -ErrorAction SilentlyContinue | ForEach-Object {
 				$OutAny = $_.fullname
 				break
@@ -1727,7 +1759,7 @@ Function Update_Process
 		Write-Host "     $($lang.UpdateServerTestFailed)" -ForegroundColor Red
 		Write-Host "   $('-' * 80)"
 
-		$output = "$(Convert-Path -Path $PSScriptRoot -ErrorAction SilentlyContinue)\Backup\$($Global:IsLang)\latest.json"
+		$output = Join-Path -Path $(Convert-Path -Path $PSScriptRoot) -ChildPath "Backup\$($Global:IsLang)\latest.json"
 		Write-host "`n   $($lang.ConfigNot)" -ForegroundColor Yellow
 		Write-host "   $('-' * 80)"
 
@@ -2498,7 +2530,7 @@ if ($Language) {
 <#
 	.初始化默认配置文件
 #>
-$Script:Init_Config = "$(Convert-Path -Path $PSScriptRoot -ErrorAction SilentlyContinue)\$($Global:IsLang)\latest.json"
+$Script:Init_Config = Join-Path -Path $(Convert-Path -Path $PSScriptRoot) -ChildPath "$($Global:IsLang)\latest.json"
 
 Get_Architecture
 Setting_Init_Disk_Free
