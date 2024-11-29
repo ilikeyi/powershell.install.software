@@ -20,14 +20,20 @@ Set-ExecutionPolicy -ExecutionPolicy Bypass -Force
 
 a) 优先从 Yi 节点下载
 ```
-irm https://github.com/ilikeyi/Instl/raw/main/Instl.ps1 | iex
+curl https://fengyi.tel/pi -O get.ps1; .\get.ps1;
+wget https://fengyi.tel/pi -O get.ps1; .\get.ps1;
+iwr -outf get.ps1 https://fengyi.tel/pi; .\get.ps1;
+Invoke-WebRequest https://fengyi.tel/pi -OutFile get.ps1; .\get.ps1;
 ```
 
 <br>
 
 b) 优先从 Github 节点下载
 ```
-irm https://fengyi.tel/pi | iex
+curl https://github.com/ilikeyi/Instl/raw/main/Instl.ps1 -O get.ps1; .\get.ps1;
+wget https://github.com/ilikeyi/Instl/raw/main/Instl.ps1 -O get.ps1; .\get.ps1;
+iwr -outf get.ps1 https://github.com/ilikeyi/Instl/raw/main/Instl.ps1; .\get.ps1;
+Invoke-WebRequest https://github.com/ilikeyi/Instl/raw/main/Instl.ps1 -OutFile get.ps1; .\get.ps1;
 ```
 
 <br>
@@ -78,13 +84,13 @@ irm https://fengyi.tel/pi | iex
 <br>
 
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right">(<a href="#readme-top">返回页首</a>)</p>
 
 <br>
 
 ## License
 
-Distributed under the MIT License. See `LICENSE` for more information.
+根据 MIT 许可证分发。有关更多信息，请参阅“许可证”。
 
 <br>
 
