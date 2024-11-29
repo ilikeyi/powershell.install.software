@@ -136,6 +136,7 @@ $AvailableLanguages = @(
 		Tag      = "en-US"
 		Name     = "English (United States)"
 		Language = @{
+			FontsUI                 = "Segoe UI"
 			Instl                   = "Software Installation"
 			Setting                 = "Set up"
 			Refresh                 = "Refresh"
@@ -204,6 +205,7 @@ $AvailableLanguages = @(
 		Tag      = "de-DE"
 		Name     = "German (Germany)"
 		Language = @{
+			FontsUI                 = "Segoe UI"
 			Instl                   = "Software Installation"
 			Setting                 = "aufstellen"
 			Refresh                 = "erneuern"
@@ -272,6 +274,7 @@ $AvailableLanguages = @(
 		Tag      = "ja-JP"
 		Name     = "Japanese (Japan)"
 		Language = @{
+			FontsUI                 = "Yu Gothic UI"
 			Instl                   = "ソフトウェアのインストール"
 			Setting                 = "設定"
 			Refresh                 = "リフレッシュする"
@@ -340,6 +343,7 @@ $AvailableLanguages = @(
 		Tag      = "ko-KR"
 		Name     = "Korean (Korea)"
 		Language = @{
+			FontsUI                 = "Malgun Gothic"
 			Instl                   = "소프트웨어 설치"
 			Setting                 = "설정"
 			Refresh                 = "새로 고침"
@@ -408,6 +412,7 @@ $AvailableLanguages = @(
 		Tag      = "zh-CN"
 		Name     = "Chinese (Simplified, China)"
 		Language = @{
+			FontsUI                 = "Microsoft YaHei UI"
 			Instl                   = "软件安装"
 			Setting                 = "设置"
 			Refresh                 = "刷新"
@@ -476,6 +481,7 @@ $AvailableLanguages = @(
 		Tag      = "zh-TW"
 		Name     = "Chinese (Traditional, Taiwan)"
 		Language = @{
+			FontsUI                 = "Microsoft JhengHei UI"
 			Instl                   = "軟件安裝"
 			Setting                 = "設置"
 			Refresh                 = "刷新"
@@ -544,12 +550,16 @@ $AvailableLanguages = @(
 
 Function Language
 {
+	param
+	(
+		$NewLang = (Get-Culture).Name
+	)
+
 	$Global:lang = @()
 	$Global:IsLang = ""
-	$PrimaryLnguage = (Get-Culture).Name
 
 	ForEach ($item in $AvailableLanguages) {
-		if ($item.Tag -eq $PrimaryLnguage) {
+		if ($item.Tag -eq $NewLang) {
 			$Global:lang = $item.Language
 			$Global:IsLang = $item.Tag
 			return
@@ -1533,6 +1543,7 @@ Function Update_Setting_UI
 		ControlBox     = $False
 		BackColor      = "#ffffff"
 		FormBorderStyle = "Fixed3D"
+		Font           = New-Object System.Drawing.Font($lang.FontsUI, 9, [System.Drawing.FontStyle]::Regular)
 	}
 	$GUIUpdateAuto     = New-Object System.Windows.Forms.CheckBox -Property @{
 		Height         = 22
@@ -1657,15 +1668,6 @@ Function Update_Setting_UI
 		}
 	})
 	$UI_Main_Menu.ContextMenuStrip = $UI_MainMenu
-
-	switch ($Global:IsLang) {
-		"zh-CN" {
-			$UI_Main.Font = New-Object System.Drawing.Font("Microsoft YaHei", 9, [System.Drawing.FontStyle]::Regular)
-		}
-		Default {
-			$UI_Main.Font = New-Object System.Drawing.Font("Segoe UI", 9, [System.Drawing.FontStyle]::Regular)
-		}
-	}
 
 	$UI_Main.ShowDialog() | Out-Null
 }
@@ -1837,6 +1839,7 @@ Function Install_UI
 		MinimizeBox    = $false
 		BackColor      = "#ffffff"
 		FormBorderStyle = "Fixed3D"
+		Font           = New-Object System.Drawing.Font($lang.FontsUI, 9, [System.Drawing.FontStyle]::Regular)
 	}
 	$UI_Main_Menu      = New-Object system.Windows.Forms.FlowLayoutPanel -Property @{
 		Height         = 625
@@ -2442,15 +2445,6 @@ Function Install_UI
 	})
 	$Select_App.ContextMenuStrip = $SelectMenu
 
-	switch ($Global:IsLang) {
-		"zh-CN" {
-			$UI_Main.Font = New-Object System.Drawing.Font("Microsoft YaHei", 9, [System.Drawing.FontStyle]::Regular)
-		}
-		Default {
-			$UI_Main.Font = New-Object System.Drawing.Font("Segoe UI", 9, [System.Drawing.FontStyle]::Regular)
-		}
-	}
-
 	$UI_Main.ShowDialog() | Out-Null
 }
 
@@ -2503,26 +2497,7 @@ Function Refresh_Match
 }
 
 if ($Language) {
-	$IsMatch = $True
-	ForEach ($item in $AvailableLanguages) {
-		if ($item.Tag -eq $Language) {
-			$Global:lang = $item.Language
-			$Global:IsLang = $item.Tag
-			$IsMatch = $False
-			break
-		}
-	}
-
-	if ($IsMatch) {
-		ForEach ($item in $AvailableLanguages) {
-			if ($item.Tag -eq "en-US") {
-				$Global:lang = $item.Language
-				$Global:IsLang = $item.Tag
-				$IsMatch = $False
-				break
-			}
-		}
-	}
+	Language -NewLang $Language
 } else {
 	Language
 }
