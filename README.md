@@ -20,9 +20,9 @@ Set-ExecutionPolicy -ExecutionPolicy Bypass -Force
 
 a) Prioritize downloading from Github node
 ```
-curl https://github.com/ilikeyi/Instl/raw/main/Instl.ps1 -O get.ps1; .\get.ps1;
+curl https://github.com/ilikeyi/Instl/raw/main/Instl.ps1 -o get.ps1; .\get.ps1;
 wget https://github.com/ilikeyi/Instl/raw/main/Instl.ps1 -O get.ps1; .\get.ps1;
-iwr -outf get.ps1 https://github.com/ilikeyi/Instl/raw/main/Instl.ps1; .\get.ps1;
+iwr https://github.com/ilikeyi/Instl/raw/main/Instl.ps1 -out get.ps1; .\get.ps1;
 Invoke-WebRequest https://github.com/ilikeyi/Instl/raw/main/Instl.ps1 -OutFile get.ps1; .\get.ps1;
 ```
 
@@ -30,9 +30,9 @@ Invoke-WebRequest https://github.com/ilikeyi/Instl/raw/main/Instl.ps1 -OutFile g
 
 b) Prioritize downloading from Yi node
 ```
-curl https://fengyi.tel/pi -O get.ps1; .\get.ps1;
+curl https://fengyi.tel/pi -o get.ps1; .\get.ps1;
 wget https://fengyi.tel/pi -O get.ps1; .\get.ps1;
-iwr -outf get.ps1 https://fengyi.tel/pi; .\get.ps1;
+iwr https://fengyi.tel/pi -out get.ps1; .\get.ps1;
 Invoke-WebRequest https://fengyi.tel/pi -OutFile get.ps1; .\get.ps1;
 ```
 
